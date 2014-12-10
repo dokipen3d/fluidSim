@@ -279,8 +279,7 @@
 #endif
 
 #ifndef GLM_COMPILER
-    #define GLM_COMPILER 0x40000060
-//#error "GLM_COMPILER undefined, your compiler may not be supported by GLM. Add #define GLM_COMPILER 0 to ignore this message."
+	#error "GLM_COMPILER undefined, your compiler may not be supported by GLM. Add #define GLM_COMPILER 0 to ignore this message."
 #endif//GLM_COMPILER
 
 // Report compiler detection

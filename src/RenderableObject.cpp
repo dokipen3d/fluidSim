@@ -66,7 +66,7 @@ void RenderableObject::setupObjects()
     glEnable(GL_CULL_FACE);
 
     //cout << "loading shaders" << endl;
-    if (!shader->loadProgram("/Users/dokipen/Documents/Projects/FluidSim/vertexShader.vert", "/Users/dokipen/Documents/Projects/FluidSim/fragmentShader.frag"))
+    if (!shader->loadProgram("/Users/dokipen/Documents/Projects/fluidSim/src/vertexShader.vert", "/Users/dokipen/Documents/Projects/fluidSim/src/fragmentShader.frag"))
     {
 
         printf( "Unable to load basic shader!\n" );
@@ -75,7 +75,7 @@ void RenderableObject::setupObjects()
 
     //glEnable (GL_TEXTURE_RECTANGLE_ARB);
     //cout << "loading shaders" << endl;
-    if (!volumeShader->loadProgram("/Users/dokipen/Documents/Projects/FluidSim/vertexShader.vert", "/Users/dokipen/Documents/Projects/FluidSim/fluidNew.fsh"))
+    if (!volumeShader->loadProgram("/Users/dokipen/Documents/Projects/fluidSim/src/vertexShader.vert", "/Users/dokipen/Documents/Projects/fluidSim/src/fluidNew.fsh"))
     {
 
         printf( "Unable to load volume shader!\n" );

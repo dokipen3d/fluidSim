@@ -11,7 +11,7 @@ public:
     ImplicitSphere(std::string newName) : ImplicitVolume(newName){setepDefaults();};
     void setepDefaults();
     virtual float sampleVolume(glm::vec3 pos);
-    float radius = 128;
+    float radius = 32;
 };
 
 #endif // IMPLITSPHERE_H

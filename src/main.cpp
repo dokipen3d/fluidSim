@@ -1,4 +1,3 @@
-#define GLM_COMPILER 0x40000060
 
 
 #include "GridObject.h"
@@ -51,7 +50,8 @@ const int SCREEN_WIDTH = 1280; const int SCREEN_HEIGHT = 720;
 int main(int argc, char *argv[])
 {
 
-
+    //cout << "number of args is" << argc << endl;
+    //cout << *argv[argc-1] << endl;
 
     //omp_set_num_threads(1);
     int input, input2;
