@@ -8,37 +8,19 @@
 
 using namespace std;
 
-
-
-class Chunk{
+class Chunk {
 
 public:
-    Chunk(uint32_t initial_size);
-	~Chunk();
-	vector<float> chunkData;
-    atomic<bool> empty;
-    bool okayToDelete;
-    bool justCreatedOneFrameAgo;
-    atomic<int> voxelCount;
-    double timeCreated;
-
-
-
-
-
-
+  Chunk(uint32_t initial_size);
+  ~Chunk();
+  vector<float> chunkData;
+  atomic<bool> empty;
+  bool okayToDelete;
+  bool justCreatedOneFrameAgo;
+  atomic<int> voxelCount;
+  double timeCreated;
 
 private:
-
-	
-
-
-
-
 };
-
-
-
-
 
 #endif

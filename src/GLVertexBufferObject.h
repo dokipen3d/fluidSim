@@ -8,27 +8,23 @@
 #include <iostream>
 #include <fstream>
 
-class GLVertexBufferObject
-{
+class GLVertexBufferObject {
 public:
-    GLVertexBufferObject();
-    virtual ~GLVertexBufferObject();
-    void bind();
-    void unbind();
-    GLuint getProgramID();
-    void setType(GLenum type);
-    void uploadData(GLsizeiptr  size,  const GLvoid *data);
-    const char* openGLErrorString( GLenum _errorCode );
-    void CheckGLError(std::string str);
-
+  GLVertexBufferObject();
+  virtual ~GLVertexBufferObject();
+  void bind();
+  void unbind();
+  GLuint getProgramID();
+  void setType(GLenum type);
+  void uploadData(GLsizeiptr size, const GLvoid *data);
+  const char *openGLErrorString(GLenum _errorCode);
+  void CheckGLError(std::string str);
 
 private:
-
-    GLenum bufferType;
-    GLenum bufferDrawType;
-    GLuint bufferID;
-    GLenum error;
-
+  GLenum bufferType;
+  GLenum bufferDrawType;
+  GLuint bufferID;
+  GLenum error;
 };
 
 #endif // GLVERTEXBUFFEROBJECT_H

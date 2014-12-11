@@ -4,8 +4,6 @@
 #include <atomic>
 #include <stdint.h>
 
-
-
 //----------------------------------------------
 // The World's Simplest Lock-Free HashTable
 //
@@ -20,40 +18,37 @@
 // value = 0 means the key is unused.
 // The hash table never grows in size.
 // You can't delete individual items from the hash table.
-// You can Clear the hash table, but only at a time when there are no other calls being made from other threads.
+// You can Clear the hash table, but only at a time when there are no other
+// calls being made from other threads.
 //----------------------------------------------
-class LockFreeHashTable
-{
+class LockFreeHashTable {
 public:
-    struct Entry
-    {
-        std::atomic<uint32_t> key;
-        std::atomic<uintptr_t> value;
+  struct Entry {
+    std::atomic<uint32_t> key;
+    std::atomic<uintptr_t> value;
 
-        //std::atomic<uint32_t> memhash;
-    };
-    
+    // std::atomic<uint32_t> memhash;
+  };
+
 private:
-    Entry* m_entries;
-    uint32_t m_arraySize;
-    uint32_t zero = 0;
-    uint32_t itemCount = 0;
-    void* dummy;
+  Entry *m_entries;
+  uint32_t m_arraySize;
+  uint32_t zero = 0;
+  uint32_t itemCount = 0;
+  void *dummy;
 
-    
 public:
-    LockFreeHashTable(uint32_t arraySize);
-    ~LockFreeHashTable();
+  LockFreeHashTable(uint32_t arraySize);
+  ~LockFreeHashTable();
 
-    // Basic operations
-    void setDummyItem(void* dummyLocation);
-    void SetItem(uint32_t key, uintptr_t value);
-    uintptr_t GetItem(uint32_t key);
-    uint32_t GetItemCount();
-    void ClearKey(uint32_t key);
-    bool KeyExists(uint32_t key);
-    void Clear();
+  // Basic operations
+  void setDummyItem(void *dummyLocation);
+  void SetItem(uint32_t key, uintptr_t value);
+  uintptr_t GetItem(uint32_t key);
+  uint32_t GetItemCount();
+  void ClearKey(uint32_t key);
+  bool KeyExists(uint32_t key);
+  void Clear();
 };
-
 
 #endif // __COMMON_HASHTABLE1_H__

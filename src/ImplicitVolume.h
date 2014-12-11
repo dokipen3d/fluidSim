@@ -3,13 +3,9 @@
 
 #include "VolumeSource.h"
 
-
-class ImplicitVolume : public VolumeSource
-{
+class ImplicitVolume : public VolumeSource {
 public:
-    ImplicitVolume(std::string newName) : VolumeSource(newName){};
-
-
+  ImplicitVolume(std::string newName) : VolumeSource(newName){};
 };
 
 #endif // IMPLICITVOLUME_H

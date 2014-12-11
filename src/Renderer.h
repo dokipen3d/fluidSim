@@ -7,26 +7,18 @@
 #include <memory>
 #include <vector>
 
-
-class Renderer
-{
-
+class Renderer {
 
 public:
-	Renderer();
-	virtual ~Renderer();
+  Renderer();
+  virtual ~Renderer();
 
-	void Render();
-	void addRenderObject(std::shared_ptr<RenderableObject> &inRenderObjectPtr);
-
+  void Render();
+  void addRenderObject(std::shared_ptr<RenderableObject> &inRenderObjectPtr);
 
 private:
-
-	std::unique_ptr<CameraObject> camera;
-	std::vector<std::shared_ptr<RenderableObject>> renderObjects;
-
-
-
+  std::unique_ptr<CameraObject> camera;
+  std::vector<std::shared_ptr<RenderableObject>> renderObjects;
 };
 
 #endif

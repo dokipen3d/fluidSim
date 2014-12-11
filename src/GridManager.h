@@ -1,28 +1,12 @@
 #ifndef GRIDMANAGER_H
 #define GRIDMANAGER_H
 
-
-
-class GridManager
-{
+class GridManager {
 public:
-
-	GridManager();
-	~GridManager();
-
-
-
+  GridManager();
+  ~GridManager();
 
 private:
-
-
-
-
 };
-
-
-
-
-
 
 #endif

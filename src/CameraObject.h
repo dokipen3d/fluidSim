@@ -9,37 +9,26 @@
 
 using namespace std;
 
-
-class CameraObject : public BaseObject
-{
+class CameraObject : public BaseObject {
 
 public:
+  CameraObject(std::string newName) : BaseObject(newName) {
+    camY = 10;
+    camX = 120;
+    camZ = 60;
+    setupDefaults();
 
-	CameraObject(std::string newName) : BaseObject(newName)
-	{
-        camY = 10;
-        camX = 120;
-        camZ = 60;
-        setupDefaults();
+    // std::cout << "in camera constructor" << std::endl;
+  };
+  void setupDefaults();
+  void moveCamUp();
+  virtual ~CameraObject();
+  glm::mat4 GetRenderMatrix();
+  glm::mat4 projectionMatrix;
 
-
-        //std::cout << "in camera constructor" << std::endl;
-	};
-    void setupDefaults();
-    void moveCamUp();
-	virtual ~CameraObject();
-	glm::mat4 GetRenderMatrix();
-	glm::mat4 projectionMatrix; 
-
-    float camY;
-    float camX;
-    float camZ;
-
-
-
-
-
+  float camY;
+  float camX;
+  float camZ;
 };
-
 
 #endif

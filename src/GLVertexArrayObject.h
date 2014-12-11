@@ -10,24 +10,22 @@
 
 class GLVertexBufferObject;
 
-class GLVertexArrayObject
-{
+class GLVertexArrayObject {
 public:
-    GLVertexArrayObject();
-    virtual ~GLVertexArrayObject();
-    void bind();
-    void unBind();
-    void setVertexAttributeDataPointer(GLVertexBufferObject &bufferToBind,
-                                       GLuint shaderAttributePosition,
-                                       GLint sizeOfData);
-    const char* openGLErrorString( GLenum _errorCode );
-    void CheckGLError(std::string str);
-
+  GLVertexArrayObject();
+  virtual ~GLVertexArrayObject();
+  void bind();
+  void unBind();
+  void setVertexAttributeDataPointer(GLVertexBufferObject &bufferToBind,
+                                     GLuint shaderAttributePosition,
+                                     GLint sizeOfData);
+  const char *openGLErrorString(GLenum _errorCode);
+  void CheckGLError(std::string str);
 
 private:
-    GLenum error;
+  GLenum error;
 
-    GLuint arrayID;
+  GLuint arrayID;
 };
 
 #endif // GLVERTEXARRAYOBJECT_H

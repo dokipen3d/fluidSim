@@ -1,293 +1,271 @@
 #include "GridOperator.h"
 #include "GridObject.h"
-#include "ChannelObject.h" 
+#include "ChannelObject.h"
 #include "glm/vec3.hpp"
 #include "glm/gtc/type_precision.hpp"
 
 #include <omp.h>
 
-inline static uint32_t flatten3dCoordinatesto1D(uint32_t x, uint32_t y, uint32_t z, uint32_t channel, uint32_t chunkSize)
-{
+inline static uint32_t flatten3dCoordinatesto1D(uint32_t x, uint32_t y,
+                                                uint32_t z, uint32_t channel,
+                                                uint32_t chunkSize) {
 
-    //return ((x+channel) + ((y+channel)*chunkSize) +  ((z+channel)*chunkSize*chunkSize));
-    return ((x+channel) + ((y+channel) << 3) +  ((z+channel) << 3 << 3));
-
-
-}
-
-
-
-//----------------------------------------------
-GridOperator::GridOperator(GridObject* inGridObject)
-{
-    gridObjectPtr = inGridObject;
-    currentSourceChannelObject = gridObjectPtr->channelObjs[0].get();//default first one
-    currentTargetChannelObject = gridObjectPtr->channelObjs[0].get();//default channel to write into is same (used to be dup but changed)
-
-    refreshSourceAndTargetChannelDetails();
-    createChunks = false;
-    this->boundingBox.fluidMin = glm::i32vec3(0.0);//set bounds to 0 so we dont emit anything
-    this->boundingBox.fluidMax = glm::i32vec3(0.0);
-    chnkSize = gridObjectPtr->chunkSize;
-    //cout << "chnkSize is " << chnkSize << endl;
-    //cout <<  channelName << endl;
-
-
+  // return ((x+channel) + ((y+channel)*chunkSize) +
+  // ((z+channel)*chunkSize*chunkSize));
+  return ((x + channel) + ((y + channel) << 3) + ((z + channel) << 3 << 3));
 }
 
 //----------------------------------------------
-GridOperator::~GridOperator()
-{
+GridOperator::GridOperator(GridObject *inGridObject) {
+  gridObjectPtr = inGridObject;
+  currentSourceChannelObject =
+      gridObjectPtr->channelObjs[0].get(); // default first one
+  currentTargetChannelObject =
+      gridObjectPtr->channelObjs[0].get(); // default channel to write into is
+                                           // same (used to be dup but changed)
+
+  refreshSourceAndTargetChannelDetails();
+  createChunks = false;
+  this->boundingBox.fluidMin =
+      glm::i32vec3(0.0); // set bounds to 0 so we dont emit anything
+  this->boundingBox.fluidMax = glm::i32vec3(0.0);
+  chnkSize = gridObjectPtr->chunkSize;
+  // cout << "chnkSize is " << chnkSize << endl;
+  // cout <<  channelName << endl;
 }
 
-void GridOperator::refreshSourceAndTargetChannelDetails()
-{
-    typeToOperateOn = currentTargetChannelObject->channelInfo.channelType;
-    channelName = currentTargetChannelObject->channelInfo.channelName;
-    //cout << "channel name" << channelName << endl;
+//----------------------------------------------
+GridOperator::~GridOperator() {}
+
+void GridOperator::refreshSourceAndTargetChannelDetails() {
+  typeToOperateOn = currentTargetChannelObject->channelInfo.channelType;
+  channelName = currentTargetChannelObject->channelInfo.channelName;
+  // cout << "channel name" << channelName << endl;
 }
 //----------------------------------------------
-void GridOperator::SetGridObject(GridObject* inGridObject)
-{
-    gridObjectPtr = inGridObject;
+void GridOperator::SetGridObject(GridObject *inGridObject) {
+  gridObjectPtr = inGridObject;
 }
 
 //----------------------------------------------
-void GridOperator::IterateGrid()
-{
-    double timeA = omp_get_wtime();
-    chunkOpCounter = 0;
-    this->PreGridOp();
+void GridOperator::IterateGrid() {
+  double timeA = omp_get_wtime();
+  chunkOpCounter = 0;
+  this->PreGridOp();
 
-    currentTime = gridObjectPtr->simTime;
+  currentTime = gridObjectPtr->simTime;
 
-    //too much.... but keep here in case
-    //uint32_t internalChannels = static_cast<uint32_t>(currentSourceChannelObject->channelInfo.channelType);//1 for scalar and 3 for vector. will have to deal with sdf another way
+  // too much.... but keep here in case
+  // uint32_t internalChannels =
+  // static_cast<uint32_t>(currentSourceChannelObject->channelInfo.channelType);//1
+  // for scalar and 3 for vector. will have to deal with sdf another way
 
-    int32_t internalChannels = 1; //for making scalar or cevtor
-    if( currentTargetChannelObject->channelInfo.channelType == ChannelType::vector)
-    {
-        internalChannels = 3;
-        //cout << "channels : " << internalChannels << endl;
-    }
+  int32_t internalChannels = 1; // for making scalar or cevtor
+  if (currentTargetChannelObject->channelInfo.channelType ==
+      ChannelType::vector) {
+    internalChannels = 3;
+    // cout << "channels : " << internalChannels << endl;
+  }
 
-    //cout << "iterating grid" << endl;
-    int fmz = gridObjectPtr->boundingBox.fluidMin.z;
-    int fmy =  gridObjectPtr->boundingBox.fluidMin.y;
-    int fmx =  gridObjectPtr->boundingBox.fluidMin.x;
+  // cout << "iterating grid" << endl;
+  int fmz = gridObjectPtr->boundingBox.fluidMin.z;
+  int fmy = gridObjectPtr->boundingBox.fluidMin.y;
+  int fmx = gridObjectPtr->boundingBox.fluidMin.x;
 
-    int fMax =  gridObjectPtr->boundingBox.fluidMax.x;
-    int fMay  = gridObjectPtr->boundingBox.fluidMax.y;
-    int fMaz = gridObjectPtr->boundingBox.fluidMax.z;
+  int fMax = gridObjectPtr->boundingBox.fluidMax.x;
+  int fMay = gridObjectPtr->boundingBox.fluidMax.y;
+  int fMaz = gridObjectPtr->boundingBox.fluidMax.z;
 
-    //cout << "<" << fmx << ", " << fmy << ", " << fmz << ">  to  <" << fMax << ", " << fMay << ", " << fMaz << "> ";
+  // cout << "<" << fmx << ", " << fmy << ", " << fmz << ">  to  <" << fMax <<
+  // ", " << fMay << ", " << fMaz << "> ";
 
+  struct chunkAddresses {
+    Chunk *chunkSource;
+    Chunk *chunkTarget;
+    glm::i32vec3 chunkIndex;
+  };
+  std::vector<chunkAddresses> chunks;
 
+// cout << "source channel is " << name << " " <<
+// currentSourceChannelObject->channelInfo.channelName << endl;
 
-    struct chunkAddresses
-    {
-        Chunk* chunkSource;
-        Chunk* chunkTarget;
-        glm::i32vec3 chunkIndex;
+#pragma omp parallel for collapse(3)
+  for (int i = fmx; i <= fMax; i++) {
+    for (int j = fmy; j <= fMay; j++) {
+      for (int k = fmz; k <= fMaz; k++) {
+        // int threadid  = omp_get_thread_num();
+        // cout << threadid << endl;
+        // cout <<" jhjhdjs" <<endl;
+        // myString << "iterating in operator " << name <<  " chunk "  <<
+        // i<<j<<k<<endl;
+        chunkAddresses newChunkAddresses;
+        newChunkAddresses.chunkSource =
+            currentSourceChannelObject->GetChunk(i, j, k);
+        newChunkAddresses.chunkTarget = currentTargetChannelObject->GetChunk(
+            i, j, k); // if we are writing into the same grid/channel, then set
+                      // these the same
+        newChunkAddresses.chunkIndex = glm::i32vec3(i, j, k);
 
-    };
-    std::vector<chunkAddresses> chunks;
-
-    //cout << "source channel is " << name << " " << currentSourceChannelObject->channelInfo.channelName << endl;
-
-    #pragma omp parallel for collapse(3)
-    for (int i = fmx; i <= fMax; i++)
-    {
-        for (int j= fmy; j <= fMay; j++)
+        // cout << "adding existing" << endl;
+        if (newChunkAddresses.chunkTarget !=
+            currentTargetChannelObject->dummyChunk) // if there is a chunk there
+                                                    // then go ahead and store
+                                                    // it
         {
-            for (int k = fmz; k <= fMaz; k++)
-            {
-                //int threadid  = omp_get_thread_num();
-                //cout << threadid << endl;
-                //cout <<" jhjhdjs" <<endl;
-                //myString << "iterating in operator " << name <<  " chunk "  << i<<j<<k<<endl;
-                chunkAddresses newChunkAddresses;
-                newChunkAddresses.chunkSource = currentSourceChannelObject->GetChunk(i,j,k);
-                newChunkAddresses.chunkTarget = currentTargetChannelObject->GetChunk(i,j,k);//if we are writing into the same grid/channel, then set these the same
-                newChunkAddresses.chunkIndex = glm::i32vec3(i,j,k);
-
-
-                //cout << "adding existing" << endl;
-                if (newChunkAddresses.chunkTarget != currentTargetChannelObject->dummyChunk)//if there is a chunk there then go ahead and store it
-                {
-                    #pragma omp critical
-                    {
-
-
-                        chunks.emplace_back(newChunkAddresses);
-                    }
-
-                }
-//                else{
-//                    //myString << "dummyChunk " <<  name << i<<j<<k<<endl;
-//                }
-            }
+#pragma omp critical
+          { chunks.emplace_back(newChunkAddresses); }
         }
+        //                else{
+        //                    //myString << "dummyChunk " <<  name <<
+        //                    i<<j<<k<<endl;
+        //                }
+      }
     }
+  }
 
-    if (forceInputBoundsIteration){
+  if (forceInputBoundsIteration) {
 
+#pragma omp parallel for collapse(3)
+    for (int i = this->boundingBox.fluidMin.z;
+         i <= this->boundingBox.fluidMax.z; i++) {
+      for (int j = this->boundingBox.fluidMin.y;
+           j <= this->boundingBox.fluidMax.y; j++) {
+        for (int k = this->boundingBox.fluidMin.x;
+             k <= this->boundingBox.fluidMax.x; k++) {
 
-        #pragma omp parallel for collapse(3)
-        for (int i = this->boundingBox.fluidMin.z ; i <= this->boundingBox.fluidMax.z; i++)
-        {
-            for (int j= this->boundingBox.fluidMin.y; j <= this->boundingBox.fluidMax.y; j++)
-            {
-                for (int k = this->boundingBox.fluidMin.x; k <= this->boundingBox.fluidMax.x; k++)
-                {
+          chunkAddresses newChunkAddresses;
+          newChunkAddresses.chunkSource = nullptr;
+          newChunkAddresses.chunkTarget = nullptr;
+          newChunkAddresses.chunkIndex = glm::i32vec3(i, j, k);
 
-                    chunkAddresses newChunkAddresses;
-                    newChunkAddresses.chunkSource = nullptr;
-                    newChunkAddresses.chunkTarget = nullptr;
-                    newChunkAddresses.chunkIndex = glm::i32vec3(i,j,k);
+// myString << "iterating in operator implcit bounds section" << name <<  "
+// chunk "  << i<<j<<k<<endl;
 
-                    //myString << "iterating in operator implcit bounds section" << name <<  " chunk "  << i<<j<<k<<endl;
+// myString << "bounds loop " <<  i<< "," << j << "," << k << "   ";
 
-                    //myString << "bounds loop " <<  i<< "," << j << "," << k << "   ";
-
-                        #pragma omp critical
-                        {
-                            //myString << "pushing back " << endl;
-                            chunks.emplace_back(newChunkAddresses);
-                        }
-
-
-                }
-            }
+#pragma omp critical
+          {
+            // myString << "pushing back " << endl;
+            chunks.emplace_back(newChunkAddresses);
+          }
         }
+      }
     }
-    //loop through this operator bounding box and push chunks to vector (even though they dont exists. we will check in algorithm if they are null
+  }
+  // loop through this operator bounding box and push chunks to vector (even
+  // though they dont exists. we will check in algorithm if they are null
 
-    totalChunksToOperateOn = chunks.size();
-    cout << "chunks to iterate through: " << totalChunksToOperateOn << " with " << totalChunksToOperateOn*chnkSize*chnkSize*chnkSize << " voxels"  <<endl;
-    //cout << myString.str() << endl;
-    //myString.str("");
-    //double timeA = omp_get_wtime();
-    //#pragma omp parallel for
-    //dx = currentSourceChannelObject->parentDx/currentSourceChannelObject->parentChunkSize;
-    #pragma omp parallel for collapse(1)
-    for (int i = 0; i < chunks.size(); i++)
-    {
-        if(callPreChunkOp){
+  totalChunksToOperateOn = chunks.size();
+  cout << "chunks to iterate through: " << totalChunksToOperateOn << " with "
+       << totalChunksToOperateOn *chnkSize *chnkSize *chnkSize << " voxels"
+       << endl;
+// cout << myString.str() << endl;
+// myString.str("");
+// double timeA = omp_get_wtime();
+//#pragma omp parallel for
+// dx =
+// currentSourceChannelObject->parentDx/currentSourceChannelObject->parentChunkSize;
+#pragma omp parallel for collapse(1)
+  for (int i = 0; i < chunks.size(); i++) {
+    if (callPreChunkOp) {
 
-            {
-            this->PreChunkOp(chunks[i].chunkSource, chunks[i].chunkTarget, chunks[i].chunkIndex);
-            }
-        }
-        //cout << "iterating through chunk vector " << i << endl;
-        //#pragma omp parallel for collapse(3)
-        for (int w = 0; w < chnkSize; w++)
-        {
-            for (int v = 0; v <  chnkSize; v++)
-            {
-                for (int u = 0; u < chnkSize; u++)
-                {
-
-                    for (int a = 0; a < internalChannels; a++)
-                    {
-
-
-                        //int threadid  = omp_get_thread_num();
-                        //cout << threadid << endl;
-                        //myString << "in cell " << u+a<<v+a<<w+a<<endl;
-                        uint32_t chunkDataIndex =  ((u) + (((v)*chnkSize)) +  (((w)*chnkSize*chnkSize)))+(a*chnkSize*chnkSize*chnkSize);
-                        //uint32_t chunkDataIndex = (       (u + chnkSize * (v + chnkSize * w))    *a) + (a*chnkSize*chnkSize*chnkSize);
-                        //cout << "index " << chunkDataIndex << endl;
-
-
-                        this->Algorithm(	chunks[i].chunkIndex,
-                                            glm::i32vec3(u, v, w),	//voxel position in local chunk space
-                                            chunks[i].chunkSource,
-                                            chunks[i].chunkTarget,
-                                            chunkDataIndex,
-                                            a
-                                            );
-                        //myString.clear()
-
-
-                    }
-                }
-            }
-        }
-        //cout << "sending through chunk " << chunks[i].chunkIndex.x << " " << chunks[i].chunkIndex.y << " " << chunks[i].chunkIndex.z << endl;
-        #pragma omp critical
-        if(callPostChunkOp){
-
-            {
-            this->PostChunkOp(chunks[i].chunkSource,  chunks[i].chunkTarget, chunks[i].chunkIndex);
-            }
-        }
+      {
+        this->PreChunkOp(chunks[i].chunkSource, chunks[i].chunkTarget,
+                         chunks[i].chunkIndex);
+      }
     }
+    // cout << "iterating through chunk vector " << i << endl;
+    //#pragma omp parallel for collapse(3)
+    for (int w = 0; w < chnkSize; w++) {
+      for (int v = 0; v < chnkSize; v++) {
+        for (int u = 0; u < chnkSize; u++) {
+
+          for (int a = 0; a < internalChannels; a++) {
+
+            // int threadid  = omp_get_thread_num();
+            // cout << threadid << endl;
+            // myString << "in cell " << u+a<<v+a<<w+a<<endl;
+            uint32_t chunkDataIndex =
+                ((u) + (((v)*chnkSize)) + (((w)*chnkSize * chnkSize))) +
+                (a * chnkSize * chnkSize * chnkSize);
+            // uint32_t chunkDataIndex = (       (u + chnkSize * (v + chnkSize *
+            // w))    *a) + (a*chnkSize*chnkSize*chnkSize);
+            // cout << "index " << chunkDataIndex << endl;
+
+            this->Algorithm(
+                chunks[i].chunkIndex,
+                glm::i32vec3(u, v, w), // voxel position in local chunk space
+                chunks[i].chunkSource, chunks[i].chunkTarget, chunkDataIndex,
+                a);
+            // myString.clear()
+          }
+        }
+      }
+    }
+// cout << "sending through chunk " << chunks[i].chunkIndex.x << " " <<
+// chunks[i].chunkIndex.y << " " << chunks[i].chunkIndex.z << endl;
+#pragma omp critical
+    if (callPostChunkOp) {
+
+      {
+        this->PostChunkOp(chunks[i].chunkSource, chunks[i].chunkTarget,
+                          chunks[i].chunkIndex);
+      }
+    }
+  }
 
 #pragma omp barrier
 
-    if (callGridOp){
-        this->GridOp();
-    }
+  if (callGridOp) {
+    this->GridOp();
+  }
 
-    double timeB = omp_get_wtime();
-    cout << "grid operator " << name << " took " << timeB-timeA << " seconds" << endl;
-    //cout << myString.str() << endl;
-//    cout << currentSourceChannelObject->numChunks << " chunks created " << endl;
-//    currentSourceChannelObject->printChunks();
-    //myString.str("");
-
-
-
+  double timeB = omp_get_wtime();
+  cout << "grid operator " << name << " took " << timeB - timeA << " seconds"
+       << endl;
+  // cout << myString.str() << endl;
+  //    cout << currentSourceChannelObject->numChunks << " chunks created " <<
+  //    endl;
+  //    currentSourceChannelObject->printChunks();
+  // myString.str("");
 }
 
-void GridOperator::PostChunkOp(Chunk*& inChunk, Chunk*& outChunk, glm::i32vec3 chunkIdSecondary)
-{
-    //chunkOpCounter++;
+void GridOperator::PostChunkOp(Chunk *&inChunk, Chunk *&outChunk,
+                               glm::i32vec3 chunkIdSecondary) {
+  // chunkOpCounter++;
 }
 
-void GridOperator::PreChunkOp(Chunk*& inChunk, Chunk*& outChunk, glm::i32vec3 chunkIdSecondary)
-{
+void GridOperator::PreChunkOp(Chunk *&inChunk, Chunk *&outChunk,
+                              glm::i32vec3 chunkIdSecondary) {}
 
+void GridOperator::PreGridOp() {
+  currentSourceChannelObject =
+      gridObjectPtr->channelObjs[0].get(); // default first one
+  currentTargetChannelObject =
+      gridObjectPtr->channelObjs[0].get(); // default dup channel to write into
+  //    cout << currentSourceChannelObject << endl;
+  //    cout << currentTargetChannelObject << endl;
 }
 
-void GridOperator::PreGridOp()
-{
-    currentSourceChannelObject = gridObjectPtr->channelObjs[0].get();//default first one
-    currentTargetChannelObject = gridObjectPtr->channelObjs[0].get();//default dup channel to write into
-//    cout << currentSourceChannelObject << endl;
-//    cout << currentTargetChannelObject << endl;
+void GridOperator::GridOp() {}
 
-}
-
-void GridOperator::GridOp()
-{
-
-}
-
-//void GridOperator::BucketOp(glm::i32vec3 chunkId)
+// void GridOperator::BucketOp(glm::i32vec3 chunkId)
 //{
 //    //cout << "in base bucket op " <<endl;
 //}
 
 //----------------------------------------------
-void GridOperator::SetChannelName(std::string nameToSet)
-{
-    channelName = nameToSet;
-    uint32_t index = gridObjectPtr->GetMemoryIndexForChannelName(channelName);
-    currentSourceChannelObject = gridObjectPtr->channelObjs[index].get();//default first one
-    currentTargetChannelObject = gridObjectPtr->channelObjs[index].get();//default dup channel to write into
-    //cout << "set channel to " << nameToSet << " " << index << endl;
-    //cout << "new source channel is " << currentSourceChannelObject->channelInfo.channelName << endl;
-    refreshSourceAndTargetChannelDetails();
-
-
+void GridOperator::SetChannelName(std::string nameToSet) {
+  channelName = nameToSet;
+  uint32_t index = gridObjectPtr->GetMemoryIndexForChannelName(channelName);
+  currentSourceChannelObject =
+      gridObjectPtr->channelObjs[index].get(); // default first one
+  currentTargetChannelObject = gridObjectPtr->channelObjs[index]
+                                   .get(); // default dup channel to write into
+  // cout << "set channel to " << nameToSet << " " << index << endl;
+  // cout << "new source channel is " <<
+  // currentSourceChannelObject->channelInfo.channelName << endl;
+  refreshSourceAndTargetChannelDetails();
 }
 
-void GridOperator::setNodeName(std::string nameIn)
-{
-    name = nameIn;
-}
-
-
-
+void GridOperator::setNodeName(std::string nameIn) { name = nameIn; }
