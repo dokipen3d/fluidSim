@@ -275,11 +275,12 @@
 #	endif
 
 #else
-#	define GLM_COMPILER GLM_COMPILER_UNKNOWN
+        #define GLM_COMPILER GLM_COMPILER_UNKNOWN
 #endif
 
 #ifndef GLM_COMPILER
-	#error "GLM_COMPILER undefined, your compiler may not be supported by GLM. Add #define GLM_COMPILER 0 to ignore this message."
+        //#error "GLM_COMPILER undefined, your compiler may not be supported by GLM. Add #define GLM_COMPILER 0 to ignore this message."
+#define GLM_COMPILER GLM_COMPILER_APPLE_CLANG60
 #endif//GLM_COMPILER
 
 // Report compiler detection

@@ -57,7 +57,7 @@ int main(int argc, char *argv[]) {
   cout << "number of args is" << argc << endl;
   cout << *argv[argc - 1] << endl;
 
-  // omp_set_num_threads(1);
+ //omp_set_num_threads(8);
   int input, input2;
   SDL_Event keyevent;
   bool eventLoop = true;

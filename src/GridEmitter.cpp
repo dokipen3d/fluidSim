@@ -18,7 +18,7 @@ void GridEmitter::setupDefaults() {
   createChunks = true;
   std::string name = "sphereEmitter";
   forceInputBoundsIteration = true;
-  // auto emitterSphere = make_shared<ImplicitTorus>(name);
+  //auto emitterSphere = make_shared<ImplicitTorus>(name);
   auto emitterSphere = make_shared<ImplicitSphere>(name);
   // callPreChunkOp = true;
   sourceVolume = emitterSphere;

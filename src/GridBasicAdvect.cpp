@@ -4,6 +4,9 @@
 #include "glm/vec3.hpp"
 #include "glm/trigonometric.hpp"
 #include "GridObject.h"
+#include <stdio.h>
+#include <cassert>
+#include <omp.h>
 
 //#include <omp.h>
 
@@ -32,6 +35,8 @@ void GridBasicAdvect::setupDefaults() {
 
 void GridBasicAdvect::PreChunkOp(Chunk *&inChunk, Chunk *&outChunk,
                                  glm::i32vec3 chunkIdSecondary) {
+
+    //printf("Hello from thread %d, nthreads %d\n", omp_get_thread_num(), omp_get_num_threads());
 
   // cout << chunkIdSecondary.x<<" "<<chunkIdSecondary.y<< " " <<
   // chunkIdSecondary.z << " " <<
