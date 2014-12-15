@@ -20,6 +20,15 @@ void Renderer::Render() {
   }
 }
 
+void Renderer::RenderSame()
+{
+    for (auto x : renderObjects) {
+      camera->moveCamUp();
+      x->Render(camera->GetRenderMatrix());
+      // x->Render(glm::mat4(1));
+    }
+}
+
 void Renderer::addRenderObject(
     std::shared_ptr<RenderableObject> &inRenderObjectPtr) {
   auto newRenderObject = inRenderObjectPtr;

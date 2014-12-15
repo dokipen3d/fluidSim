@@ -27,12 +27,13 @@ public:
     // << std::endl;
     gridObjectPtr = inGridObject;
     setupObjects();
-    res = 256;
+    res = 128;
     threeD = new float[res * res * res];
     // fillTexture();
   };
   virtual ~RenderableObject();
   void Render(glm::mat4 ProjectionViewMatrix);
+
   void updateQuad(float minX, float minY, float minZ, float maxX, float maxY,
                   float maxZ);
   const char *openGLErrorString(GLenum _errorCode);

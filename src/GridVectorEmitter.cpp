@@ -52,25 +52,25 @@ void GridVectorEmitter::Algorithm(glm::i32vec3 chunkId,
   //                                        (glm::simplex(glm::vec2(channel+time,
   //                                        (Z)*frequency))*strength))));
 
-  //            glm::vec3 value =
-  //            glm::vec3((glm::simplex(glm::vec3(X*frequency+time,
-  //            Y*frequency+time, Z*frequency+time))*strength,
-  //                                        (glm::simplex(glm::vec3(X*frequency+time,
-  //                                        Y*frequency+time,
-  //                                        Z*frequency+time))*strength,
-  //                                        (glm::simplex(glm::vec3(X*frequency+time,
-  //                                        Y*frequency+time,
-  //                                        Z*frequency+time))*strength))));
+//              glm::vec3 value =
+//              glm::vec3((glm::simplex(glm::vec3(X*frequency+time,
+//              Y*frequency+time, Z*frequency+time))*strength,
+//                                          (glm::simplex(glm::vec3(X*frequency+time,
+//                                          Y*frequency+time,
+//                                          Z*frequency+time))*strength,
+//                                          (glm::simplex(glm::vec3(X*frequency+time,
+//                                          Y*frequency+time,
+//                                          Z*frequency+time))*strength))));
 
-  //    glm::vec3 value = glm::vec3((glm::simplex(glm::vec2(channel+time,
-  //    (X)*frequency))+(glm::simplex(glm::vec2(channel+time,
-  //    Y*frequency*2))*0.5)*strength,
-  //                                (glm::simplex(glm::vec2(channel+time,
-  //                                (Y)*frequency))+(glm::simplex(glm::vec2(channel+time,
-  //                                Z*frequency*2))*0.5)*strength,
-  //                                (glm::simplex(glm::vec2(channel+time,
-  //                                (Z)*frequency))+(glm::simplex(glm::vec2(channel+time,
-  //                                X*frequency*2))*0.5)*strength))));
+//      glm::vec3 value = glm::vec3((glm::simplex(glm::vec2(channel+time,
+//      (X)*frequency))+(glm::simplex(glm::vec2(channel+time,
+//      Y*frequency*2))*0.5)*strength,
+//                                  (glm::simplex(glm::vec2(channel+time,
+//                                  (Y)*frequency))+(glm::simplex(glm::vec2(channel+time,
+//                                  Z*frequency*2))*0.5)*strength,
+//                                  (glm::simplex(glm::vec2(channel+time,
+//                                  (Z)*frequency))+(glm::simplex(glm::vec2(channel+time,
+//                                  X*frequency*2))*0.5)*strength))));
   glm::vec3 value = glm::vec3(0.0f, 0.5f, 0.0f);
   outChunk->chunkData[dataIndex] = value[channel];
   // inChunk->chunkData[dataIndex] = 1;

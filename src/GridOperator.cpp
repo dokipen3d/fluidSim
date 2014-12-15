@@ -155,16 +155,19 @@ void GridOperator::IterateGrid() {
   // loop through this operator bounding box and push chunks to vector (even
   // though they dont exists. we will check in algorithm if they are null
 
-  totalChunksToOperateOn = chunks.size();
-  cout << "chunks to iterate through: " << totalChunksToOperateOn << " with "
-       << totalChunksToOperateOn *chnkSize *chnkSize *chnkSize << " voxels"
-       << endl;
+// totalChunksToOperateOn = chunks.size();
+//  cout << "chunks to iterate through: " << totalChunksToOperateOn << " with "
+//       << totalChunksToOperateOn *chnkSize *chnkSize *chnkSize << " voxels"
+//       << endl;
+
+
 // cout << myString.str() << endl;
 // myString.str("");
 // double timeA = omp_get_wtime();
 //#pragma omp parallel for
 // dx =
 // currentSourceChannelObject->parentDx/currentSourceChannelObject->parentChunkSize;
+#pragma omp barrier
 #pragma omp parallel for collapse(1)
   for (int i = 0; i < chunks.size(); i++) {
     if (callPreChunkOp) {
@@ -221,8 +224,10 @@ void GridOperator::IterateGrid() {
   }
 
   double timeB = omp_get_wtime();
-  cout << "grid operator " << name << " took " << timeB - timeA << " seconds"
-       << endl;
+//  cout << "grid operator " << name << " took " << timeB - timeA << " seconds"
+//       << endl;
+
+
   // cout << myString.str() << endl;
   //    cout << currentSourceChannelObject->numChunks << " chunks created " <<
   //    endl;

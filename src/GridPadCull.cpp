@@ -139,7 +139,7 @@ void GridPadCull::PostChunkOp(Chunk *&inChunk, Chunk *&outChunk,
 
   // double timeNow = omp_get_wtime();
 
-  if ((gridObjectPtr->simTime - outChunk->timeCreated) > 0.5) {
+  if ((gridObjectPtr->simTime - outChunk->timeCreated) > 0.1) {
     outChunk->okayToDelete = true;
   }
 

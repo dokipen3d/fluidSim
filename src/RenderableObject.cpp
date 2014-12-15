@@ -397,6 +397,7 @@ void RenderableObject::Render(glm::mat4 ProjectionViewMatrix) {
   glBindVertexArray(0);
 }
 
+
 GLfloat RenderableObject::colours[108] =
 
     {

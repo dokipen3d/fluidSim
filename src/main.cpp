@@ -57,10 +57,16 @@ int main(int argc, char *argv[]) {
   cout << "number of args is" << argc << endl;
   cout << *argv[argc - 1] << endl;
 
- //omp_set_num_threads(8);
+  omp_set_num_threads(8);
   int input, input2;
   SDL_Event keyevent;
   bool eventLoop = true;
+  double elapsedTime = 0.0;
+  double averageTime = 0.0;
+  int framesElapsed = 1;
+
+  //for only rendering frames every once in a while.
+  int frameCount = 0;
 
   unique_ptr<GridObject> grid_obj(new GridObject());
   unique_ptr<GridEmitter> gridEmit(new GridEmitter(grid_obj.get()));
@@ -163,14 +169,27 @@ int main(int argc, char *argv[]) {
     // bouyancy->IterateGrid();
 
     basicAdvect->IterateGrid();
-    renderer->Render();
 
+    //only render every x frames
+    if (frameCount == 500000){
+        renderer->Render();
+        frameCount = 0;
+    }
+    else{
+        renderer->RenderSame();
+    }
+    frameCount++;
     grid_obj->incrementSimTime(0.08);
 
     /* Swap our back buffer to the front */
     SDL_GL_SwapWindow(window);
     double timeB = omp_get_wtime();
-    cout << "total time was " << timeB - timeA << " seconds" << endl << endl;
+    double frameTime = timeB - timeA;
+    elapsedTime += frameTime;
+    averageTime = elapsedTime/framesElapsed;
+    framesElapsed++;
+
+    cout << "total time was " << frameTime << " seconds." << "average time is " << averageTime << " seconds." << endl << endl;
   }
 
   /* Clear our buffer with a red background */

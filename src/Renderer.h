@@ -14,6 +14,8 @@ public:
   virtual ~Renderer();
 
   void Render();
+  void RenderSame();
+
   void addRenderObject(std::shared_ptr<RenderableObject> &inRenderObjectPtr);
 
 private:
