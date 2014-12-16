@@ -128,7 +128,7 @@ void GLTextureObject::resizeWith3dData(int w, int h, int d, void *data,
   glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
   glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER,
                   GL_NEAREST); // GL_NEAREST
-  glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST); // GL_LINEAR
+  glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST); // GL_LINEAR ccccc
   glTexImage3D(textureType, 0, internalFormat, w, h, d, 0, incomingFormat,
                GL_FLOAT, data);
   CheckGLError("resize");

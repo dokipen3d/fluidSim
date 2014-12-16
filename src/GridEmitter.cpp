@@ -176,8 +176,8 @@ void GridEmitter::Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelPosition,
 
       // map_range(sample, -32.0f, 0.0f, value*0.08, 0.0f)
       // float value = glm::max(glm::cos(currentTime*3), 0.0);
-      if (currentTime < 0.08) {
-        outChunk->chunkData[dataIndex] += 1.0f;
+      if (currentTime < 50.00) {
+        outChunk->chunkData[dataIndex] += 0.01f;
       } else {
         outChunk->chunkData[dataIndex] += 0.0f;
       }

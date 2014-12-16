@@ -51,7 +51,7 @@ int main(int argc, char *argv[]) {
   cout << "number of args is" << argc << endl;
   cout << *argv[argc - 1] << endl;
 
-  //omp_set_num_threads(4);
+  omp_set_num_threads(1);
   int input, input2;
   SDL_Event keyevent;
   bool eventLoop = true;
@@ -175,13 +175,13 @@ int main(int argc, char *argv[]) {
     basicAdvect->IterateGrid();
 
     //only render every x frames
-    //if (frameCount == 0){
+    if (frameCount == 4){
         renderer->Render();
-      //  frameCount = 0;
-    //}
-    //else{
-    //    renderer->RenderSame();
-    //}
+        frameCount = 0;
+    }
+    else{
+        renderer->RenderSame();
+    }
     frameCount++;
     grid_obj->incrementSimTime(0.08);
 
