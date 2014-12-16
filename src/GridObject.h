@@ -35,6 +35,7 @@ public:
 
   double simTime; // will put into timeManager
   void incrementSimTime(double timeElapsed);
+  float dx;
 
 private:
   void SetDefaultChannels();

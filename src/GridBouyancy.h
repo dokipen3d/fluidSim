@@ -19,6 +19,8 @@ public:
                          uint32_t channel);
   virtual void PreGridOp();
   virtual void GridOp();
+
+  Chunk* source;
 };
 
 //#endif // GRIDDISSIPATOR_H

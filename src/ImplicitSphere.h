@@ -11,6 +11,8 @@ public:
   void setepDefaults();
   virtual float sampleVolume(glm::vec3 pos);
   float radius = 32;
+
+
 };
 
 #endif // IMPLITSPHERE_H

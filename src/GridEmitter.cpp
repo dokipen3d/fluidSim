@@ -123,15 +123,13 @@ void GridEmitter::Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelPosition,
   float Y = ((chunkId.y * (int)chnkSize) + voxelPosition.y);
 
   float Z = ((chunkId.z * (int)chnkSize) + voxelPosition.z);
-  if (X < -32) {
-    // cout << "about to sample" << X << " " << Y << " " << Z  << endl;
-  }
+
 
   // float sampleA = sourceVolume->sampleVolume(glm::vec3(X, Y, Z));
   float sample =
       sourceVolume->sampleVolume(glm::vec3(X + 0.5f, Y + 0.5f, Z + 0.5f));
 
-  if (sample < 4.0f) {
+  if (sample < bandwidth) {
     if (!currentTargetChannelObject->ChunkExists(chunkId.x, chunkId.y,
                                                  chunkId.z)) {
       // do checks to emit

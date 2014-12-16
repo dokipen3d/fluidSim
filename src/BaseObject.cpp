@@ -1,4 +1,3 @@
-#include <SDL2/SDL_opengl.h>
 
 #include "BaseObject.h"
 #include <iostream>

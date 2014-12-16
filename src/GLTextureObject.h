@@ -1,6 +1,6 @@
 #ifndef GLTEXTUREOBJECT_H
 #define GLTEXTUREOBJECT_H
-#include <GL/glew.h>
+#include "GL/glew.h"
 #include <OpenGL/gl.h>
 #include <string>
 

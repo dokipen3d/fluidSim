@@ -25,6 +25,7 @@ public:
                          Chunk *inChunk, Chunk *outChunk, uint32_t dataIndex,
                          uint32_t channel);
   float addPositiveDifference(float inputReference, float amountToAdd);
+  float bandwidth = 4.0f;
   // virtual void PreChunkOp(Chunk* inChunk, glm::i32vec3 chunkIdSecondary)
   // override;
 

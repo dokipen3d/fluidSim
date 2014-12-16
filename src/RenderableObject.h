@@ -2,8 +2,7 @@
 #define RENDERABLEOBJECT_H
 
 #include "BaseObject.h"
-#include <GL/glew.h>
-#include <SDL2/SDL_opengl.h>
+#include "GL/glew.h"
 #include <memory>
 
 #include <iostream>
@@ -27,7 +26,7 @@ public:
     // << std::endl;
     gridObjectPtr = inGridObject;
     setupObjects();
-    res = 128;
+    res = 256;
     threeD = new float[res * res * res];
     // fillTexture();
   };

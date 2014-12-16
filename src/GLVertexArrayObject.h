@@ -5,7 +5,7 @@
 #include <string>
 #include <iostream>
 #include <fstream>
-#include <GL/glew.h>
+#include "GL/glew.h"
 #include <OpenGL/gl.h>
 
 class GLVertexBufferObject;

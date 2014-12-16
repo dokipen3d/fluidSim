@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 3.3.0, 2014-12-15T03:44:59. -->
+<!-- Written by QtCreator 3.3.0, 2014-12-16T20:41:41. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -108,8 +108,7 @@
     <value type="bool" key="ProjectExplorer.BuildConfiguration.ClearSystemEnvironment">false</value>
     <valuelist type="QVariantList" key="ProjectExplorer.BuildConfiguration.UserEnvironmentChanges">
      <value type="QString">DYLD_LIBRARY_PATH=/Users/dokipen/code/openmp/runtime/exports/mac_32e/lib:$DYLD_LIBRARY_PATH</value>
-     <value type="QString">LIBRARY_PATH=/Users/dokipen/code/openmp/runtime/exports/mac_32e/lib:$LIBRARY_PATH
-</value>
+     <value type="QString">LIBRARY_PATH=/Users/dokipen/code/llvm/build/Release/lib:/Users/dokipen/code/openmp/runtime/exports/mac_32e/lib:$LIBRARY_PATH</value>
     </valuelist>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">all</value>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName"></value>

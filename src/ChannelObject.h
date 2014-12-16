@@ -38,7 +38,7 @@ public:
   int channelAmount;
 
   float SampleTrilinear(float x, float y, float z, uint32_t channel);
-  float SampleExplicit(float x, float y, float z);
+  float SampleExplicit(float x, float y, float z, uint32_t channel);
   float SampleExplicitAlt(float x, float y, float z);
 
 protected:

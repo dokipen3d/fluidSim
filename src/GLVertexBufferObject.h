@@ -1,7 +1,7 @@
 #ifndef GLVERTEXBUFFEROBJECT_H
 #define GLVERTEXBUFFEROBJECT_H
 
-#include <GL/glew.h>
+#include "GL/glew.h"
 #include <OpenGL/gl.h>
 #include <cstdio>
 #include <string>

@@ -79,7 +79,8 @@ void GridObject::AddChannel(ChannelInfo inInfo) {
 //----------------------------------------------
 void GridObject::SetCommonOptions() {
   chunkSize = 8;
-  bucketSize = 1;
+  bucketSize = 1.0f;
+  dx = bucketSize/(float)chunkSize;
   numChannels = 0;
   boundingBox.min = glm::vec3(0.0);
   boundingBox.max = glm::vec3(0.0);
@@ -118,7 +119,7 @@ void GridObject::SetDefaultChannels() {
   // scalarChannelInit =
   // {string("density"),string("temperature"),string("fuel"),string("pressure")
   // };
-  scalarChannelInit = {string("density"), string("pressure")};
+  scalarChannelInit = {string("density"), string("pressure"), string("divergence")};
 
   vectorChannelInit = {string("velocity")};
 
@@ -126,7 +127,7 @@ void GridObject::SetDefaultChannels() {
   for (int i = 0; i < scalarChannelInit.size(); i++) {
     channelDetails[scalarChannelInit.at(i)] =
         ChannelInfo(channelIndex, scalarChannelInit.at(i), ChannelType::scalar);
-
+    //inc index twice because we'll be swapping/pingponging channel
     channelIndex++;
     channelIndex++;
 

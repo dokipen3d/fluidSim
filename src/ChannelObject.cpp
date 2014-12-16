@@ -302,11 +302,11 @@ glm::vec3 ChannelObject::SampleVectorAtPositionExplicit(float x, float y,
   glm::vec3 vectorValue;
 
   currentChannelToSample = 0;
-  vectorValue.x = SampleExplicit(x + 0.5f, y, z);
+  vectorValue.x = SampleExplicit(x + 0.5f, y, z, currentChannelToSample);
   currentChannelToSample++;
-  vectorValue.y = SampleExplicit(z, y + 0.5f, z);
+  vectorValue.y = SampleExplicit(z, y + 0.5f, z, currentChannelToSample);
   currentChannelToSample++;
-  vectorValue.z = SampleExplicit(x, y, z + 0.5f);
+  vectorValue.z = SampleExplicit(x, y, z + 0.5f, currentChannelToSample);
   currentChannelToSample = 0;
 
   return vectorValue;
@@ -748,9 +748,10 @@ float ChannelObject::SampleTrilinear(float x, float y, float z,
   return tmp;
 }
 
-float ChannelObject::SampleExplicit(float x, float y, float z) {
+float ChannelObject::SampleExplicit(float x, float y, float z,
+                                    uint32_t channel) {
 
-  int32_t parentChunkSizeMinus1 = parentChunkSize - 1; // 7
+  //int32_t parentChunkSizeMinus1 = parentChunkSize - 1; // 7
 
   float getRidOfDivCalc = 1.0 / parentChunkSize;
 
@@ -786,7 +787,7 @@ float ChannelObject::SampleExplicit(float x, float y, float z) {
   Chunk *sampleChunk = GetChunk(chunkIndexDivX, chunkIndexDivY, chunkIndexDivZ);
   float tmp = sampleChunk->chunkData[flatten3dCoordinatesto1D(
       (localGridIndexX) % parentChunkSize, (localGridIndexY) % parentChunkSize,
-      (localGridIndexZ) % parentChunkSize, currentChannelToSample,
+      (localGridIndexZ) % parentChunkSize, channel,
       parentChunkSize)];
 
   //    if ( (x > 15) && (y > 15) && (z > 15)){

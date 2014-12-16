@@ -1,18 +1,12 @@
 
 
-#include "GridObject.h"
-#include "GridEmitter.h"
-#include "GridDissipator.h"
-#include "GridPadCull.h"
-#include "GridVectorEmitter.h"
-#include "GridBasicAdvect.h"
-#include "GridBouyancy.h"
+#include "GridOpsCollection.h"
 
-#include <GL/glew.h>
-#include <SDL2/SDL.h>
+
+#include "GL/glew.h"
 //#include <OpenGL/gl.h>
-
-#include <SDL2/SDL_opengl.h>
+#include "/usr/local/include/SDL2/SDL.h"
+#include "/usr/local/include/SDL2/SDL_opengl.h"
 
 #include <memory>
 #include <time.h>
@@ -57,7 +51,7 @@ int main(int argc, char *argv[]) {
   cout << "number of args is" << argc << endl;
   cout << *argv[argc - 1] << endl;
 
-  omp_set_num_threads(8);
+  //omp_set_num_threads(4);
   int input, input2;
   SDL_Event keyevent;
   bool eventLoop = true;
@@ -68,21 +62,29 @@ int main(int argc, char *argv[]) {
   //for only rendering frames every once in a while.
   int frameCount = 0;
 
-  unique_ptr<GridObject> grid_obj(new GridObject());
-  unique_ptr<GridEmitter> gridEmit(new GridEmitter(grid_obj.get()));
+  auto grid_obj = make_unique<GridObject>();
+
+  auto gridEmit = make_unique<GridEmitter>(grid_obj.get());
   gridEmit->setNodeName(std::string("emitter"));
-  unique_ptr<GridDissipator> gridDiss(new GridDissipator(grid_obj.get()));
+
+  auto gridDiss = make_unique<GridDissipator>(grid_obj.get());
   gridDiss->setNodeName(std::string("diss"));
-  unique_ptr<GridPadCull> gridPad(new GridPadCull(grid_obj.get()));
+
+  auto gridPad = make_unique<GridPadCull>(grid_obj.get());
   gridPad->setNodeName(std::string("padcull"));
+
   auto vecEmit = make_unique<GridVectorEmitter>(grid_obj.get());
   vecEmit->setNodeName(std::string("vectorEmit"));
   vecEmit->SetChannelName(std::string("velocity"));
+
   auto basicAdvect = make_unique<GridBasicAdvect>(grid_obj.get());
   basicAdvect->setNodeName(std::string("basicAdvect"));
 
   auto bouyancy = make_unique<GridBouyancy>(grid_obj.get());
   bouyancy->setNodeName(std::string("bouyancy"));
+
+  auto divergence = make_unique<GridDivergence>(grid_obj.get());
+  divergence->setNodeName(std::string("divergence oper"));
 
   // gridEmit->IterateGrid();
 
@@ -163,21 +165,23 @@ int main(int argc, char *argv[]) {
     gridEmit->IterateGrid();
     gridPad->IterateGrid();
 
-    vecEmit->IterateGrid();
+    //vecEmit->IterateGrid();
 
     // gridDiss->IterateGrid();
-    // bouyancy->IterateGrid();
+    bouyancy->IterateGrid();
+    divergence->IterateGrid();
+
 
     basicAdvect->IterateGrid();
 
     //only render every x frames
-    if (frameCount == 500000){
+    //if (frameCount == 0){
         renderer->Render();
-        frameCount = 0;
-    }
-    else{
-        renderer->RenderSame();
-    }
+      //  frameCount = 0;
+    //}
+    //else{
+    //    renderer->RenderSame();
+    //}
     frameCount++;
     grid_obj->incrementSimTime(0.08);
 

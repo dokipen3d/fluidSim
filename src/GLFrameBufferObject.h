@@ -1,7 +1,7 @@
 #ifndef GLFRAMEBUFFEROBJECT_H
 #define GLFRAMEBUFFEROBJECT_H
 
-#include <GL/glew.h>
+#include "GL/glew.h"
 #include <OpenGL/gl.h>
 #include <string>
 

@@ -155,10 +155,10 @@ void GridOperator::IterateGrid() {
   // loop through this operator bounding box and push chunks to vector (even
   // though they dont exists. we will check in algorithm if they are null
 
-// totalChunksToOperateOn = chunks.size();
-//  cout << "chunks to iterate through: " << totalChunksToOperateOn << " with "
-//       << totalChunksToOperateOn *chnkSize *chnkSize *chnkSize << " voxels"
-//       << endl;
+ totalChunksToOperateOn = chunks.size();
+  cout << "chunks to iterate through: " << totalChunksToOperateOn << " with "
+       << totalChunksToOperateOn *chnkSize *chnkSize *chnkSize << " voxels"
+       << endl;
 
 
 // cout << myString.str() << endl;
@@ -224,8 +224,8 @@ void GridOperator::IterateGrid() {
   }
 
   double timeB = omp_get_wtime();
-//  cout << "grid operator " << name << " took " << timeB - timeA << " seconds"
-//       << endl;
+  cout << "grid operator " << name << " took " << timeB - timeA << " seconds"
+       << endl;
 
 
   // cout << myString.str() << endl;
