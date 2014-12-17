@@ -51,7 +51,7 @@ int main(int argc, char *argv[]) {
   cout << "number of args is" << argc << endl;
   cout << *argv[argc - 1] << endl;
 
-  omp_set_num_threads(1);
+  //omp_set_num_threads(1);
   int input, input2;
   SDL_Event keyevent;
   bool eventLoop = true;
@@ -85,6 +85,10 @@ int main(int argc, char *argv[]) {
 
   auto divergence = make_unique<GridDivergence>(grid_obj.get());
   divergence->setNodeName(std::string("divergence oper"));
+
+  auto pressure = make_unique<GridPressure>(grid_obj.get());
+  pressure->setNodeName(std::string("pressure oper"));
+
 
   // gridEmit->IterateGrid();
 
@@ -170,7 +174,7 @@ int main(int argc, char *argv[]) {
     // gridDiss->IterateGrid();
     bouyancy->IterateGrid();
     divergence->IterateGrid();
-
+    pressure->IterateGrid();
 
     basicAdvect->IterateGrid();
 

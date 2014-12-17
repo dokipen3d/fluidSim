@@ -50,6 +50,9 @@ void GridOperator::SetGridObject(GridObject *inGridObject) {
 //----------------------------------------------
 void GridOperator::IterateGrid() {
   double timeA = omp_get_wtime();
+//ITERATE-----------------------------------------------------------------------------
+for (int iteration = 0; iteration < numberOfIterations; iteration++){
+
   chunkOpCounter = 0;
   this->PreGridOp();
 
@@ -89,6 +92,7 @@ void GridOperator::IterateGrid() {
 // cout << "source channel is " << name << " " <<
 // currentSourceChannelObject->channelInfo.channelName << endl;
 
+//SORTING BOUNDS------------------------------------------------------------------------------
 #pragma omp parallel for collapse(3)
   for (int i = fmx; i <= fMax; i++) {
     for (int j = fmy; j <= fMay; j++) {
@@ -122,7 +126,10 @@ void GridOperator::IterateGrid() {
       }
     }
   }
+//END OF SORTING BOUNDS------------------------------------------------------------------------------
 
+
+//FORCE SORTING BOUNDS------------------------------------------------------------------------------
   if (forceInputBoundsIteration) {
 
 #pragma omp parallel for collapse(3)
@@ -152,21 +159,25 @@ void GridOperator::IterateGrid() {
       }
     }
   }
+//END OF FORCE SORTING BOUNDS------------------------------------------------------------------------------
+
   // loop through this operator bounding box and push chunks to vector (even
   // though they dont exists. we will check in algorithm if they are null
 
- totalChunksToOperateOn = chunks.size();
+  if (iteration == 0){
+  totalChunksToOperateOn = chunks.size();
   cout << "chunks to iterate through: " << totalChunksToOperateOn << " with "
        << totalChunksToOperateOn *chnkSize *chnkSize *chnkSize << " voxels"
        << endl;
-
-
+    }
 // cout << myString.str() << endl;
 // myString.str("");
 // double timeA = omp_get_wtime();
 //#pragma omp parallel for
 // dx =
 // currentSourceChannelObject->parentDx/currentSourceChannelObject->parentChunkSize;
+
+
 #pragma omp barrier
 #pragma omp parallel for collapse(1)
   for (int i = 0; i < chunks.size(); i++) {
@@ -216,6 +227,8 @@ void GridOperator::IterateGrid() {
       }
     }
   }
+  cout << "end of " << name << " iteration: " << iteration+1 << endl;
+
 
 #pragma omp barrier
 
@@ -223,10 +236,13 @@ void GridOperator::IterateGrid() {
     this->GridOp();
   }
 
+}
+//END OF ITERATE-----------------------------------------------------------------------------
+
+
   double timeB = omp_get_wtime();
   cout << "grid operator " << name << " took " << timeB - timeA << " seconds"
        << endl;
-
 
   // cout << myString.str() << endl;
   //    cout << currentSourceChannelObject->numChunks << " chunks created " <<
@@ -251,6 +267,7 @@ void GridOperator::PreGridOp() {
   //    cout << currentSourceChannelObject << endl;
   //    cout << currentTargetChannelObject << endl;
 }
+
 
 void GridOperator::GridOp() {}
 

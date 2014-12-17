@@ -89,6 +89,9 @@ void GridBasicAdvect::Algorithm(glm::i32vec3 chunkId,
 
   glm::vec3 sampleVelocity =
       velocitySourceChannelObject->SampleVectorAtPosition(X, Y, Z);
+
+
+
   // glm::vec3 sampleVelocity =
   // glm::vec3(velocitySourceChannelObject->SampleTrilinear(X-0.5, 0.0f, 0.0f),
   // velocitySourceChannelObject->SampleTrilinear(0.0f, Y-0.5, 0.0f),

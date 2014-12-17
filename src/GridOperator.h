@@ -34,6 +34,7 @@ public:
                           glm::i32vec3 chunkIdSecondary);
 
   virtual void PreGridOp();
+
   virtual void GridOp();
   void SetChannelName(std::string nameToSet);
   std::string name;
@@ -44,6 +45,7 @@ public:
   bool callGridOp = false;
   bool callPostChunkOp = false;
   void refreshSourceAndTargetChannelDetails();
+  u_int32_t numberOfIterations = 1;
 
 protected:
   double currentTime;
