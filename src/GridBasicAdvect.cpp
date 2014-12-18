@@ -105,7 +105,7 @@ void GridBasicAdvect::Algorithm(glm::i32vec3 chunkId,
   // outChunk->chunkData[dataIndex] = inChunk->chunkData[dataIndex];
   // float density = inChunk->chunkData[dataIndex];
   outChunk->chunkData[dataIndex] = currentSourceChannelObject->SampleTrilinear(
-      X - sampleVelocity.x, Y - sampleVelocity.y, Z - sampleVelocity.z, 0.0f);
+      X - sampleVelocity.x, Y - sampleVelocity.y, Z - sampleVelocity.z, channel);
   // outChunk->chunkData[dataIndex] =
   // currentSourceChannelObject->SampleTrilinear(X-2,Y-2, Z-2);
 

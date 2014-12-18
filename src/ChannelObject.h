@@ -23,6 +23,9 @@ public:
   float SampleChannelAtPosition(float x, float y, float z);
   glm::vec3 SampleVectorAtPosition(float x, float y, float z);
   glm::vec3 SampleVectorAtPositionExplicit(float x, float y, float z);
+  glm::vec3 SampleVectorAtCellFaceFast(float x, float y, float z, u_int32_t channel);
+  glm::vec3 SampleVectorAtCellCentreFast(float x, float y, float z);
+
 
   ChannelInfo channelInfo;
   float defaultValue;
