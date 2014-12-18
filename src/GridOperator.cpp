@@ -63,7 +63,7 @@ for (int iteration = 0; iteration < numberOfIterations; iteration++){
   // static_cast<uint32_t>(currentSourceChannelObject->channelInfo.channelType);//1
   // for scalar and 3 for vector. will have to deal with sdf another way
 
-  int32_t internalChannels = 1; // for making scalar or cevtor
+  internalChannels = 1; // for making scalar or vector
   if (currentTargetChannelObject->channelInfo.channelType ==
       ChannelType::vector) {
     internalChannels = 3;

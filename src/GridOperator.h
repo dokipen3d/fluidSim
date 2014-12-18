@@ -62,6 +62,7 @@ protected:
   u_int32_t chnkSize;
   uint32_t chunkOpCounter = 0;
   uint32_t totalChunksToOperateOn;
+  int32_t internalChannels = 1;
 };
 
 #endif

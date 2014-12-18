@@ -83,10 +83,12 @@ ChannelObject::ChannelObject(ChannelInfo inInfo, GridObject *parentGrid) {
   currentChannelToSample = 0; // set to a single channel by default. in
                               // overloaded SampleTrilinear, use this to go 0-2.
                               // dont forget to set it back to 0;
-  channelAmount = 1; // for making scalar or cevtor
+  channelAmount = 1;          // for making scalar or cevtor
   if (channelInfo.channelType == ChannelType::vector) {
     channelAmount = 3;
   }
+
+  voxelSize = 1.0f / parentChunkSize;
   // create a dummy chunk so when we sample outside bounds we get a default
   // value
   dummyChunk = new Chunk((parentChunkSize * parentChunkSize * parentChunkSize) *
@@ -312,71 +314,81 @@ glm::vec3 ChannelObject::SampleVectorAtPositionExplicit(float x, float y,
   return vectorValue;
 }
 
-glm::vec3 ChannelObject::SampleVectorAtCellCentreFast(float x, float y, float z)
-{
-    float u;
-    float v;
-    float w;
+glm::vec3 ChannelObject::SampleVectorAtCellCentreFast(float x, float y,
+                                                      float z) {
+  float u;
+  float v;
+  float w;
 
-    u = (this->SampleExplicit(x,y,z,0) - this->SampleExplicit(x+1,y,z,0))   /   2;
-    v = (this->SampleExplicit(x,y,z,1) - this->SampleExplicit(x,y+1,z,1))   /   2;
-    w = (this->SampleExplicit(x,y,z,2) - this->SampleExplicit(x,y,z+1,2))   /   2;
+  u = (this->SampleExplicit(x, y, z, 0) +
+       this->SampleExplicit(x + voxelSize, y, z, 0)) /
+      2.0f; // have to do + voxel size for now as the chunk check happens in
+            // Sampleexplicit. +1 would mean +1 in absolute distance
+  v = (this->SampleExplicit(x, y, z, 1) +
+       this->SampleExplicit(x, y + voxelSize, z, 1)) /
+      2.0f;
+  w = (this->SampleExplicit(x, y, z, 2) +
+       this->SampleExplicit(x, y, z + voxelSize, 2)) /
+      2.0f;
+
+  return glm::vec3(u, v, w);
+}
+
+glm::vec3 ChannelObject::SampleVectorAtCellFaceFast(float x, float y, float z,
+                                                    u_int32_t channel) {
+  float u;
+  float v;
+  float w;
+
+  switch (channel) {
+  case 0: // U
+    u = (this->SampleExplicit(x, y, z, 0));
+    v = (this->SampleExplicit(x, y, z, 1) +
+         this->SampleExplicit(x, y + voxelSize, z, 1) +
+         this->SampleExplicit(x + voxelSize, y, z, 1) +
+         this->SampleExplicit(x + voxelSize, y + voxelSize, z, 1)) /
+        4.0f;
+    w = (this->SampleExplicit(x, y, z, 2) +
+         this->SampleExplicit(x, y, z + voxelSize, 2) +
+         this->SampleExplicit(x + voxelSize, y, z, 2) +
+         this->SampleExplicit(x + voxelSize, y, z + voxelSize, 2)) /
+        4.0f;
 
     return glm::vec3(u, v, w);
 
-}
+  case 1: // V
+    u = (this->SampleExplicit(x, y, z, 0) +
+         this->SampleExplicit(x + voxelSize, y, z, 0) +
+         this->SampleExplicit(x, y + voxelSize, z, 0) +
+         this->SampleExplicit(x + voxelSize, y + voxelSize, z, 0)) /
+        4.0f;
+    v = (this->SampleExplicit(x, y, z, 1));
+    w = (this->SampleExplicit(x, y, z, 2) +
+         this->SampleExplicit(x, y, z + voxelSize, 2) +
+         this->SampleExplicit(x, y + voxelSize, z, 2) +
+         this->SampleExplicit(x, y + voxelSize, z + voxelSize, 2)) /
+        4.0f;
 
-glm::vec3 ChannelObject::SampleVectorAtCellFaceFast(float x, float y, float z, u_int32_t channel)
-{
-    float u;
-    float v;
-    float w;
+    return glm::vec3(u, v, w);
 
-    switch (channel){
-        case 0://U
-            u = (this->SampleExplicit(x,    y,      z,      0));
-            v = (this->SampleExplicit(x,    y,      z,      1)+
-                 this->SampleExplicit(x,    y+1,    z,      1)+
-                 this->SampleExplicit(x+1,  y,      z,      1)+
-                 this->SampleExplicit(x+1,  y+1,    z,      1)) /4;
-            w = (this->SampleExplicit(x,    y,      z,      2)+
-                 this->SampleExplicit(x,    y,      z+1,    2)+
-                 this->SampleExplicit(x+1,  y,      z,      2)+
-                 this->SampleExplicit(x+1,  y,      z+1,    2)) /4;
+  case 2: // W
+    u = (this->SampleExplicit(x, y, z, 0) +
+         this->SampleExplicit(x + 1, y, z, 0) +
+         this->SampleExplicit(x, y, z + 1, 0) +
+         this->SampleExplicit(x + 1, y, z + 1, 0)) /
+        4.0f;
+    v = (this->SampleExplicit(x, y, z, 1) +
+         this->SampleExplicit(x, y + 1, z, 1) +
+         this->SampleExplicit(x, y, z + 1, 1) +
+         this->SampleExplicit(x, y + 1, z + 1, 1)) /
+        4.0f;
+    w = (this->SampleExplicit(x, y, z, 2));
 
-            return glm::vec3(u,v,w);
+    return glm::vec3(u, v, w);
 
-        case 1://V
-            u = (this->SampleExplicit(x,    y,      z,      0)+
-                 this->SampleExplicit(x+1,  y,      z,      0)+
-                 this->SampleExplicit(x,    y+1,    z,      0)+
-                 this->SampleExplicit(x+1,  y+1,    z,      0)) /4;
-            v = (this->SampleExplicit(x,    y,      z,      1));
-            w = (this->SampleExplicit(x,    y,      z,      2)+
-                 this->SampleExplicit(x,    y,      z+1,    2)+
-                 this->SampleExplicit(x,    y+1,    z,      2)+
-                 this->SampleExplicit(x,    y+1,    z+1,    2)) /4;
-
-            return glm::vec3(u,v,w);
-
-        case 2://W
-            u = (this->SampleExplicit(x,    y,      z,      0)+
-                 this->SampleExplicit(x+1,  y,      z,      0)+
-                 this->SampleExplicit(x,    y,      z+1,    0)+
-                 this->SampleExplicit(x+1,  y,      z+1,    0)) /4;
-            v = (this->SampleExplicit(x,    y,      z,      1)+
-                 this->SampleExplicit(x,    y+1,    z,      1)+
-                 this->SampleExplicit(x,    y,      z+1,    1)+
-                 this->SampleExplicit(x,    y+1,    z+1,    1)) /4;
-            w = (this->SampleExplicit(x,    y,      z,      2));
-
-            return glm::vec3(u,v,w);
-
-        default:
-            return glm::vec3(0.0f,0.0f,0.0f);
-    }
-
-
+  default:
+    return glm::vec3(0.0f, 0.0f, 0.0f);
+  }
 }
 
 void ChannelObject::printChunks() {
@@ -818,7 +830,7 @@ float ChannelObject::SampleTrilinear(float x, float y, float z,
 float ChannelObject::SampleExplicit(float x, float y, float z,
                                     uint32_t channel) {
 
-  //int32_t parentChunkSizeMinus1 = parentChunkSize - 1; // 7
+  // int32_t parentChunkSizeMinus1 = parentChunkSize - 1; // 7
 
   float getRidOfDivCalc = 1.0 / parentChunkSize;
 
@@ -854,8 +866,7 @@ float ChannelObject::SampleExplicit(float x, float y, float z,
   Chunk *sampleChunk = GetChunk(chunkIndexDivX, chunkIndexDivY, chunkIndexDivZ);
   float tmp = sampleChunk->chunkData[flatten3dCoordinatesto1D(
       (localGridIndexX) % parentChunkSize, (localGridIndexY) % parentChunkSize,
-      (localGridIndexZ) % parentChunkSize, channel,
-      parentChunkSize)];
+      (localGridIndexZ) % parentChunkSize, channel, parentChunkSize)];
 
   //    if ( (x > 15) && (y > 15) && (z > 15)){
   //        cout << "address of chunk is " << sampleChunk << endl;

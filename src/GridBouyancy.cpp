@@ -37,8 +37,8 @@ void GridBouyancy::Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelPosition,
   //glm::vec3 vel =  currentTargetChannelObject->SampleVectorAtPosition(X + 0.5f, Y + 0.5f, Z + 0.5f);
 
  // float yPos = densSample - vel.y;
-  glm::vec3 value = glm::vec3(0.0f, densSample* 1.0f, 0.0f);
-  outChunk->chunkData[dataIndex] = value[channel];
+  glm::vec3 value = glm::vec3(0.0f, densSample* 0.02f, 0.0f);
+  outChunk->chunkData[dataIndex] += value[channel];
 }
 
 void GridBouyancy::PreGridOp() {

@@ -87,30 +87,25 @@ void GridBasicAdvect::Algorithm(glm::i32vec3 chunkId,
   //    float sample = sourceVolume->sampleVolume(glm::vec3(X+0.5, Y+0.5,
   //    Z+0.5));
 
-  glm::vec3 sampleVelocity =
-      velocitySourceChannelObject->SampleVectorAtPosition(X, Y, Z);
+  glm::vec3 sampleVelocity{0.0};
+
+  if(internalChannels == 3){
+
+      sampleVelocity = velocitySourceChannelObject->SampleVectorAtCellFaceFast(X, Y, Z, channel);
+
+  }
+
+  else{
+
+      sampleVelocity = velocitySourceChannelObject->SampleVectorAtCellCentreFast(X, Y, Z);
+      //sampleVelocity = velocitySourceChannelObject->SampleVectorAtPosition(X, Y, Z);
+    }
 
 
 
-  // glm::vec3 sampleVelocity =
-  // glm::vec3(velocitySourceChannelObject->SampleTrilinear(X-0.5, 0.0f, 0.0f),
-  // velocitySourceChannelObject->SampleTrilinear(0.0f, Y-0.5, 0.0f),
-  // velocitySourceChannelObject->SampleTrilinear(0.0f, 0.0f, Z-0.5));
-  //            float sX = voxelPosition.x - sampleVelocity.x;
-  //            float sY = voxelPosition.y - sampleVelocity.y;
-  //            float sZ = voxelPosition.z - sampleVelocity.z;
-
-  // outChunk->chunkData[dataIndex] =
-  // currentSourceChannelObject->SampleTrilinear(X-sampleVelocity.x,Y-sampleVelocity.y,Z-sampleVelocity.z);
-  // outChunk->chunkData[dataIndex] = inChunk->chunkData[dataIndex];
-  // float density = inChunk->chunkData[dataIndex];
   outChunk->chunkData[dataIndex] = currentSourceChannelObject->SampleTrilinear(
       X - sampleVelocity.x, Y - sampleVelocity.y, Z - sampleVelocity.z, channel);
-  // outChunk->chunkData[dataIndex] =
-  // currentSourceChannelObject->SampleTrilinear(X-2,Y-2, Z-2);
 
-  // cout << "xyz" << sampleVelocity.x << " " <<sampleVelocity.y << " " <<
-  // sampleVelocity.z << endl;
 }
 
 void GridBasicAdvect::PreGridOp() {

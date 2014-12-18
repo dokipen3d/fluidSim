@@ -39,6 +39,7 @@ public:
   int counter = 0;
   bool controlChannel = false;
   int channelAmount;
+  float voxelSize;
 
   float SampleTrilinear(float x, float y, float z, uint32_t channel);
   float SampleExplicit(float x, float y, float z, uint32_t channel);
