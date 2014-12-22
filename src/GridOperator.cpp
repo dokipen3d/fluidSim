@@ -112,7 +112,7 @@ for (int iteration = 0; iteration < numberOfIterations; iteration++){
 
         // cout << "adding existing" << endl;
         if (newChunkAddresses.chunkTarget !=
-            currentTargetChannelObject->dummyChunk) // if there is a chunk there
+            currentSourceChannelObject->dummyChunk) // if there is a chunk there
                                                     // then go ahead and store
                                                     // it
         {
@@ -190,9 +190,9 @@ for (int iteration = 0; iteration < numberOfIterations; iteration++){
     }
     // cout << "iterating through chunk vector " << i << endl;
     //#pragma omp parallel for collapse(3)
-    for (int w = 0; w < chnkSize; w++) {
-      for (int v = 0; v < chnkSize; v++) {
-        for (int u = 0; u < chnkSize; u++) {
+    for (int w = startVoxel; w < chnkSize; w += skipAmount) {//for skipping voxels in thr red black gauss seidel update
+      for (int v = startVoxel; v < chnkSize; v += skipAmount) {//can do 1-startvoxel to ping pong between 1 & 0
+        for (int u = startVoxel; u < chnkSize; u += skipAmount) {//and then do skipAmount = startVoxel+1 in each postgridop
 
           for (int a = 0; a < internalChannels; a++) {
 
@@ -227,7 +227,7 @@ for (int iteration = 0; iteration < numberOfIterations; iteration++){
       }
     }
   }
-  cout << "end of " << name << " iteration: " << iteration+1 << endl;
+  cout << "end of " << name << " iteration: " << iteration+1 << " " << startVoxel << endl;
 
 
 #pragma omp barrier
@@ -235,8 +235,8 @@ for (int iteration = 0; iteration < numberOfIterations; iteration++){
   if (callGridOp) {
     this->GridOp();
   }
-
 }
+
 //END OF ITERATE-----------------------------------------------------------------------------
 
 

@@ -22,7 +22,7 @@ void GridPadCull::Algorithm(glm::i32vec3 chunkId,
   bool lValueFalse = false;
   bool lValueTrue = true;
 
-  if (outChunk->chunkData[dataIndex] > 0.004) {
+  if (outChunk->chunkData[dataIndex] > 0.001) {
 
     // if (inChunk->empty.compare_exchange_strong(lValueTrue, false)){
     outChunk->empty = false;

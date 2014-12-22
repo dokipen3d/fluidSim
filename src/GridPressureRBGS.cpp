@@ -1,4 +1,4 @@
-#include "GridPressure.h"
+#include "GridPressureRBGS.h"
 #include "ChannelObject.h"
 #include "GridObject.h"
 
@@ -6,7 +6,7 @@
 
 
 
-void GridPressure::setupDefaults()
+void GridPressureRBGS::setupDefaults()
 {
     //set the source channel
     uint32_t divergenceSourceChannel =
@@ -17,38 +17,30 @@ void GridPressure::setupDefaults()
 
     divergenceSource = gridObjectPtr->channelObjs[divergenceSourceChannel].get(); // default first one
 
-    currentSourceChannelObject =
-        gridObjectPtr->channelObjs[pressureTarget].get(); // default first one
+//    currentSourceChannelObject =
+//        gridObjectPtr->channelObjs[pressureTarget+1].get(); // default first one
     currentTargetChannelObject =
-        gridObjectPtr->channelObjs[pressureTarget=1].get(); // want vel channel.
+        gridObjectPtr->channelObjs[pressureTarget].get(); // want vel channel.
 
     callGridOp = true;
     callPreChunkOp = true;
     scale = gridObjectPtr->dx;
     scaleSquared = -(scale*scale);
-    numberOfIterations = 30;
+    numberOfIterations = 80;
+    skipAmount =  2;
+
 
 }
 
-void GridPressure::PreChunkOp(Chunk *&inChunk, Chunk *&outChunk,
+void GridPressureRBGS::PreChunkOp(Chunk *&inChunk, Chunk *&outChunk,
                               glm::i32vec3 chunkIdSecondary) {
 
-    if (currentSourceChannelObject->ChunkExists(
-            chunkIdSecondary.x, chunkIdSecondary.y, chunkIdSecondary.z)) {
-       //cout << "already exists!" << endl;
-      // cout << outChunk << endl;
-
-    } else {
-      outChunk = currentSourceChannelObject->CreateChunk(
-          chunkIdSecondary.x, chunkIdSecondary.y, chunkIdSecondary.z);
-       //cout << "outChunk" << endl;
-    }
-
+    //start with a pressure value of 0;
     std::fill(outChunk->chunkData.begin(),outChunk->chunkData.end(), 0.0f);
-    callPreChunkOp = false;//only call once;
+    callPreChunkOp = false;//not after first iteration
 }
 
-void GridPressure::Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelPosition,
+void GridPressureRBGS::Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelPosition,
                             Chunk *inChunk, Chunk *outChunk, uint32_t dataIndex,
                             uint32_t channel){
 
@@ -60,23 +52,23 @@ void GridPressure::Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelPosition,
   float Y = ((chunkId.y * (int)chnkSize) + voxelPosition.y);
   float Z = ((chunkId.z * (int)chnkSize) + voxelPosition.z);
 
-  //add scale here?
+  //add world scale here?
 
  // float P6 = inChunk->chunkData[dataIndex];
-  float P  = currentSourceChannelObject->SampleExplicit(X, Y, Z, 0 );
+  float P  = currentTargetChannelObject->SampleExplicit(X, Y, Z, 0 );
 
-  float Pip1JK = currentSourceChannelObject->SampleExplicit(X+1, Y, Z, 0 );
-  float Pim1JK = currentSourceChannelObject->SampleExplicit(X-1, Y, Z, 0 );
+  float Pip1JK = currentTargetChannelObject->SampleExplicit(X+1, Y, Z, 0 );
+  float Pim1JK = currentTargetChannelObject->SampleExplicit(X-1, Y, Z, 0 );
 
-  float PIjp1K = currentSourceChannelObject->SampleExplicit(X, Y+1, Z, 0 );
-  float PIjm1K = currentSourceChannelObject->SampleExplicit(X, Y-1, Z, 0 );
+  float PIjp1K = currentTargetChannelObject->SampleExplicit(X, Y+1, Z, 0 );
+  float PIjm1K = currentTargetChannelObject->SampleExplicit(X, Y-1, Z, 0 );
 
-  float PIJkp1 = currentSourceChannelObject->SampleExplicit(X, Y, Z+1, 0 );
-  float PIJkm1 = currentSourceChannelObject->SampleExplicit(X, Y, Z-1, 0 );
+  float PIJkp1 = currentTargetChannelObject->SampleExplicit(X, Y, Z+1, 0 );
+  float PIJkm1 = currentTargetChannelObject->SampleExplicit(X, Y, Z-1, 0 );
 
   float div = divergenceSource->SampleExplicit(X, Y, Z, 0);
 
-  //float pressureVal = ((P*6.0f) - Pip1JK - Pim1JK - PIjp1K - PIjm1K - PIJkp1 - PIJkm1 + div) * scaleSquared;
+  //float pressureVal = (P6 - Pip1JK - Pim1JK - PIjp1K - PIjm1K - PIJkp1 - PIJkm1 + div) * scaleSquared;
 //  float pressureVal = ( (div*scaleSquared) +((Pip1JK - P) - (P - Pim1JK)) +
 //                                            ((P - PIjp1K) - (P - PIjm1K)) +
 //                                            ((P - PIJkp1) - (P - PIJkm1)) )/6;
@@ -89,9 +81,9 @@ void GridPressure::Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelPosition,
 
   float pressureVal =  (1.0f/6.0f) * (// replace the 1/6 with (1 - omega) * P + omega / 6 where omega is SOR value between 1 and 2 (close to 1.7 is best)
                         ((P - Pip1JK) - (P - Pim1JK)) +                     // (
-                        ((P - PIjp1K) - (P - PIjm1K)) +                     // ((1 - omega) * P) + (omega / 6))
+                        ((P - PIjp1K) - (P - PIjm1K)) +                    // ((1 - omega) * P) + (omega / 6))
                         ((P - PIJkp1) - (P - PIJkm1)) + (div*scaleSquared)  // ) is clearer
-                       ) ;
+                        ) ;
 
 //  float pressureVal =  ( ((1 - omega) * P) + (omega / 6)) * (// replace the 1/6 with (1 - omega) * P + omega / 6 where omega is SOR value between 1 and 2 (close to 1.7 is best)
 //                        ((P - Pip1JK) - (P - Pim1JK)) +                     // (
@@ -106,12 +98,12 @@ void GridPressure::Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelPosition,
 }
 
 
-GridPressure::~GridPressure()
+GridPressureRBGS::~GridPressureRBGS()
 {
 
 }
 
-void GridPressure::PreGridOp()
+void GridPressureRBGS::PreGridOp()
 {
 
     //set the source channel
@@ -124,14 +116,15 @@ void GridPressure::PreGridOp()
     divergenceSource = gridObjectPtr->channelObjs[divergenceSourceChannel].get(); // default first one
 
     currentSourceChannelObject =
-        gridObjectPtr->channelObjs[pressureTarget].get(); // default first one
+        gridObjectPtr->channelObjs[pressureTarget+1].get(); // default first one
     currentTargetChannelObject =
-        gridObjectPtr->channelObjs[pressureTarget+1].get(); // want  channel.
+        gridObjectPtr->channelObjs[pressureTarget].get(); // want  channel.
 
 
 }
 
-void GridPressure::GridOp() {
-  gridObjectPtr->SwapChannelPointers(std::string("pressure"));
+void GridPressureRBGS::GridOp() {
+  //gridObjectPtr->SwapChannelPointers(std::string("pressure")); //dont swap with red black
+    startVoxel = 1 - startVoxel;
 }
 

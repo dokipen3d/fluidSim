@@ -57,14 +57,18 @@ inline static int32_t fastFloor(float x) {
 }
 
 inline static void separateFracInt(const float &in, float &floatPart,
-                                   uint32_t &intPart, const float &chunkSize) {
-  float temp = glm::mod(in, chunkSize);
+                                   u_int32_t &intPart, const float &chunkSize) {
+  // float tempIn = in;
 
+  float temp = glm::mod(in, chunkSize);
   float tempFloatyInt;
   floatPart = std::modf(temp, &tempFloatyInt);
-  // intPart = (uint32_t)tempFloatyInt;
-  intPart = static_cast<uint32_t>(tempFloatyInt);
+  intPart = (int)tempFloatyInt;
+  //intPart = static_cast<uint32_t>(tempFloatyInt);
+ // if (intPart == 8)
+   //   cout <<"in: " << in << " floatpart: " << floatPart << " temp floaty int: " << tempFloatyInt << " mod chnk: " << temp << endl;
 }
+
 
 //----------------------------------------------
 ChannelObject::ChannelObject(ChannelInfo inInfo, GridObject *parentGrid) {
@@ -79,6 +83,8 @@ ChannelObject::ChannelObject(ChannelInfo inInfo, GridObject *parentGrid) {
   SamplerPointerFunc[1] = &ChannelObject::SampleTrilinear;
   SamplerPointerFunc[2] = &ChannelObject::SampleTrilinear;
   parentChunkSize = parentGridObject->chunkSize;
+  parentChunkSizeMinus1 = parentChunkSize - 1;
+
   fParentChunkSize = (float)parentChunkSize;
   currentChannelToSample = 0; // set to a single channel by default. in
                               // overloaded SampleTrilinear, use this to go 0-2.
@@ -110,6 +116,19 @@ ChannelObject::~ChannelObject() {
   // cout << "channel Object " << channelInfo.channelName << " destroyed" <<
   // endl;
 }
+
+//void ChannelObject::separateFracInt(const float &in, float &floatPart,
+//                                   u_int32_t &intPart, const float &chunkSize) {
+//    float tempIn = in;
+
+//  float temp = glm::mod(tempIn, 8.0f);
+//  float tempFloatyInt;
+//  floatPart = std::modf(temp, &tempFloatyInt);
+//  intPart = (u_int32_t)tempFloatyInt;
+//  //intPart = static_cast<uint32_t>(tempFloatyInt);
+//  //if (intPart == 8)
+//  //    cout <<"in: " << in << " floatpart: " << floatPart << " temp floaty int: " << tempFloatyInt << " mod chnk: " << temp << endl;
+//}
 
 //----------------------------------------------
 void ChannelObject::ClearChunks() {
@@ -306,9 +325,9 @@ glm::vec3 ChannelObject::SampleVectorAtPositionExplicit(float x, float y,
   currentChannelToSample = 0;
   vectorValue.x = SampleExplicit(x + 0.5f, y, z, currentChannelToSample);
   currentChannelToSample++;
-  vectorValue.y = SampleExplicit(z, y + 0.5f, z, currentChannelToSample);
+  vectorValue.y = SampleExplicit(y, y + 0.5f, z, currentChannelToSample);
   currentChannelToSample++;
-  vectorValue.z = SampleExplicit(x, y, z + 0.5f, currentChannelToSample);
+  vectorValue.z = SampleExplicit(z, y, z + 0.5f, currentChannelToSample);
   currentChannelToSample = 0;
 
   return vectorValue;
@@ -321,14 +340,14 @@ glm::vec3 ChannelObject::SampleVectorAtCellCentreFast(float x, float y,
   float w;
 
   u = (this->SampleExplicit(x, y, z, 0) +
-       this->SampleExplicit(x + voxelSize, y, z, 0)) /
+       this->SampleExplicit(x + 1, y, z, 0)) /
       2.0f; // have to do + voxel size for now as the chunk check happens in
             // Sampleexplicit. +1 would mean +1 in absolute distance
   v = (this->SampleExplicit(x, y, z, 1) +
-       this->SampleExplicit(x, y + voxelSize, z, 1)) /
+       this->SampleExplicit(x, y + 1, z, 1)) /
       2.0f;
   w = (this->SampleExplicit(x, y, z, 2) +
-       this->SampleExplicit(x, y, z + voxelSize, 2)) /
+       this->SampleExplicit(x, y, z + 1, 2)) /
       2.0f;
 
   return glm::vec3(u, v, w);
@@ -344,29 +363,29 @@ glm::vec3 ChannelObject::SampleVectorAtCellFaceFast(float x, float y, float z,
   case 0: // U
     u = (this->SampleExplicit(x, y, z, 0));
     v = (this->SampleExplicit(x, y, z, 1) +
-         this->SampleExplicit(x, y + voxelSize, z, 1) +
-         this->SampleExplicit(x + voxelSize, y, z, 1) +
-         this->SampleExplicit(x + voxelSize, y + voxelSize, z, 1)) /
+         this->SampleExplicit(x, y + 1, z, 1) +
+         this->SampleExplicit(x + 1, y, z, 1) +
+         this->SampleExplicit(x + 1, y + 1, z, 1)) /
         4.0f;
     w = (this->SampleExplicit(x, y, z, 2) +
-         this->SampleExplicit(x, y, z + voxelSize, 2) +
-         this->SampleExplicit(x + voxelSize, y, z, 2) +
-         this->SampleExplicit(x + voxelSize, y, z + voxelSize, 2)) /
+         this->SampleExplicit(x, y, z + 1, 2) +
+         this->SampleExplicit(x + 1, y, z, 2) +
+         this->SampleExplicit(x + 1, y, z + 1, 2)) /
         4.0f;
 
     return glm::vec3(u, v, w);
 
   case 1: // V
     u = (this->SampleExplicit(x, y, z, 0) +
-         this->SampleExplicit(x + voxelSize, y, z, 0) +
-         this->SampleExplicit(x, y + voxelSize, z, 0) +
-         this->SampleExplicit(x + voxelSize, y + voxelSize, z, 0)) /
+         this->SampleExplicit(x + 1 , y, z, 0) +
+         this->SampleExplicit(x, y + 1, z, 0) +
+         this->SampleExplicit(x + 1, y + 1, z, 0)) /
         4.0f;
     v = (this->SampleExplicit(x, y, z, 1));
     w = (this->SampleExplicit(x, y, z, 2) +
-         this->SampleExplicit(x, y, z + voxelSize, 2) +
-         this->SampleExplicit(x, y + voxelSize, z, 2) +
-         this->SampleExplicit(x, y + voxelSize, z + voxelSize, 2)) /
+         this->SampleExplicit(x, y, z + 1, 2) +
+         this->SampleExplicit(x, y + 1, z, 2) +
+         this->SampleExplicit(x, y + 1, z + 1, 2)) /
         4.0f;
 
     return glm::vec3(u, v, w);
@@ -402,7 +421,6 @@ float ChannelObject::SampleTrilinear(float x, float y, float z,
   // cout << "sampling "
   // int threadid  = omp_get_thread_num();
   // cout << threadid <<endl;
-  int32_t parentChunkSizeMinus1 = parentChunkSize - 1;
   // work out what chunk to sample. At first work this out for every voxel.
   // Later can do checking in the algorithm to see if it exists in chunk already
   // (ray box intersection).
@@ -462,9 +480,9 @@ float ChannelObject::SampleTrilinear(float x, float y, float z,
   //        cout << "in box 2 : " << counter << endl;
   //        counter++;
   //    }
-  //    assert (fracX <= 1.0 && fracX >= 0);
-  //    assert (fracY <= 1.0 && fracY >= 0);
-  //    assert (fracZ <= 1.0 && fracZ >= 0);
+//      assert (fracX <= 1.0 && fracX >= 0);
+//      assert (fracY <= 1.0 && fracY >= 0);
+//      assert (fracZ <= 1.0 && fracZ >= 0);
 
   Chunk *sampleChunk = GetChunk(chunkIndexDivX, chunkIndexDivY, chunkIndexDivZ);
   //    if (sampleChunk == dummyChunk)
@@ -493,6 +511,14 @@ float ChannelObject::SampleTrilinear(float x, float y, float z,
   //       double tmp5678 = LERP (tmp56, tmp78, fractx);
 
   //       double tmp = LERP(tmp1234, tmp5678, fractz);
+
+
+    localGridIndexX &= parentChunkSizeMinus1;
+
+    localGridIndexY &= parentChunkSizeMinus1;
+
+    localGridIndexZ &= parentChunkSizeMinus1;
+
   tmp1 = sampleChunk->chunkData[flatten3dCoordinatesto1D(
       localGridIndexX, localGridIndexY, localGridIndexZ, channel,
       parentChunkSize)];
@@ -544,7 +570,7 @@ float ChannelObject::SampleTrilinear(float x, float y, float z,
         (localGridIndexX + 1) % parentChunkSize, localGridIndexY,
         localGridIndexZ, channel, parentChunkSize)];
     tmp4 = sampleChunkXp1->chunkData[flatten3dCoordinatesto1D(
-        (localGridIndexX + 1) & parentChunkSize, localGridIndexY + 1,
+        (localGridIndexX + 1) % parentChunkSize, localGridIndexY + 1,
         localGridIndexZ, channel, parentChunkSize)];
 
     tmp5 = sampleChunk->chunkData[flatten3dCoordinatesto1D(
@@ -806,7 +832,7 @@ float ChannelObject::SampleTrilinear(float x, float y, float z,
   }
 
   else {
-    cout << "something went wrong, voxel doesn't exist" << endl;
+    cout << "something went wrong, voxel doesn't exist. chunk " <<  chunkIndexDivX << " " << chunkIndexDivY << " " << chunkIndexDivZ << " " << localGridIndexX << " " << localGridIndexY << " " << localGridIndexZ <<  "    : " << x << " " << y << " " << z << endl;
     return -1;
   }
 
@@ -859,9 +885,9 @@ float ChannelObject::SampleExplicit(float x, float y, float z,
   separateFracInt(y, fracY, localGridIndexY, fParentChunkSize);
   separateFracInt(z, fracZ, localGridIndexZ, fParentChunkSize);
 
-  assert(fracX < 1.0 && fracX >= 0);
-  assert(fracY < 1.0 && fracY >= 0);
-  assert(fracZ < 1.0 && fracZ >= 0);
+//  assert(fracX < 1.0 && fracX >= 0);
+//  assert(fracY < 1.0 && fracY >= 0);
+//  assert(fracZ < 1.0 && fracZ >= 0);
 
   Chunk *sampleChunk = GetChunk(chunkIndexDivX, chunkIndexDivY, chunkIndexDivZ);
   float tmp = sampleChunk->chunkData[flatten3dCoordinatesto1D(

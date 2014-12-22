@@ -1,4 +1,4 @@
-#include "GridBasicAdvect.h"
+#include "GridBasicVelAdvect.h"
 #include "Chunk.h"
 #include "ChannelObject.h"
 #include "glm/vec3.hpp"
@@ -16,30 +16,26 @@ inline static float map_range(float value, float low1, float high1, float low2,
 }
 
 //----------------------------------------------
-GridBasicAdvect::~GridBasicAdvect() {}
+GridBasicVelAdvect::~GridBasicVelAdvect() {}
 
-void GridBasicAdvect::setupDefaults() {
+void GridBasicVelAdvect::setupDefaults() {
   uint32_t velSource =
       gridObjectPtr->GetMemoryIndexForChannelName(std::string("velocity"));
-  uint32_t densitySource =
-      gridObjectPtr->GetMemoryIndexForChannelName(std::string("density"));
-  uint32_t densityTarget =
-      gridObjectPtr->GetMemoryIndexForChannelName(std::string("density"));
+  uint32_t velTarget =
+      gridObjectPtr->GetMemoryIndexForChannelName(std::string("velocity"));
 
-  velocitySourceChannelObject =
-      gridObjectPtr->channelObjs[velSource].get(); // default first one
   currentSourceChannelObject =
-      gridObjectPtr->channelObjs[densityTarget]
-          .get(); // want dup density channel.will swap after
-
+      gridObjectPtr->channelObjs[velSource].get(); // default first one
   currentTargetChannelObject =
-      gridObjectPtr->channelObjs[densityTarget + 1]
+      gridObjectPtr->channelObjs[velTarget+1]
           .get(); // want dup density channel.will swap after
   callPreChunkOp = true;
+
   callGridOp = true;
+  internalChannels = 3;
 }
 
-void GridBasicAdvect::PreChunkOp(Chunk *&inChunk, Chunk *&outChunk,
+void GridBasicVelAdvect::PreChunkOp(Chunk *&inChunk, Chunk *&outChunk,
                                  glm::i32vec3 chunkIdSecondary) {
 
     //printf("Hello from thread %d, nthreads %d\n", omp_get_thread_num(), omp_get_num_threads());
@@ -73,11 +69,12 @@ void GridBasicAdvect::PreChunkOp(Chunk *&inChunk, Chunk *&outChunk,
 
 //}
 
-void GridBasicAdvect::GridOp() {
-  gridObjectPtr->SwapChannelPointers(std::string("density"));
+void GridBasicVelAdvect::GridOp() {
+  gridObjectPtr->SwapChannelPointers(std::string("velocity"));
+  cout << "swapped pointers for vel" << endl;
 }
 //----------------------------------------------
-void GridBasicAdvect::Algorithm(glm::i32vec3 chunkId,
+void GridBasicVelAdvect::Algorithm(glm::i32vec3 chunkId,
                                 glm::i32vec3 voxelPosition, Chunk *inChunk,
                                 Chunk *outChunk, uint32_t dataIndex,
                                 uint32_t channel)
@@ -93,31 +90,49 @@ void GridBasicAdvect::Algorithm(glm::i32vec3 chunkId,
   //    float sample = sourceVolume->sampleVolume(glm::vec3(X+0.5, Y+0.5,
   //    Z+0.5));
 
-  glm::vec3 sampleVelocity{0.0};
+  glm::vec3 sampleVelocity;
 
 
-      sampleVelocity = velocitySourceChannelObject->SampleVectorAtPosition(X, Y, Z);
+      sampleVelocity = currentSourceChannelObject->SampleVectorAtCellFaceFast(X, Y, Z, channel);
+      //sampleVelocity = velocitySourceChannelObject->SampleVectorAtPosition(X, Y, Z);
+      //sampleVelocity = glm::vec3{0.0f};
 
 
+      switch (channel) {
+          case 0: // U
+              outChunk->chunkData[dataIndex] = currentSourceChannelObject->SampleTrilinear(
+                            X  - sampleVelocity.x, Y - sampleVelocity.y, Z - sampleVelocity.z, channel);
+              break;
+          case 1: // V
+                Y -= 0.5f;
+              outChunk->chunkData[dataIndex] = currentSourceChannelObject->SampleTrilinear(
+                            X - sampleVelocity.x, Y - sampleVelocity.y, Z - sampleVelocity.z, channel);
+              break;
 
+          case 2: // W
+              outChunk->chunkData[dataIndex] = currentSourceChannelObject->SampleTrilinear(
+                            X - sampleVelocity.x, Y - sampleVelocity.y, Z - sampleVelocity.z, channel);
+              break;
+          default:
+              outChunk->chunkData[dataIndex] = 0.0f;
+              break;
+        }
 
-  outChunk->chunkData[dataIndex] = currentSourceChannelObject->SampleTrilinear(
-      X - sampleVelocity.x, Y - sampleVelocity.y, Z - sampleVelocity.z, channel);
+//      outChunk->chunkData[dataIndex] = currentSourceChannelObject->SampleTrilinear(
+//                                 X - sampleVelocity.x, Y + 0.5f - sampleVelocity.y, Z - sampleVelocity.z, channel);
 
 }
 
-void GridBasicAdvect::PreGridOp() {
-  uint32_t velSource =
-      gridObjectPtr->GetMemoryIndexForChannelName(std::string("velocity"));
-  uint32_t densityTarget =
-      gridObjectPtr->GetMemoryIndexForChannelName(std::string("density"));
+void GridBasicVelAdvect::PreGridOp() {
+    uint32_t velSource =
+        gridObjectPtr->GetMemoryIndexForChannelName(std::string("velocity"));
+    uint32_t velTarget =
+        gridObjectPtr->GetMemoryIndexForChannelName(std::string("velocity"));
 
-  velocitySourceChannelObject =
-      gridObjectPtr->channelObjs[velSource].get(); // default first one
-  currentSourceChannelObject =
-      gridObjectPtr->channelObjs[densityTarget].get();
-  currentTargetChannelObject =
-      gridObjectPtr->channelObjs[densityTarget + 1]
+    currentSourceChannelObject =
+        gridObjectPtr->channelObjs[velSource].get(); // default first one
+    currentTargetChannelObject =
+        gridObjectPtr->channelObjs[velTarget+1]
           .get(); // want dup density channel.will swap after
 }
 // float GridEmitter::addPositiveDifference(float inputReference, float

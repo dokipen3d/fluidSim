@@ -1,5 +1,5 @@
-#ifndef GRIDPRESSURE_H
-#define GRIDPRESSURE_H
+#ifndef GRIDPRESSURERBGS_H
+#define GRIDPRESSURERBGS_H
 
 #include "GridOperator.h"
 #include "ChannelObject.h"
@@ -7,10 +7,10 @@
 
 using namespace std;
 
-class GridPressure : public GridOperator
+class GridPressureRBGS : public GridOperator
 {
 public:
-    GridPressure(GridObject *inGridObject) : GridOperator(inGridObject) {
+    GridPressureRBGS(GridObject *inGridObject) : GridOperator(inGridObject) {
       cout << "in GridDivergence Constructor" << endl;
       setupDefaults();
     };
@@ -19,7 +19,7 @@ public:
                            uint32_t channel);
     virtual void setupDefaults();
 
-    virtual ~GridPressure();
+    virtual ~GridPressureRBGS();
     virtual void PreGridOp();
     float scale;
     float scaleSquared;

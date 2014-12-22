@@ -24,21 +24,34 @@ void GridBouyancy::Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelPosition,
                              Chunk *inChunk, Chunk *outChunk,
                              uint32_t dataIndex, uint32_t channel) {
 
-//    float X = ((chunkId.x * static_cast<int>(chnkSize)) + voxelPosition.x);
+    float X = ((chunkId.x * static_cast<int>(chnkSize)) + voxelPosition.x);
 
-//    float Y = ((chunkId.y * static_cast<int>(chnkSize)) + voxelPosition.y);
+    float Y = ((chunkId.y * static_cast<int>(chnkSize)) + voxelPosition.y);
 
-//    float Z = ((chunkId.z * static_cast<int>(chnkSize)) + voxelPosition.z);
+    float Z = ((chunkId.z * static_cast<int>(chnkSize)) + voxelPosition.z);
     //if we are a vel operator and sampling a scalar, we need to do the inverse channel (could do it before calling algo)
-  float densSample =
-      inChunk
-          ->chunkData[dataIndex - (channel * chnkSize * chnkSize * chnkSize)];
+//  float densSample =
+//      inChunk
+//          ->chunkData[dataIndex - (channel * chnkSize * chnkSize * chnkSize)];
+  float densSample = currentSourceChannelObject->SampleExplicit(X, Y, Z, 0);
+  float densSampleP1 = currentSourceChannelObject->SampleExplicit(X, Y+1, Z, 0);
+  float densSampleXP1 = currentSourceChannelObject->SampleExplicit(X+1, Y, Z, 0);
+
+
 
   //glm::vec3 vel =  currentTargetChannelObject->SampleVectorAtPosition(X + 0.5f, Y + 0.5f, Z + 0.5f);
 
  // float yPos = densSample - vel.y;
-  glm::vec3 value = glm::vec3(0.0f, densSample* 0.02f, 0.0f);
-  outChunk->chunkData[dataIndex] += value[channel];
+
+  //expensive if we allow all three channels
+  //glm::vec3 value = glm::vec3(((densSample+densSampleXP1)/2)*0.02f, ((densSample+densSampleP1)/2)*0.0f, 0.0f);
+
+  glm::vec3 value = glm::vec3(0.0f, ((densSample+densSampleP1)/2)*0.5f, 0.0f);
+
+if (currentTime < 0.10){
+
+    outChunk->chunkData[dataIndex] += value[channel];
+}
 }
 
 void GridBouyancy::PreGridOp() {

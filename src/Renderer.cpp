@@ -13,7 +13,7 @@ Renderer::~Renderer() {}
 
 void Renderer::Render() {
   for (auto x : renderObjects) {
-    camera->moveCamUp();
+    //camera->moveCamUp();
     x->fillTexture();
     x->Render(camera->GetRenderMatrix());
     // x->Render(glm::mat4(1));
@@ -23,7 +23,7 @@ void Renderer::Render() {
 void Renderer::RenderSame()
 {
     for (auto x : renderObjects) {
-      camera->moveCamUp();
+      //camera->moveCamUp();
       x->Render(camera->GetRenderMatrix());
       // x->Render(glm::mat4(1));
     }

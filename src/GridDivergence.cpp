@@ -8,15 +8,16 @@
 
 void GridDivergence::setupDefaults()
 {
-    //set the target channel
     uint32_t divergenceTarget =
         gridObjectPtr->GetMemoryIndexForChannelName(std::string("divergence"));
     //set the source channel
     uint32_t velocitySource =
         gridObjectPtr->GetMemoryIndexForChannelName(std::string("velocity"));
 
+    velocitySourceChannelObject = gridObjectPtr->channelObjs[velocitySource].get();
+
     currentSourceChannelObject =
-        gridObjectPtr->channelObjs[velocitySource].get(); // default first one
+        gridObjectPtr->channelObjs[divergenceTarget].get(); // default first one
     currentTargetChannelObject =
         gridObjectPtr->channelObjs[divergenceTarget].get(); // want vel channel.
 
@@ -32,14 +33,16 @@ void GridDivergence::Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelPosition,
   float Y = ((chunkId.y * (int)chnkSize) + voxelPosition.y);
   float Z = ((chunkId.z * (int)chnkSize) + voxelPosition.z);
 
-  float uDivergenceM1 = currentSourceChannelObject->SampleExplicit(X-1, Y, Z, 0 );
-  float uDivergenceP1 = currentSourceChannelObject->SampleExplicit(X, Y, Z, 0 );
+  //do scale here?
 
-  float vDivergenceM1 = currentSourceChannelObject->SampleExplicit(X, Y-1, Z, 1 );
-  float vDivergenceP1 = currentSourceChannelObject->SampleExplicit(X, Y, Z, 1 );
+  float uDivergenceM1 = velocitySourceChannelObject->SampleExplicit(X, Y, Z, 0 );
+  float uDivergenceP1 = velocitySourceChannelObject->SampleExplicit(X+1, Y, Z, 0 );
 
-  float wDivergenceM1 = currentSourceChannelObject->SampleExplicit(X, Y, Z-1, 2 );
-  float wDivergenceP1 = currentSourceChannelObject->SampleExplicit(X, Y, Z, 2 );
+  float vDivergenceM1 = velocitySourceChannelObject->SampleExplicit(X, Y+1, Z, 1 );
+  float vDivergenceP1 = velocitySourceChannelObject->SampleExplicit(X, Y, Z, 1 );
+
+  float wDivergenceM1 = velocitySourceChannelObject->SampleExplicit(X, Y, Z+1, 2 );
+  float wDivergenceP1 = velocitySourceChannelObject->SampleExplicit(X, Y, Z, 2 );
 
   float Udiff = (uDivergenceP1 - uDivergenceM1);
   float Vdiff = (vDivergenceP1 - vDivergenceM1);
@@ -64,8 +67,10 @@ void GridDivergence::PreGridOp()
     uint32_t velocitySource =
         gridObjectPtr->GetMemoryIndexForChannelName(std::string("velocity"));
 
+    velocitySourceChannelObject = gridObjectPtr->channelObjs[velocitySource].get();
+
     currentSourceChannelObject =
-        gridObjectPtr->channelObjs[velocitySource].get(); // default first one
+        gridObjectPtr->channelObjs[divergenceTarget].get(); // default first one
     currentTargetChannelObject =
         gridObjectPtr->channelObjs[divergenceTarget].get(); // want vel channel.
 

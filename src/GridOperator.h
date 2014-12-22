@@ -46,6 +46,8 @@ public:
   bool callPostChunkOp = false;
   void refreshSourceAndTargetChannelDetails();
   u_int32_t numberOfIterations = 1;
+  int startVoxel = 0;
+  int skipAmount = 1;
 
 protected:
   double currentTime;
@@ -63,6 +65,8 @@ protected:
   uint32_t chunkOpCounter = 0;
   uint32_t totalChunksToOperateOn;
   int32_t internalChannels = 1;
+
+
 };
 
 #endif

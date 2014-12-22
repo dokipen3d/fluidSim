@@ -21,6 +21,7 @@ public:
     virtual ~GridDivergence();
     virtual void PreGridOp();
     float scale;
+    ChannelObject* velocitySourceChannelObject;
 };
 
 #endif // GRIDDIVERGENCE_H

@@ -35,7 +35,7 @@ void GridVectorEmitter::Algorithm(glm::i32vec3 chunkId,
 
   // float sample = sourceVolume->sampleVolume(glm::vec3(X+0.5, Y+0.5, Z+0.5));
 
-  float strength = 3.0f;
+  float strength = 0.001f;
   float frequency = 1.0f / 16.0f;
 
   Z += 50;
@@ -62,16 +62,16 @@ void GridVectorEmitter::Algorithm(glm::i32vec3 chunkId,
 //                                          Y*frequency+time,
 //                                          Z*frequency+time))*strength))));
 
-//      glm::vec3 value = glm::vec3((glm::simplex(glm::vec2(channel+time,
-//      (X)*frequency))+(glm::simplex(glm::vec2(channel+time,
-//      Y*frequency*2))*0.5)*strength,
-//                                  (glm::simplex(glm::vec2(channel+time,
-//                                  (Y)*frequency))+(glm::simplex(glm::vec2(channel+time,
-//                                  Z*frequency*2))*0.5)*strength,
-//                                  (glm::simplex(glm::vec2(channel+time,
-//                                  (Z)*frequency))+(glm::simplex(glm::vec2(channel+time,
-//                                  X*frequency*2))*0.5)*strength))));
-  glm::vec3 value = glm::vec3(0.0f, 0.5f, 0.0f);
+      glm::vec3 value = glm::vec3((glm::simplex(glm::vec2(channel+time,
+      (X)*frequency))+(glm::simplex(glm::vec2(channel+time,
+      Y*frequency*2))*0.5)*strength,
+                                  (glm::simplex(glm::vec2(channel+time,
+                                  (Y)*frequency))+(glm::simplex(glm::vec2(channel+time,
+                                  Z*frequency*2))*0.5)*strength,
+                                  (glm::simplex(glm::vec2(channel+time,
+                                  (Z)*frequency))+(glm::simplex(glm::vec2(channel+time,
+                                  X*frequency*2))*0.5)*strength))));
+  //glm::vec3 value = glm::vec3(0.0f, 0.5f, 0.0f);
   outChunk->chunkData[dataIndex] = value[channel];
   // inChunk->chunkData[dataIndex] = 1;
 

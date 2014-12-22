@@ -27,6 +27,8 @@ public:
   glm::vec3 SampleVectorAtCellCentreFast(float x, float y, float z);
 
 
+  //void separateFracInt(const float &in, float &floatPart,
+  //                                   u_int32_t &intPart, const float &chunkSize);
   ChannelInfo channelInfo;
   float defaultValue;
   bool boundsSet;
@@ -40,6 +42,7 @@ public:
   bool controlChannel = false;
   int channelAmount;
   float voxelSize;
+  u_int32_t parentChunkSizeMinus1;// = parentChunkSize - 1;
 
   float SampleTrilinear(float x, float y, float z, uint32_t channel);
   float SampleExplicit(float x, float y, float z, uint32_t channel);

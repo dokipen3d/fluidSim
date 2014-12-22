@@ -4,6 +4,9 @@
 #include "GridPadCull.h"
 #include "GridVectorEmitter.h"
 #include "GridBasicAdvect.h"
+#include "GridBasicVelAdvect.h"
+
 #include "GridBouyancy.h"
 #include "GridDivergence.h"
 #include "GridPressure.h"
+#include "GridPressureRBGS.h"

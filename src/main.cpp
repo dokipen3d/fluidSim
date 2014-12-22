@@ -80,6 +80,9 @@ int main(int argc, char *argv[]) {
   auto basicAdvect = make_unique<GridBasicAdvect>(grid_obj.get());
   basicAdvect->setNodeName(std::string("basicAdvect"));
 
+  auto basicVelAdvect = make_unique<GridBasicVelAdvect>(grid_obj.get());
+  basicVelAdvect->setNodeName(std::string("basicVelAdvect"));
+
   auto bouyancy = make_unique<GridBouyancy>(grid_obj.get());
   bouyancy->setNodeName(std::string("bouyancy"));
 
@@ -176,7 +179,10 @@ int main(int argc, char *argv[]) {
     divergence->IterateGrid();
     pressure->IterateGrid();
 
+    basicVelAdvect->IterateGrid();
+
     basicAdvect->IterateGrid();
+
 
     //only render every x frames
     if (frameCount == 4){
