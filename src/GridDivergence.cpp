@@ -21,7 +21,7 @@ void GridDivergence::setupDefaults()
     currentTargetChannelObject =
         gridObjectPtr->channelObjs[divergenceTarget].get(); // want vel channel.
 
-    scale = gridObjectPtr->dx;
+    scale = 1.0f;
 
 }
 

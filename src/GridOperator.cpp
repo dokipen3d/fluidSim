@@ -179,7 +179,7 @@ for (int iteration = 0; iteration < numberOfIterations; iteration++){
 
 
 #pragma omp barrier
-#pragma omp parallel for collapse(1)
+#pragma omp parallel for
   for (int i = 0; i < chunks.size(); i++) {
     if (callPreChunkOp) {
 
@@ -228,14 +228,14 @@ for (int iteration = 0; iteration < numberOfIterations; iteration++){
     }
   }
   cout << "end of " << name << " iteration: " << iteration+1 << " " << startVoxel << endl;
-
+}
 
 #pragma omp barrier
 
   if (callGridOp) {
     this->GridOp();
   }
-}
+
 
 //END OF ITERATE-----------------------------------------------------------------------------
 

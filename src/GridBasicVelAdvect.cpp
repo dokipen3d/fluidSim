@@ -100,8 +100,9 @@ void GridBasicVelAdvect::Algorithm(glm::i32vec3 chunkId,
 
       switch (channel) {
           case 0: // U
+                X -= 0.5f;
               outChunk->chunkData[dataIndex] = currentSourceChannelObject->SampleTrilinear(
-                            X  - sampleVelocity.x, Y - sampleVelocity.y, Z - sampleVelocity.z, channel);
+                            X - sampleVelocity.x, Y - sampleVelocity.y, Z - sampleVelocity.z, channel);
               break;
           case 1: // V
                 Y -= 0.5f;
@@ -110,6 +111,7 @@ void GridBasicVelAdvect::Algorithm(glm::i32vec3 chunkId,
               break;
 
           case 2: // W
+                Z -= 0.5f;
               outChunk->chunkData[dataIndex] = currentSourceChannelObject->SampleTrilinear(
                             X - sampleVelocity.x, Y - sampleVelocity.y, Z - sampleVelocity.z, channel);
               break;
