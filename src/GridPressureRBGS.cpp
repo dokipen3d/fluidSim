@@ -26,7 +26,7 @@ void GridPressureRBGS::setupDefaults()
     callPreChunkOp = true;
     scale = gridObjectPtr->dx;
     scaleSquared = -(scale*scale);
-    numberOfIterations = 80;
+    numberOfIterations = 50;
     skipAmount =  2;
 
 
@@ -68,6 +68,8 @@ void GridPressureRBGS::Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelPositio
 
   float div = divergenceSource->SampleExplicit(X, Y, Z, 0);
 
+  float pressureVal = (Pip1JK + Pim1JK + PIjp1K + PIjm1K + PIJkp1 + PIJkm1 + (div*scaleSquared))/6;
+
   //float pressureVal = (P6 - Pip1JK - Pim1JK - PIjp1K - PIjm1K - PIJkp1 - PIJkm1 + div) * scaleSquared;
 //  float pressureVal = ( (div*scaleSquared) +((Pip1JK - P) - (P - Pim1JK)) +
 //                                            ((P - PIjp1K) - (P - PIjm1K)) +
@@ -79,11 +81,11 @@ void GridPressureRBGS::Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelPositio
 //                        ((P - PIJkp1) - (P - PIJkm1)) + (div*scaleSquared)
 //                        );
 
-  float pressureVal =  (1.0f/6.0f) * (// replace the 1/6 with (1 - omega) * P + omega / 6 where omega is SOR value between 1 and 2 (close to 1.7 is best)
-                        ((P - Pip1JK) - (P - Pim1JK)) +                     // (
-                        ((P - PIjp1K) - (P - PIjm1K)) +                    // ((1 - omega) * P) + (omega / 6))
-                        ((P - PIJkp1) - (P - PIJkm1)) + (div*scaleSquared)  // ) is clearer
-                        ) ;
+//  float pressureVal =  (1.0f/6.0f) * (// replace the 1/6 with (1 - omega) * P + omega / 6 where omega is SOR value between 1 and 2 (close to 1.7 is best)
+//                        ((P - Pip1JK) - (P - Pim1JK)) +                     // (
+//                        ((P - PIjp1K) - (P - PIjm1K)) +                    // ((1 - omega) * P) + (omega / 6))
+//                        ((P - PIJkp1) - (P - PIJkm1)) + (div*scaleSquared)  // ) is clearer
+//                        ) ;
 
 //  float pressureVal =  ( ((1 - omega) * P) + (omega / 6)) * (// replace the 1/6 with (1 - omega) * P + omega / 6 where omega is SOR value between 1 and 2 (close to 1.7 is best)
 //                        ((P - Pip1JK) - (P - Pim1JK)) +                     // (

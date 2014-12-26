@@ -29,7 +29,7 @@ set(LIBRARY_SEARCH_PATH
 
 #-lstdc++ -stdlib=libc++
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp -std=c++1y -pedantic -mfpmath=sse -msse2 -msse3 -msse4 -msse4.1 -msse4.2 -O3")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -v -fopenmp -std=c++1y -mfpmath=sse -msse2 -msse3 -msse4 -msse4.1 -msse4.2 -O3")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -v -fopenmp -ffast-math -std=c++1y -mfpmath=sse -msse2 -msse3 -msse4 -msse4.1 -msse4.2 -O3")
 
 aux_source_directory(src/ SRC_LIST)
 add_executable(${PROJECT_NAME} ${SRC_LIST})

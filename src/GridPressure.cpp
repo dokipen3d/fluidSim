@@ -25,27 +25,27 @@ void GridPressure::setupDefaults()
     callGridOp = true;
     callPreChunkOp = true;
     scale = 1.0f;
-    scaleSquared = (scale*scale);
-    numberOfIterations = 80;
+    scaleSquared = -(scale*scale);
+    numberOfIterations = 20;
 
 }
 
 void GridPressure::PreChunkOp(Chunk *&inChunk, Chunk *&outChunk,
                               glm::i32vec3 chunkIdSecondary) {
 
-    if (currentSourceChannelObject->ChunkExists(
+    if (currentTargetChannelObject->ChunkExists(
             chunkIdSecondary.x, chunkIdSecondary.y, chunkIdSecondary.z)) {
        //cout << "already exists!" << endl;
       // cout << outChunk << endl;
 
     } else {
-      outChunk = currentSourceChannelObject->CreateChunk(
+      outChunk = currentTargetChannelObject->CreateChunk(
           chunkIdSecondary.x, chunkIdSecondary.y, chunkIdSecondary.z);
        //cout << "outChunk" << endl;
     }
 
-    std::fill(outChunk->chunkData.begin(),outChunk->chunkData.end(), 0.0f);
-    callPreChunkOp = false;//only call once;
+    //std::fill(outChunk->chunkData.begin(),outChunk->chunkData.end(), 0.0f);
+    //callPreChunkOp = false;//only call once;
 }
 
 void GridPressure::Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelPosition,
@@ -77,7 +77,7 @@ void GridPressure::Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelPosition,
   float div = divergenceSource->SampleExplicit(X, Y, Z, 0);
 
   //float pressureVal = ((P*6.0f) - Pip1JK - Pim1JK - PIjp1K - PIjm1K - PIJkp1 - PIJkm1 + div)/scaleSquared;
-  float pressureVal = (Pip1JK + Pim1JK + PIjp1K + PIjm1K + PIJkp1 + PIJkm1 + (div*scaleSquared))*(1.0f/6.0f);
+  float pressureVal = (Pip1JK + Pim1JK + PIjp1K + PIjm1K + PIJkp1 + PIJkm1 + (div*scaleSquared))/6;
 
 //  float pressureVal = ( (div*scaleSquared) +((Pip1JK - P) - (P - Pim1JK)) +
 //                                            ((P - PIjp1K) - (P - PIjm1K)) +

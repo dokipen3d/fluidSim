@@ -38,17 +38,17 @@ void GridDivergence::Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelPosition,
   float uDivergenceM1 = velocitySourceChannelObject->SampleExplicit(X, Y, Z, 0 );
   float uDivergenceP1 = velocitySourceChannelObject->SampleExplicit(X+1, Y, Z, 0 );
 
-  float vDivergenceM1 = velocitySourceChannelObject->SampleExplicit(X, Y+1, Z, 1 );
-  float vDivergenceP1 = velocitySourceChannelObject->SampleExplicit(X, Y, Z, 1 );
+  float vDivergenceM1 = velocitySourceChannelObject->SampleExplicit(X, Y, Z, 1 );
+  float vDivergenceP1 = velocitySourceChannelObject->SampleExplicit(X, Y+1, Z, 1 );
 
-  float wDivergenceM1 = velocitySourceChannelObject->SampleExplicit(X, Y, Z+1, 2 );
-  float wDivergenceP1 = velocitySourceChannelObject->SampleExplicit(X, Y, Z, 2 );
+  float wDivergenceM1 = velocitySourceChannelObject->SampleExplicit(X, Y, Z, 2 );
+  float wDivergenceP1 = velocitySourceChannelObject->SampleExplicit(X, Y, Z+1, 2 );
 
   float Udiff = (uDivergenceP1 - uDivergenceM1);
   float Vdiff = (vDivergenceP1 - vDivergenceM1);
   float Wdiff = (wDivergenceP1 - wDivergenceM1);
 
-  float divergence = (-scale * Udiff+Vdiff+Wdiff);
+  float divergence = (scale * Udiff+Vdiff+Wdiff);
 
   outChunk->chunkData[dataIndex] = divergence;
 }

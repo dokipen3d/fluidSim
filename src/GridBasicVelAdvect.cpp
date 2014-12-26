@@ -98,30 +98,36 @@ void GridBasicVelAdvect::Algorithm(glm::i32vec3 chunkId,
       //sampleVelocity = glm::vec3{0.0f};
 
 
-      switch (channel) {
-          case 0: // U
-                X -= 0.5f;
-              outChunk->chunkData[dataIndex] = currentSourceChannelObject->SampleTrilinear(
-                            X - sampleVelocity.x, Y - sampleVelocity.y, Z - sampleVelocity.z, channel);
-              break;
-          case 1: // V
-                Y -= 0.5f;
-              outChunk->chunkData[dataIndex] = currentSourceChannelObject->SampleTrilinear(
-                            X - sampleVelocity.x, Y - sampleVelocity.y, Z - sampleVelocity.z, channel);
-              break;
+//      switch (channel) {
+//          case 0: // U
+//                X += 0.5f;
+//                //Y -= 0.5f;
+//                //Z -= 0.5f;
 
-          case 2: // W
-                Z -= 0.5f;
-              outChunk->chunkData[dataIndex] = currentSourceChannelObject->SampleTrilinear(
-                            X - sampleVelocity.x, Y - sampleVelocity.y, Z - sampleVelocity.z, channel);
-              break;
-          default:
-              outChunk->chunkData[dataIndex] = 0.0f;
-              break;
-        }
+////              outChunk->chunkData[dataIndex] = currentSourceChannelObject->SampleTrilinear(
+////                            X - sampleVelocity.x, Y - sampleVelocity.y, Z - sampleVelocity.z, channel);
+//              //break;
+//          case 1: // V
+//                //X -= 0.5f;
+//                Y += 0.5f;
+//                //Z -= 0.5f;
 
-//      outChunk->chunkData[dataIndex] = currentSourceChannelObject->SampleTrilinear(
-//                                 X - sampleVelocity.x, Y + 0.5f - sampleVelocity.y, Z - sampleVelocity.z, channel);
+////              outChunk->chunkData[dataIndex] = currentSourceChannelObject->SampleTrilinear(
+////                            X - sampleVelocity.x, Y - sampleVelocity.y, Z - sampleVelocity.z, channel);
+//              //break;
+
+//          case 2: // W
+//                //X -= 0.5f;
+//                //Y -= 0.5f;
+//                Z += 0.5f;
+////              outChunk->chunkData[dataIndex] = currentSourceChannelObject->SampleTrilinear(
+////                            X - sampleVelocity.x, Y - sampleVelocity.y, Z - sampleVelocity.z, channel);
+//              //break;
+//          }
+
+
+      outChunk->chunkData[dataIndex] = currentSourceChannelObject->SampleTrilinear(
+                                 X - sampleVelocity.x, Y - sampleVelocity.y, Z - sampleVelocity.z, channel);
 
 }
 

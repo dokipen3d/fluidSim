@@ -10,8 +10,8 @@ public:
   };
   void setepDefaults();
   virtual float sampleVolume(glm::vec3 pos);
-  float radiusA = 16;
-  float radiusB = 12;
+  float radiusA = 8;
+  float radiusB = 4;
 };
 
 #endif // IMPLICITSPHERE_H

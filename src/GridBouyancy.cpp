@@ -12,8 +12,10 @@ void GridBouyancy::setupDefaults() {
   uint32_t densitySource =
       gridObjectPtr->GetMemoryIndexForChannelName(std::string("density"));
 
+  densitySourceChannel = gridObjectPtr->channelObjs[densitySource].get();
+
   currentSourceChannelObject =
-      gridObjectPtr->channelObjs[densitySource].get(); // default first one
+      gridObjectPtr->channelObjs[velTarget].get(); // default first one
   currentTargetChannelObject =
       gridObjectPtr->channelObjs[velTarget].get(); // want vel channel.
   // callPreChunkOp = true;
@@ -33,9 +35,9 @@ void GridBouyancy::Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelPosition,
 //  float densSample =
 //      inChunk
 //          ->chunkData[dataIndex - (channel * chnkSize * chnkSize * chnkSize)];
-  float densSample = currentSourceChannelObject->SampleExplicit(X, Y, Z, 0);
-  float densSampleP1 = currentSourceChannelObject->SampleExplicit(X, Y+1, Z, 0);
-  float densSampleXP1 = currentSourceChannelObject->SampleExplicit(X+1, Y, Z, 0);
+  float densSample = densitySourceChannel->SampleExplicit(X, Y-1, Z, 0);
+  float densSampleP1 = densitySourceChannel->SampleExplicit(X, Y, Z, 0);
+  //float densSampleXP1 = currentSourceChannelObject->SampleExplicit(X+1, Y, Z, 0);
 
 
 
@@ -46,12 +48,12 @@ void GridBouyancy::Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelPosition,
   //expensive if we allow all three channels
   //glm::vec3 value = glm::vec3(((densSample+densSampleXP1)/2)*0.02f, ((densSample+densSampleP1)/2)*0.0f, 0.0f);
 
-  glm::vec3 value = glm::vec3(0.0f, ((densSample+densSampleP1)/2)*0.5f, 0.0f);
+  glm::vec3 value = glm::vec3(0.0f, ((densSample+densSampleP1)/2)*0.1f, 0.0f);
 
-if (currentTime < 0.10){
-
-    outChunk->chunkData[dataIndex] += value[channel];
-}
+    //if (currentTime < 50000){
+        float newVal = outChunk->chunkData[dataIndex]+ value[channel];
+        outChunk->chunkData[dataIndex] = newVal;
+    //}
 }
 
 void GridBouyancy::PreGridOp() {
@@ -60,8 +62,10 @@ void GridBouyancy::PreGridOp() {
   uint32_t densitySource =
       gridObjectPtr->GetMemoryIndexForChannelName(std::string("density"));
 
+  densitySourceChannel = gridObjectPtr->channelObjs[densitySource].get();
+
   currentSourceChannelObject =
-      gridObjectPtr->channelObjs[densitySource].get(); // default first one
+      gridObjectPtr->channelObjs[velTarget].get(); // default first one
   currentTargetChannelObject =
       gridObjectPtr->channelObjs[velTarget].get(); // want vel channel.
 }

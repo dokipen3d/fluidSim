@@ -20,7 +20,7 @@ public:
   virtual void PreGridOp();
   virtual void GridOp();
 
-  Chunk* source;
+  ChannelObject* densitySourceChannel;
 };
 
 //#endif // GRIDDISSIPATOR_H

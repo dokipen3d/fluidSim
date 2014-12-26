@@ -189,7 +189,7 @@ for (int iteration = 0; iteration < numberOfIterations; iteration++){
       }
     }
     // cout << "iterating through chunk vector " << i << endl;
-    //#pragma omp parallel for collapse(3)
+    #pragma omp parallel for collapse(3)
     for (int w = startVoxel; w < chnkSize; w += skipAmount) {//for skipping voxels in thr red black gauss seidel update
       for (int v = startVoxel; v < chnkSize; v += skipAmount) {//can do 1-startvoxel to ping pong between 1 & 0
         for (int u = startVoxel; u < chnkSize; u += skipAmount) {//and then do skipAmount = startVoxel+1 in each postgridop
@@ -228,13 +228,14 @@ for (int iteration = 0; iteration < numberOfIterations; iteration++){
     }
   }
   cout << "end of " << name << " iteration: " << iteration+1 << " " << startVoxel << endl;
-}
+
 
 #pragma omp barrier
 
   if (callGridOp) {
     this->GridOp();
   }
+}
 
 
 //END OF ITERATE-----------------------------------------------------------------------------

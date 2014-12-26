@@ -100,9 +100,9 @@ void GridObject::SwapChannelPointers(
 
   int channelIndexToSwap = channelDetails[nameToSwap].memoryIndex;
   // cout << "changing " << nameToSwap << channelIndexToSwap << endl;
-  channelObjs[channelIndexToSwap].swap(channelObjs.at(channelIndexToSwap));
-  std::swap(channelObjs.at(channelIndexToSwap),
-            channelObjs.at(channelIndexToSwap + 1));
+  channelObjs[channelIndexToSwap].swap(channelObjs.at(channelIndexToSwap+1));
+//  std::swap(channelObjs.at(channelIndexToSwap),
+//            channelObjs.at(channelIndexToSwap + 1));
   // cout << " swapping " << channelObjs.at(channelIndexToSwap).get() << " with
   // " << channelObjs.at(channelIndexToSwap+1).get() << endl;
 }

@@ -92,6 +92,9 @@ int main(int argc, char *argv[]) {
   auto pressure = make_unique<GridPressure>(grid_obj.get());
   pressure->setNodeName(std::string("pressure oper"));
 
+  auto projection = make_unique<GridProjection>(grid_obj.get());
+  projection->setNodeName(std::string("projection oper"));
+
 
   // gridEmit->IterateGrid();
 
@@ -169,6 +172,9 @@ int main(int argc, char *argv[]) {
       }
     }
 
+    basicAdvect->IterateGrid();
+    basicVelAdvect->IterateGrid();
+
     gridEmit->IterateGrid();
     gridPad->IterateGrid();
 
@@ -178,14 +184,15 @@ int main(int argc, char *argv[]) {
     bouyancy->IterateGrid();
     divergence->IterateGrid();
     pressure->IterateGrid();
+    projection->IterateGrid();
 
-    basicVelAdvect->IterateGrid();
 
-    basicAdvect->IterateGrid();
+
+
 
 
     //only render every x frames
-    if (frameCount == 4){
+    if (frameCount == 3){
         renderer->Render();
         frameCount = 0;
     }
@@ -193,7 +200,7 @@ int main(int argc, char *argv[]) {
         renderer->RenderSame();
     }
     frameCount++;
-    grid_obj->incrementSimTime(0.08);
+    grid_obj->incrementSimTime(0.041666666f);
 
     /* Swap our back buffer to the front */
     SDL_GL_SwapWindow(window);

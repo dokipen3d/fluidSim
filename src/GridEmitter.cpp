@@ -142,6 +142,7 @@ void GridEmitter::Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelPosition,
       //                            currentSourceChannelObject->ChunkExists(chunkId.x,
       //                            chunkId.y, chunkId.z) << endl;
       //            }
+
       outChunk = currentTargetChannelObject->CreateChunk(chunkId.x, chunkId.y,
                                                          chunkId.z);
       // inChunk->chunkData[dataIndex] = 0;
@@ -175,9 +176,9 @@ void GridEmitter::Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelPosition,
       // map_range(sample, -16.0f, -1.0f, 1.0f, 0.1f)
 
       // map_range(sample, -32.0f, 0.0f, value*0.08, 0.0f)
-      // float value = glm::max(glm::cos(currentTime*3), 0.0);
-      if (currentTime < 0.08) {
-        outChunk->chunkData[dataIndex] += 1.0f;
+      //float value = glm::max(glm::cos(currentTime*1.2), 0.0);
+      if (currentTime < 500) {
+        outChunk->chunkData[dataIndex] += 0.1f;
       } else {
         outChunk->chunkData[dataIndex] += 0.0f;
       }

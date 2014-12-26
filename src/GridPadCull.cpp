@@ -22,7 +22,7 @@ void GridPadCull::Algorithm(glm::i32vec3 chunkId,
   bool lValueFalse = false;
   bool lValueTrue = true;
 
-  if (outChunk->chunkData[dataIndex] > 0.001) {
+  if (outChunk->chunkData[dataIndex] > 0.0005) {
 
     // if (inChunk->empty.compare_exchange_strong(lValueTrue, false)){
     outChunk->empty = false;
@@ -139,7 +139,7 @@ void GridPadCull::PostChunkOp(Chunk *&inChunk, Chunk *&outChunk,
 
   // double timeNow = omp_get_wtime();
 
-  if ((gridObjectPtr->simTime - outChunk->timeCreated) > 0.1) {
+  if ((gridObjectPtr->simTime - outChunk->timeCreated) > 0.5) {
     outChunk->okayToDelete = true;
   }
 
