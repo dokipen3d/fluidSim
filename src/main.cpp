@@ -192,7 +192,7 @@ int main(int argc, char *argv[]) {
 
 
     //only render every x frames
-    if (frameCount == 3){
+    if (frameCount == 1){
         renderer->Render();
         frameCount = 0;
     }

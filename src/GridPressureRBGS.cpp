@@ -22,12 +22,13 @@ void GridPressureRBGS::setupDefaults()
     currentTargetChannelObject =
         gridObjectPtr->channelObjs[pressureTarget].get(); // want vel channel.
 
-    callGridOp = true;
+    //callGridOp = true;
     callPreChunkOp = true;
     scale = gridObjectPtr->dx;
     scaleSquared = -(scale*scale);
     numberOfIterations = 50;
-    skipAmount =  2;
+    skipAmount =  1;
+    startVoxel = 0;
 
 
 }
@@ -127,6 +128,6 @@ void GridPressureRBGS::PreGridOp()
 
 void GridPressureRBGS::GridOp() {
   //gridObjectPtr->SwapChannelPointers(std::string("pressure")); //dont swap with red black
-    startVoxel = 1 - startVoxel;
+    //startVoxel = 1 - startVoxel;
 }
 

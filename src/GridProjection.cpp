@@ -84,12 +84,12 @@ void GridProjection::Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelPosition,
             //break;
 
 
-    float diff = (Pp1 - Pm1);
-    float oldVel = outChunk->chunkData[dataIndex];
+    //float diff = (Pp1 - Pm1);
+    //float oldVel = outChunk->chunkData[dataIndex];
 //    if (diff > 0.001)
 //        cout << diff << endl;
 
-    outChunk->chunkData[dataIndex] = oldVel - diff;
+    outChunk->chunkData[dataIndex] -= (Pp1 - Pm1);
 
 
 

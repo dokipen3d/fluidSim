@@ -93,7 +93,7 @@ for (int iteration = 0; iteration < numberOfIterations; iteration++){
 // currentSourceChannelObject->channelInfo.channelName << endl;
 
 //SORTING BOUNDS------------------------------------------------------------------------------
-#pragma omp parallel for collapse(3)
+#pragma omp parallel for ordered collapse(3)
   for (int i = fmx; i <= fMax; i++) {
     for (int j = fmy; j <= fMay; j++) {
       for (int k = fmz; k <= fMaz; k++) {
@@ -132,7 +132,7 @@ for (int iteration = 0; iteration < numberOfIterations; iteration++){
 //FORCE SORTING BOUNDS------------------------------------------------------------------------------
   if (forceInputBoundsIteration) {
 
-#pragma omp parallel for collapse(3)
+#pragma omp parallel for ordered collapse(3)
     for (int i = this->boundingBox.fluidMin.z;
          i <= this->boundingBox.fluidMax.z; i++) {
       for (int j = this->boundingBox.fluidMin.y;
@@ -179,7 +179,7 @@ for (int iteration = 0; iteration < numberOfIterations; iteration++){
 
 
 #pragma omp barrier
-#pragma omp parallel for
+#pragma omp parallel for ordered
   for (int i = 0; i < chunks.size(); i++) {
     if (callPreChunkOp) {
 
@@ -189,7 +189,7 @@ for (int iteration = 0; iteration < numberOfIterations; iteration++){
       }
     }
     // cout << "iterating through chunk vector " << i << endl;
-    #pragma omp parallel for collapse(3)
+    #pragma omp parallel for ordered collapse(3)
     for (int w = startVoxel; w < chnkSize; w += skipAmount) {//for skipping voxels in thr red black gauss seidel update
       for (int v = startVoxel; v < chnkSize; v += skipAmount) {//can do 1-startvoxel to ping pong between 1 & 0
         for (int u = startVoxel; u < chnkSize; u += skipAmount) {//and then do skipAmount = startVoxel+1 in each postgridop

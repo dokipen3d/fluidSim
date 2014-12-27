@@ -22,7 +22,7 @@ void GridPadCull::Algorithm(glm::i32vec3 chunkId,
   bool lValueFalse = false;
   bool lValueTrue = true;
 
-  if (outChunk->chunkData[dataIndex] > 0.0005) {
+  if (outChunk->chunkData[dataIndex] > 0.008) {
 
     // if (inChunk->empty.compare_exchange_strong(lValueTrue, false)){
     outChunk->empty = false;
@@ -70,7 +70,6 @@ void GridPadCull::PostChunkOp(Chunk *&inChunk, Chunk *&outChunk,
     outChunk->timeCreated = gridObjectPtr->simTime;
     //#pragma omp parrallel for collapse(3)
     //#pragma omp critical
-
     {
       for (int i = -1 * chunksToPad; i <= chunksToPad; i++) {
         for (int j = -1 * chunksToPad; j <= chunksToPad; j++) {
@@ -90,7 +89,9 @@ void GridPadCull::PostChunkOp(Chunk *&inChunk, Chunk *&outChunk,
 
               // break;
               // currentSourceChannelObject->CreateChunk(chunkId.x+i,chunkId.y+j,chunkId.z+k);
-            } else {
+            } else
+            //#pragma omp barrier
+            {
               // myString << chunkIdSecondary.z+k << " doesnt exists" << endl;
               currentTargetChannelObject->CreateChunk(
                   (int)chunkIdSecondary.x + i, (int)chunkIdSecondary.y + j,
@@ -139,7 +140,7 @@ void GridPadCull::PostChunkOp(Chunk *&inChunk, Chunk *&outChunk,
 
   // double timeNow = omp_get_wtime();
 
-  if ((gridObjectPtr->simTime - outChunk->timeCreated) > 0.5) {
+  if ((gridObjectPtr->simTime - outChunk->timeCreated) > 0.5f) {
     outChunk->okayToDelete = true;
   }
 

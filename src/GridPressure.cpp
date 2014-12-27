@@ -101,8 +101,8 @@ void GridPressure::Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelPosition,
 //                        ((P - PIJkp1) - (P - PIJkm1)) + (div*scaleSquared)  // ) is clearer
 //                        ) ;
 
-  outChunk->chunkData[dataIndex] = pressureVal;
-
+  //outChunk->chunkData[dataIndex] = pressureVal;
+    outChunk->chunkData[dataIndex] = (Pip1JK + Pim1JK + PIjp1K + PIjm1K + PIJkp1 + PIJkm1 + (div*scaleSquared))/6;
 
 
 }

@@ -17,7 +17,7 @@ public:
   atomic<bool> empty;
   bool okayToDelete;
   bool justCreatedOneFrameAgo;
-  atomic<int> voxelCount;
+  atomic<uint32_t> voxelCount;
   double timeCreated;
 
 private:

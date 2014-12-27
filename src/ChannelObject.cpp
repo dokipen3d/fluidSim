@@ -363,14 +363,14 @@ glm::vec3 ChannelObject::SampleVectorAtCellFaceFast(float x, float y, float z,
   case 0: // U
     u = (this->SampleExplicit(x, y, z, 0));
     v = (this->SampleExplicit(x, y, z, 1) +
-         this->SampleExplicit(x, y - 1, z, 1) +
-         this->SampleExplicit(x - 1, y, z, 1) +
-         this->SampleExplicit(x - 1, y - 1, z, 1)) /
+         this->SampleExplicit(x, y + 1, z, 1) +
+         this->SampleExplicit(x + 1, y, z, 1) +
+         this->SampleExplicit(x + 1, y + 1, z, 1)) /
         4.0f;
     w = (this->SampleExplicit(x, y, z, 2) +
-         this->SampleExplicit(x, y, z - 1, 2) +
-         this->SampleExplicit(x - 1, y, z, 2) +
-         this->SampleExplicit(x - 1, y, z - 1, 2)) /
+         this->SampleExplicit(x, y, z + 1, 2) +
+         this->SampleExplicit(x + 1, y, z, 2) +
+         this->SampleExplicit(x + 1, y, z + 1, 2)) /
         4.0f;
 
     return glm::vec3(u, v, w);
