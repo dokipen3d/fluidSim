@@ -10,13 +10,13 @@ uniform sampler2DRect texFront;
 
 uniform sampler3D volumeTexture;
 
-vec3 LightPosition = vec3(1.0, 0.0, 1.0);
-vec3 LightIntensity = vec3(3.0);
-float Absorption = 0.5;
+vec3 LightPosition = vec3(1.0, 0.5, 1.0);
+vec3 LightIntensity = vec3(2.0);
+float Absorption = 0.333;
 
 
 const float maxDist = sqrt(2.0);
-const int numSamples = 256;
+const int numSamples = 128;
 const float stepSize = maxDist/float(numSamples);
 const int numLightSamples = 64;
 const float lscale = maxDist / float(numLightSamples);

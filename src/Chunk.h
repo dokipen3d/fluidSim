@@ -15,7 +15,7 @@ public:
   ~Chunk();
   vector<float> chunkData;
   atomic<bool> empty;
-  bool okayToDelete;
+  bool okayToDelete = false;
   bool justCreatedOneFrameAgo;
   atomic<uint32_t> voxelCount;
   double timeCreated;

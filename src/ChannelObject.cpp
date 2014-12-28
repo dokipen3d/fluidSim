@@ -69,12 +69,24 @@ inline static void separateFracInt(const float &in, float &floatPart,
    //   cout <<"in: " << in << " floatpart: " << floatPart << " temp floaty int: " << tempFloatyInt << " mod chnk: " << temp << endl;
 }
 
+inline static void separateFracIntFast(const float &in,
+                                   u_int32_t &intPart, uint32_t parentChunkSizem1) {
+  // float tempIn = in;
+
+  int floatToInt = glm::floor(in);
+  intPart = floatToInt & parentChunkSizem1;
+
+}
 
 //----------------------------------------------
 ChannelObject::ChannelObject(ChannelInfo inInfo, GridObject *parentGrid) {
   // chunks = std::unique_ptr<LockFreeHashTable>(new
   // LockFreeHashTable(65536));//default size of 2^16, 16-bit
-  chunks = std::make_unique<LockFreeHashTable>(65536);
+  //chunks = std::make_unique<LockFreeHashTable>(65536);
+  //chunks = std::make_unique<LockFreeHashTable>(131072);
+    chunks = std::make_unique<LockFreeHashTable>(262144);
+
+
   channelInfo = inInfo;
   parentGridObject = parentGrid;
   defaultValue = 0.0f;
@@ -873,17 +885,19 @@ float ChannelObject::SampleExplicit(float x, float y, float z,
   // int32_t chunkIndexDivY = ((int)y / (parentChunkSize));
   // int32_t chunkIndexDivZ = ((int)z / (parentChunkSize));
 
-  float fracX;
-  float fracY;
-  float fracZ;
+
 
   uint32_t localGridIndexX;
   uint32_t localGridIndexY;
   uint32_t localGridIndexZ;
 
-  separateFracInt(x, fracX, localGridIndexX, fParentChunkSize);
-  separateFracInt(y, fracY, localGridIndexY, fParentChunkSize);
-  separateFracInt(z, fracZ, localGridIndexZ, fParentChunkSize);
+//  separateFracInt(x, fracX, localGridIndexX, fParentChunkSize);
+//  separateFracInt(y, fracY, localGridIndexY, fParentChunkSize);
+//  separateFracInt(z, fracZ, localGridIndexZ, fParentChunkSize);
+
+  separateFracIntFast(x, localGridIndexX, parentChunkSizeMinus1);
+  separateFracIntFast(y, localGridIndexY, parentChunkSizeMinus1);
+  separateFracIntFast(z, localGridIndexZ, parentChunkSizeMinus1);
 
 //  assert(fracX < 1.0 && fracX >= 0);
 //  assert(fracY < 1.0 && fracY >= 0);

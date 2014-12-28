@@ -13,6 +13,12 @@ class GridObject;
 class ChannelObject;
 class Chunk;
 
+struct chunkAddresses {
+  Chunk *chunkSource;
+  Chunk *chunkTarget;
+  glm::i32vec3 chunkIndex;
+};
+
 class GridOperator {
 
 public:
@@ -48,6 +54,8 @@ public:
   u_int32_t numberOfIterations = 1;
   int startVoxel = 0;
   int skipAmount = 1;
+
+  std::vector<chunkAddresses> chunks;
 
 protected:
   double currentTime;

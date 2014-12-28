@@ -63,7 +63,7 @@ void GridPressure::Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelPosition,
   //add scale here?
 
  // float P6 = inChunk->chunkData[dataIndex];
-  float P  = currentSourceChannelObject->SampleExplicit(X, Y, Z, 0 );
+  //float P  = currentSourceChannelObject->SampleExplicit(X, Y, Z, 0 );
 
   float Pip1JK = currentSourceChannelObject->SampleExplicit(X+1, Y, Z, 0 );
   float Pim1JK = currentSourceChannelObject->SampleExplicit(X-1, Y, Z, 0 );
@@ -77,7 +77,7 @@ void GridPressure::Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelPosition,
   float div = divergenceSource->SampleExplicit(X, Y, Z, 0);
 
   //float pressureVal = ((P*6.0f) - Pip1JK - Pim1JK - PIjp1K - PIjm1K - PIJkp1 - PIJkm1 + div)/scaleSquared;
-  float pressureVal = (Pip1JK + Pim1JK + PIjp1K + PIjm1K + PIJkp1 + PIJkm1 + (div*scaleSquared))/6;
+  //float pressureVal = (Pip1JK + Pim1JK + PIjp1K + PIjm1K + PIJkp1 + PIJkm1 + (div*scaleSquared))/6;
 
 //  float pressureVal = ( (div*scaleSquared) +((Pip1JK - P) - (P - Pim1JK)) +
 //                                            ((P - PIjp1K) - (P - PIjm1K)) +

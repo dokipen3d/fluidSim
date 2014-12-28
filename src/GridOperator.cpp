@@ -10,10 +10,11 @@ inline static uint32_t flatten3dCoordinatesto1D(uint32_t x, uint32_t y,
                                                 uint32_t z, uint32_t channel,
                                                 uint32_t chunkSize) {
 
-  // return ((x+channel) + ((y+channel)*chunkSize) +
-  // ((z+channel)*chunkSize*chunkSize));
-  return ((x + channel) + ((y + channel) << 3) + ((z + channel) << 3 << 3));
+  return ((x+channel) + ((y+channel)*chunkSize) + ((z+channel)*chunkSize*chunkSize));
+  //return ((x + channel) + ((y + channel) << 3) + ((z + channel) << 3 << 3));
 }
+
+
 
 //----------------------------------------------
 GridOperator::GridOperator(GridObject *inGridObject) {
@@ -53,6 +54,7 @@ void GridOperator::IterateGrid() {
 //ITERATE-----------------------------------------------------------------------------
 for (int iteration = 0; iteration < numberOfIterations; iteration++){
 
+    chunks.clear();
   chunkOpCounter = 0;
   this->PreGridOp();
 
@@ -82,18 +84,13 @@ for (int iteration = 0; iteration < numberOfIterations; iteration++){
   // cout << "<" << fmx << ", " << fmy << ", " << fmz << ">  to  <" << fMax <<
   // ", " << fMay << ", " << fMaz << "> ";
 
-  struct chunkAddresses {
-    Chunk *chunkSource;
-    Chunk *chunkTarget;
-    glm::i32vec3 chunkIndex;
-  };
-  std::vector<chunkAddresses> chunks;
+
 
 // cout << "source channel is " << name << " " <<
 // currentSourceChannelObject->channelInfo.channelName << endl;
 
 //SORTING BOUNDS------------------------------------------------------------------------------
-#pragma omp parallel for ordered collapse(3)
+#pragma omp parallel for collapse(3)
   for (int i = fmx; i <= fMax; i++) {
     for (int j = fmy; j <= fMay; j++) {
       for (int k = fmz; k <= fMaz; k++) {
@@ -132,7 +129,7 @@ for (int iteration = 0; iteration < numberOfIterations; iteration++){
 //FORCE SORTING BOUNDS------------------------------------------------------------------------------
   if (forceInputBoundsIteration) {
 
-#pragma omp parallel for ordered collapse(3)
+#pragma omp parallel for collapse(3)
     for (int i = this->boundingBox.fluidMin.z;
          i <= this->boundingBox.fluidMax.z; i++) {
       for (int j = this->boundingBox.fluidMin.y;

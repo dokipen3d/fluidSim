@@ -17,17 +17,17 @@ void GridPressureRBGS::setupDefaults()
 
     divergenceSource = gridObjectPtr->channelObjs[divergenceSourceChannel].get(); // default first one
 
-//    currentSourceChannelObject =
-//        gridObjectPtr->channelObjs[pressureTarget+1].get(); // default first one
+    currentSourceChannelObject =
+        gridObjectPtr->channelObjs[pressureTarget].get(); // default first one
     currentTargetChannelObject =
         gridObjectPtr->channelObjs[pressureTarget].get(); // want vel channel.
 
-    //callGridOp = true;
+    callGridOp = true;
     callPreChunkOp = true;
     scale = gridObjectPtr->dx;
     scaleSquared = -(scale*scale);
-    numberOfIterations = 50;
-    skipAmount =  1;
+    numberOfIterations = 20;
+    skipAmount =  2;
     startVoxel = 0;
 
 
@@ -119,7 +119,7 @@ void GridPressureRBGS::PreGridOp()
     divergenceSource = gridObjectPtr->channelObjs[divergenceSourceChannel].get(); // default first one
 
     currentSourceChannelObject =
-        gridObjectPtr->channelObjs[pressureTarget+1].get(); // default first one
+        gridObjectPtr->channelObjs[pressureTarget].get(); // default first one
     currentTargetChannelObject =
         gridObjectPtr->channelObjs[pressureTarget].get(); // want  channel.
 
@@ -128,6 +128,6 @@ void GridPressureRBGS::PreGridOp()
 
 void GridPressureRBGS::GridOp() {
   //gridObjectPtr->SwapChannelPointers(std::string("pressure")); //dont swap with red black
-    //startVoxel = 1 - startVoxel;
+    startVoxel = 1 - startVoxel;
 }
 
