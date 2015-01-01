@@ -26,7 +26,7 @@ void GridPressure::setupDefaults()
     callPreChunkOp = true;
     scale = 1.0f;
     scaleSquared = -(scale*scale);
-    numberOfIterations = 10;
+    numberOfIterations = 20;
 
 }
 

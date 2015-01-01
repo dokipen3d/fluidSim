@@ -5,6 +5,8 @@
 #include "GridVectorEmitter.h"
 #include "GridBasicAdvect.h"
 #include "GridRK2Advect.h"
+#include "GridMacCormackAdvect.h"
+#include "GridMacCormackVelAdvect.h"
 #include "GridRK2VelAdvect.h"
 
 #include "GridBasicVelAdvect.h"

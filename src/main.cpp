@@ -78,7 +78,7 @@ int main(int argc, char *argv[]) {
   vecEmit->SetChannelName(std::string("velocity"));
 
   auto basicAdvect = make_unique<GridRK2Advect>(grid_obj.get());
-  //auto basicAdvect = make_unique<GridRK2Advect>(grid_obj.get());
+  //auto basicAdvect = make_unique<GridBasicAdvect>(grid_obj.get());
 
   basicAdvect->setNodeName(std::string("basicAdvect"));
 
@@ -92,6 +92,8 @@ int main(int argc, char *argv[]) {
 
   auto divergence = make_unique<GridDivergence>(grid_obj.get());
   divergence->setNodeName(std::string("divergence oper"));
+
+  //auto pressure = make_unique<GridPressure>(grid_obj.get());
 
   auto pressure = make_unique<GridPressure>(grid_obj.get());
   pressure->setNodeName(std::string("pressure oper"));

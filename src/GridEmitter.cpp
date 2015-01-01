@@ -20,8 +20,8 @@ void GridEmitter::setupDefaults() {
   createChunks = true;
   std::string name = "sphereEmitter";
   forceInputBoundsIteration = true;
-  auto emitterSphere = make_shared<ImplicitTorus>(name);
-  //auto emitterSphere = make_shared<ImplicitSphere>(name);
+  //auto emitterSphere = make_shared<ImplicitTorus>(name);
+  auto emitterSphere = make_shared<ImplicitSphere>(name);
   // callPreChunkOp = true;
   sourceVolume = emitterSphere;
   // work out chunks to process based on implicit bounding box
@@ -181,7 +181,9 @@ void GridEmitter::Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelPosition,
       //float value = glm::max(glm::cos(currentTime*1.2), 0.0);
       if (currentTime < 500) {
         //outChunk->chunkData[dataIndex] += 0.2f;
-        float newval = addPositiveDifference(inChunk->chunkData[dataIndex],3.0f* glm::abs(glm::simplex(glm::vec3(X/16,Y/16-(currentTime*2),Z/16)) ) );
+        //float newval = addPositiveDifference(inChunk->chunkData[dataIndex],3.0f* glm::abs(glm::simplex(glm::vec3(X/16,Y/16-(currentTime*0.8),Z/16)) ) );
+          float newval = addPositiveDifference(inChunk->chunkData[dataIndex],3.0f);
+
         outChunk->chunkData[dataIndex] = newval ;
       }
 //      else {
