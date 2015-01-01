@@ -3,6 +3,8 @@
 #include "ChannelObject.h"
 #include "glm/vec3.hpp"
 #include "glm/trigonometric.hpp"
+#include "glm/gtc/noise.hpp"
+
 
 //#include <omp.h>
 
@@ -179,8 +181,8 @@ void GridEmitter::Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelPosition,
       //float value = glm::max(glm::cos(currentTime*1.2), 0.0);
       if (currentTime < 500) {
         //outChunk->chunkData[dataIndex] += 0.2f;
-        float newval = addPositiveDifference(inChunk->chunkData[dataIndex],3.0f  );
-        outChunk->chunkData[dataIndex] = newval;
+        float newval = addPositiveDifference(inChunk->chunkData[dataIndex],3.0f* glm::abs(glm::simplex(glm::vec3(X/16,Y/16-(currentTime*2),Z/16)) ) );
+        outChunk->chunkData[dataIndex] = newval ;
       }
 //      else {
 //        outChunk->chunkData[dataIndex] += 0.0f;

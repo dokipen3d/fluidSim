@@ -1,5 +1,6 @@
 #include "ImplicitTorus.h"
 #include "glm/exponential.hpp" // glm::pow
+#include "glm/gtx/rotate_vector.hpp"
 #include <iostream>
 
 using namespace std;
@@ -13,6 +14,7 @@ void ImplicitTorus::setepDefaults() {
 }
 
 glm::float32 ImplicitTorus::sampleVolume(glm::vec3 pos) {
+  pos =  glm::rotateZ(pos, 1.57079633f);
   float R = radiusA;
   float r = radiusB;
   float R2 = glm::pow(R, 2.0f);
