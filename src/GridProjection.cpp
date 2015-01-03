@@ -54,9 +54,10 @@ void GridProjection::Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelPosition,
 
 
     if (channel == 0) {
-
-            Pm1  = pressureSource->SampleExplicit(X-1.0f, Y, Z, 0 );
+            Pm1  = pressureSource->SampleExplicit(X-1, Y, Z, 0 );
             Pp1  = pressureSource->SampleExplicit(X, Y, Z, 0 );
+            outChunk->chunkData[dataIndex] -= (Pp1 - Pm1);
+
             //outChunk->chunkData[dataIndex] -= (Pp1 - Pm1)*0.000001;
             //cout << "in channel 0 " << Pm1 << " " << Pp1 << endl;
             //break;
@@ -64,16 +65,20 @@ void GridProjection::Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelPosition,
     else if (channel == 1){
 
 
-            Pm1  = pressureSource->SampleExplicit(X, Y-1.0f, Z, 0 );
+            Pm1  = pressureSource->SampleExplicit(X, Y-1, Z, 0 );
             Pp1  = pressureSource->SampleExplicit(X, Y, Z, 0 );
+            //outChunk->chunkData[dataIndex] -= (Pp1 - Pm1);
+
     }
             //break;
             //outChunk->chunkData[dataIndex] -= (Pp1 - Pm1)*0.000001;
     else if (channel == 2){
 
 
-            Pm1  = pressureSource->SampleExplicit(X, Y, Z-1.0f, 0 );
+            Pm1  = pressureSource->SampleExplicit(X, Y, Z-1, 0 );
             Pp1  = pressureSource->SampleExplicit(X, Y, Z, 0 );
+            //outChunk->chunkData[dataIndex] -= (Pp1 - Pm1);
+
     }
             //outChunk->chunkData[dataIndex] -= (Pp1 - Pm1)*0.000001;
 
@@ -89,7 +94,7 @@ void GridProjection::Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelPosition,
 //    if (diff > 0.001)
 //        cout << diff << endl;
 
-    outChunk->chunkData[dataIndex] -= (Pp1 - Pm1);
+    //outChunk->chunkData[dataIndex] -= (Pp1 - Pm1);
 
 
 

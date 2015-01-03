@@ -81,8 +81,8 @@ for (int iteration = 0; iteration < numberOfIterations; iteration++){
   int fMay = gridObjectPtr->boundingBox.fluidMax.y;
   int fMaz = gridObjectPtr->boundingBox.fluidMax.z;
 
-  // cout << "<" << fmx << ", " << fmy << ", " << fmz << ">  to  <" << fMax <<
-  // ", " << fMay << ", " << fMaz << "> ";
+   cout << "<" << fmx << ", " << fmy << ", " << fmz << ">  to  <" << fMax <<
+   ", " << fMay << ", " << fMaz << "> ";
 
 
 
@@ -108,7 +108,7 @@ for (int iteration = 0; iteration < numberOfIterations; iteration++){
         newChunkAddresses.chunkIndex = glm::i32vec3(i, j, k);
 
         // cout << "adding existing" << endl;
-        if (newChunkAddresses.chunkTarget !=
+        if (newChunkAddresses.chunkSource !=
             currentSourceChannelObject->dummyChunk) // if there is a chunk there
                                                     // then go ahead and store
                                                     // it

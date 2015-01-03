@@ -10,7 +10,7 @@ uniform sampler2DRect texFront;
 
 uniform sampler3D volumeTexture;
 
-vec3 LightPosition = vec3(1.0, 0.5, 1.0);
+vec3 LightPosition = vec3(0.0, 0.0, 50.0);
 vec3 LightIntensity = vec3(2.0);
 float Absorption = 0.333;
 

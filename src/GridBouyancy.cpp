@@ -37,6 +37,8 @@ void GridBouyancy::Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelPosition,
 //          ->chunkData[dataIndex - (channel * chnkSize * chnkSize * chnkSize)];
   float densSample = densitySourceChannel->SampleExplicit(X, Y-1, Z, 0);
   float densSampleP1 = densitySourceChannel->SampleExplicit(X, Y, Z, 0);
+
+
   //float densSampleXP1 = currentSourceChannelObject->SampleExplicit(X+1, Y, Z, 0);
 
 

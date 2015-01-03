@@ -100,19 +100,26 @@ void GridBasicVelAdvect::Algorithm(glm::i32vec3 chunkId,
 
 //      if (channel == 0) {
 
-//             X -= 0.5f;
+//            X -= 0.5f;
+
+////             Y += 0.5f;
+////             Z += 0.5f;
+
 //      }
 //      else if (channel == 1){
 
-
-//             Y -= 0.5f;
+//Y -= 0.5f;
+////             X += 0.5f;
+////             Z += 0.5f;
 //      }
 //              //break;
 //              //outChunk->chunkData[dataIndex] -= (Pp1 - Pm1)*0.000001;
 //      else if (channel == 2){
 
+//Z -= 0.5f;
+////              X += 0.5f;
+////              Y += 0.5f;
 
-//              Z -= 0.5f;
 //      }
 
 

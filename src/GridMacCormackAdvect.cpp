@@ -98,56 +98,57 @@ void GridMacCormackAdvect::Algorithm(glm::i32vec3 chunkId,
 
   sampleVelocity = velocitySourceChannelObject->SampleVectorAtCellCentreFast(X, Y, Z);
 
-    float A = currentSourceChannelObject->SampleExplicit(X,Y+1,Z,0);
-    float B = currentSourceChannelObject->SampleExplicit(X,Y-1,Z,0);
-    float C = currentSourceChannelObject->SampleExplicit(X-1,Y,Z,0);
-    float D = currentSourceChannelObject->SampleExplicit(X+1,Y,Z,0);
-    float E = currentSourceChannelObject->SampleExplicit(X,Y,Z-1,0);
-    float F = currentSourceChannelObject->SampleExplicit(X,Y,Z+1,0);
-    float G = currentSourceChannelObject->SampleExplicit(X-1,Y-1,Z-1,0);
-    float H = currentSourceChannelObject->SampleExplicit(X-1,Y-1,Z+1,0);
-    float I = currentSourceChannelObject->SampleExplicit(X+1,Y-1,Z-1,0);
-    float J = currentSourceChannelObject->SampleExplicit(X+1,Y-1,Z+1,0);
-    float K = currentSourceChannelObject->SampleExplicit(X-1,Y+1,Z-1,0);
-    float L = currentSourceChannelObject->SampleExplicit(X-1,Y+1,Z+1,0);
-    float M = currentSourceChannelObject->SampleExplicit(X+1,Y+1,Z-1,0);
-    float N = currentSourceChannelObject->SampleExplicit(X+1,Y+1,Z+1,0);
 
 
 
   //phi_n
-  float phi_n = currentSourceChannelObject->SampleExplicit(
-              X, Y, Z , channel);
+  float phi_n = inChunk->chunkData[dataIndex];
 
-  float min =   glm::min(glm::min(glm::min(glm::min(glm::min(glm::min(
-                glm::min(glm::min(glm::min(glm::min(glm::min(glm::min(glm::min(
-                    A, B), C), D), E), F), G), H), I), J), K), L), M), N);
+//  float min =   glm::min(glm::min(glm::min(glm::min(glm::min(glm::min(
+//                glm::min(glm::min(glm::min(glm::min(glm::min(glm::min(glm::min(
+//                    A, B), C), D), E), F), G), H), I), J), K), L), M), N);
 
-  float max =   glm::max(glm::max(glm::max(glm::max(glm::max(glm::max(
-                glm::max(glm::max(glm::max(glm::max(glm::max(glm::max(glm::max(
-                    A, B), C), D), E), F), G), H), I), J), K), L), M), N);
+//  float max =   glm::max(glm::max(glm::max(glm::max(glm::max(glm::max(
+//                glm::max(glm::max(glm::max(glm::max(glm::max(glm::max(glm::max(
+//                    A, B), C), D), E), F), G), H), I), J), K), L), M), N);
 
 
       //sampleVelocity = velocitySourceChannelObject->SampleVectorAtCellCentreFast(X, Y, Z);
 
   //phi_np1_hat into target
   float phi_np1_hat = currentSourceChannelObject->SampleTrilinear(
-              X - sampleVelocity.x, Y -  sampleVelocity.y, Z -sampleVelocity.z, channel);
+              X - sampleVelocity.x, Y - sampleVelocity.y, Z - sampleVelocity.z, 0);
   outChunk->chunkData[dataIndex] = phi_np1_hat;
+
+//  float A = currentSourceChannelObject->SampleExplicit(X,Y+1,Z,0);
+//  float B = currentSourceChannelObject->SampleExplicit(X,Y-1,Z,0);
+//  float C = currentSourceChannelObject->SampleExplicit(X-1,Y,Z,0);
+//  float D = currentSourceChannelObject->SampleExplicit(X+1,Y,Z,0);
+//  float E = currentSourceChannelObject->SampleExplicit(X,Y,Z-1,0);
+//  float F = currentSourceChannelObject->SampleExplicit(X,Y,Z+1,0);
+//  float G = currentSourceChannelObject->SampleExplicit(X-1,Y-1,Z-1,0);
+//  float H = currentSourceChannelObject->SampleExplicit(X-1,Y-1,Z+1,0);
+//  float I = currentSourceChannelObject->SampleExplicit(X+1,Y-1,Z-1,0);
+//  float J = currentSourceChannelObject->SampleExplicit(X+1,Y-1,Z+1,0);
+//  float K = currentSourceChannelObject->SampleExplicit(X-1,Y+1,Z-1,0);
+//  float L = currentSourceChannelObject->SampleExplicit(X-1,Y+1,Z+1,0);
+//  float M = currentSourceChannelObject->SampleExplicit(X+1,Y+1,Z-1,0);
+//  float N = currentSourceChannelObject->SampleExplicit(X+1,Y+1,Z+1,0);
+
 
   //phi_n_hat backwards step
 #pragma omp barrier
   float phi_n_hat = currentTargetChannelObject->SampleTrilinear(
-              X + sampleVelocity.x, Y +  sampleVelocity.y, Z + sampleVelocity.z, channel);
+              X + sampleVelocity.x, Y +  sampleVelocity.y, Z + sampleVelocity.z, 0);
 
 
   //phi_n
 #pragma omp barrier
 
     float finalVal = phi_np1_hat +
-            (0.5f * (phi_n - phi_n_hat));
+            ( (phi_n - phi_n_hat)/2);
 
-    finalVal =  glm::max(glm::min(finalVal, max), min);
+    //finalVal =  glm::max(glm::min(finalVal, phi_np1_hat), phi_np1_hat);
     outChunk->chunkData[dataIndex] =finalVal;
 
 
