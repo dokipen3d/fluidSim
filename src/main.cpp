@@ -50,8 +50,9 @@ int main(int argc, char *argv[]) {
 
   cout << "number of args is" << argc << endl;
   cout << *argv[argc - 1] << endl;
+bool operate = false;
 
-  //omp_set_num_threads(2);
+  //omp_set_num_threads(1);
   int input, input2;
   SDL_Event keyevent;
   bool eventLoop = true;
@@ -170,11 +171,16 @@ int main(int argc, char *argv[]) {
     // glClearColor ( 0.18, 0.18, 0.18, 1.0 );
     double timeA = omp_get_wtime();
     while (
-        SDL_PollEvent(&keyevent)) // Poll our SDL key event for any keystrokes.
+        //SDL_PollEvent(&keyevent) && (!operate) )  // Poll our SDL key event for any keystrokes.
+        SDL_PollEvent(&keyevent) ) // Poll our SDL key event for any keystrokes.
+
     {
       switch (keyevent.type) {
       case SDL_KEYDOWN:
         switch (keyevent.key.keysym.sym) {
+        case SDLK_g:
+          operate = true;
+          break;
         case SDLK_ESCAPE:
           eventLoop = false;
           break;
@@ -183,7 +189,7 @@ int main(int argc, char *argv[]) {
     }
 
 
-
+    //if (operate){
     gridEmit->IterateGrid();
     gridPad->IterateGrid();
 
@@ -222,6 +228,8 @@ int main(int argc, char *argv[]) {
     framesElapsed++;
 
     cout << "total time was " << frameTime << " seconds." << "average time is " << averageTime << " seconds." << endl << endl;
+    operate = false;
+  //}
   }
 
   /* Clear our buffer with a red background */

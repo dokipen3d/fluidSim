@@ -176,7 +176,7 @@ for (int iteration = 0; iteration < numberOfIterations; iteration++){
 
 
 #pragma omp barrier
-#pragma omp parallel for ordered
+#pragma omp parallel for
   for (int i = 0; i < chunks.size(); i++) {
     if (callPreChunkOp) {
 

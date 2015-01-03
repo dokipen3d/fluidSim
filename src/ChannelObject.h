@@ -47,6 +47,7 @@ public:
   float SampleTrilinear(float x, float y, float z, uint32_t channel);
   float SampleExplicit(float x, float y, float z, uint32_t channel);
   float SampleExplicitAlt(float x, float y, float z);
+  bool SampleIsOutsideBounds(float x, float y, float z, uint32_t channel);
 
 protected:
   GridObject *parentGridObject =

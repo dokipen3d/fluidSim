@@ -26,7 +26,7 @@ public:
                                             // be needed but if we write a node
                                             // that copies into a new grid we
                                             // need to know where
-  signed int chunksToPad = 2;
+  int chunksToPad = 1;
 };
 
 #endif // GRIDPADCULL_H

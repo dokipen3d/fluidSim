@@ -51,6 +51,8 @@ void GridBouyancy::Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelPosition,
   //glm::vec3 value = glm::vec3(((densSample+densSampleXP1)/2)*0.02f, ((densSample+densSampleP1)/2)*0.0f, 0.0f);
 
   glm::vec3 value = glm::vec3(0.0f, ((densSample+densSampleP1)/2)*0.022f, 0.0f);
+  //glm::vec3 value = glm::vec3(0.0f, 0.15f, 0.0f);
+
 
     //if (currentTime < 50000){
         float newVal = outChunk->chunkData[dataIndex]+ value[channel];

@@ -374,44 +374,44 @@ glm::vec3 ChannelObject::SampleVectorAtCellFaceFast(float x, float y, float z,
   switch (channel) {
   case 0: // U
     u = (this->SampleExplicit(x, y, z, 0));
-    v = (this->SampleExplicit(x, y, z, 1) +
-         this->SampleExplicit(x, y + 1, z, 1) +
-         this->SampleExplicit(x + 1, y, z, 1) +
-         this->SampleExplicit(x + 1, y + 1, z, 1)) /
+    v = (this->SampleExplicit(x, y - 1, z, 1) +
+         this->SampleExplicit(x, y, z, 1) +
+         this->SampleExplicit(x - 1, y - 1 , z, 1) +
+         this->SampleExplicit(x - 1, y , z, 1)) /
         4.0f;
-    w = (this->SampleExplicit(x, y, z, 2) +
-         this->SampleExplicit(x, y, z + 1, 2) +
-         this->SampleExplicit(x + 1, y, z, 2) +
-         this->SampleExplicit(x + 1, y, z + 1, 2)) /
+    w = (this->SampleExplicit(x, y, z - 1, 2) +
+         this->SampleExplicit(x, y, z , 2) +
+         this->SampleExplicit(x-1, y, z - 1, 2) +
+         this->SampleExplicit(x-1, y, z , 2)) /
         4.0f;
 
     return glm::vec3(u, v, w);
 
   case 1: // V
-    u = (this->SampleExplicit(x, y, z, 0) +
-         this->SampleExplicit(x + 1 , y, z, 0) +
-         this->SampleExplicit(x, y + 1, z, 0) +
-         this->SampleExplicit(x + 1, y + 1, z, 0)) /
+    u = (this->SampleExplicit(x - 1, y, z, 0) +
+         this->SampleExplicit(x , y, z, 0) +
+         this->SampleExplicit(x - 1, y + 1, z, 0) +
+         this->SampleExplicit(x, y - 1, z, 0)) /
         4.0f;
     v = (this->SampleExplicit(x, y, z, 1));
-    w = (this->SampleExplicit(x, y, z, 2) +
-         this->SampleExplicit(x, y, z + 1, 2) +
-         this->SampleExplicit(x, y + 1, z, 2) +
-         this->SampleExplicit(x, y + 1, z + 1, 2)) /
+    w = (this->SampleExplicit(x, y, z - 1, 2) +
+         this->SampleExplicit(x, y, z, 2) +
+         this->SampleExplicit(x, y - 1, z - 1, 2) +
+         this->SampleExplicit(x, y - 1, z, 2)) /
         4.0f;
 
     return glm::vec3(u, v, w);
 
   case 2: // W
-    u = (this->SampleExplicit(x, y, z, 0) +
-         this->SampleExplicit(x + 1, y, z, 0) +
-         this->SampleExplicit(x, y, z + 1, 0) +
-         this->SampleExplicit(x + 1, y, z + 1, 0)) /
+    u = (this->SampleExplicit(x - 1, y, z, 0) +
+         this->SampleExplicit(x, y, z, 0) +
+         this->SampleExplicit(x - 1, y, z - 1, 0) +
+         this->SampleExplicit(x , y, z - 1, 0)) /
         4.0f;
-    v = (this->SampleExplicit(x, y, z, 1) +
-         this->SampleExplicit(x, y + 1, z, 1) +
-         this->SampleExplicit(x, y, z + 1, 1) +
-         this->SampleExplicit(x, y + 1, z + 1, 1)) /
+    v = (this->SampleExplicit(x, y - 1, z, 1) +
+         this->SampleExplicit(x, y, z, 1) +
+         this->SampleExplicit(x, y - 1, z - 1, 1) +
+         this->SampleExplicit(x, y, z - 1, 1)) /
         4.0f;
     w = (this->SampleExplicit(x, y, z, 2));
 
@@ -870,7 +870,7 @@ float ChannelObject::SampleExplicit(float x, float y, float z,
 
   // int32_t parentChunkSizeMinus1 = parentChunkSize - 1; // 7
 
-  float getRidOfDivCalc = 1.0 / parentChunkSize;
+  float getRidOfDivCalc = 1.0f / parentChunkSize;
 
   //    int32_t chunkIndexDivX = glm::floor((x)/(parentChunkSize));
   //    int32_t chunkIndexDivY = glm::floor((y)/(parentChunkSize));
@@ -958,6 +958,20 @@ float ChannelObject::SampleExplicitAlt(float x, float y, float z) {
   } else {
     return 0.5;
   }
+}
+
+bool ChannelObject::SampleIsOutsideBounds(float x, float y, float z, uint32_t channel)
+{
+    float getRidOfDivCalc = 1.0f / parentChunkSize;
+
+    int32_t chunkIndexDivX = glm::floor((x)*getRidOfDivCalc);
+    int32_t chunkIndexDivY = glm::floor((y)*getRidOfDivCalc);
+    int32_t chunkIndexDivZ = glm::floor((z)*getRidOfDivCalc);
+
+    if(GetChunk(chunkIndexDivX, chunkIndexDivY, chunkIndexDivZ) == dummyChunk)
+        return true;
+    else
+        return false;
 }
 
 //----------------------------------------------
