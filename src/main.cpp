@@ -189,7 +189,7 @@ bool operate = false;
     }
 
 
-    //if (operate){
+   // if (operate){
     gridEmit->IterateGrid();
     gridPad->IterateGrid();
 
@@ -201,7 +201,7 @@ bool operate = false;
     pressure->IterateGrid();
     projection->IterateGrid();
     basicAdvect->IterateGrid();
-    basicVelAdvect->IterateGrid();
+    //basicVelAdvect->IterateGrid();
 
 
 
@@ -229,8 +229,8 @@ bool operate = false;
 
     cout << "total time was " << frameTime << " seconds." << "average time is " << averageTime << " seconds." << endl << endl;
     operate = false;
-  //}
   }
+  //}
 
   /* Clear our buffer with a red background */
 

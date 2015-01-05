@@ -49,6 +49,7 @@ public:
   float SampleExplicitAlt(float x, float y, float z);
   bool SampleIsOutsideBounds(float x, float y, float z, uint32_t channel);
 
+  glm::vec3 SampleVectorAtPositionVel(float x, float y, float z);
 protected:
   GridObject *parentGridObject =
       nullptr; // non owning pointer to parent for finding out chunksize.

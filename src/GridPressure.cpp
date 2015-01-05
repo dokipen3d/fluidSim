@@ -102,8 +102,12 @@ void GridPressure::Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelPosition,
 //                        ) ;
 
   //outChunk->chunkData[dataIndex] = pressureVal;
-    outChunk->chunkData[dataIndex] = (Pip1JK + Pim1JK + PIjp1K + PIjm1K + PIJkp1 + PIJkm1 + (div*scaleSquared))/6;
-
+  float pressure = (Pip1JK + Pim1JK + PIjp1K + PIjm1K + PIJkp1 + PIJkm1 + (div*scaleSquared))/6;
+    outChunk->chunkData[dataIndex] = pressure;
+//    if (X == 2 && Y == 2 && Z == 2 && channel == 0)
+//        cout << "pressure at   2 is " << pressure << endl;
+//    if (X == -3 && Y == 2 && Z == 2 && channel == 0)
+//        cout << "pressure at  -3 is " << pressure << endl;
 
 }
 

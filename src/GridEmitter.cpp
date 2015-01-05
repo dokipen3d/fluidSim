@@ -129,7 +129,7 @@ void GridEmitter::Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelPosition,
 
   // float sampleA = sourceVolume->sampleVolume(glm::vec3(X, Y, Z));
   float sample =
-      sourceVolume->sampleVolume(glm::vec3(X + 0.5f, Y + 0.5f, Z + 0.5f));//has to be offset by 0.5 because of central differnece ato make sphere sit at 0 (cell centres are at 0.5 on the 'world grid;
+      sourceVolume->sampleVolume(glm::vec3(X  + 0.5f, Y + 0.5f, Z + 0.5f));//has to be offset by 0.5 because of central differnece ato make sphere sit at 0 (cell centres are at 0.5 on the 'world grid;
 
   if (sample < bandwidth) {
     if (!currentTargetChannelObject->ChunkExists(chunkId.x, chunkId.y,

@@ -100,10 +100,15 @@ void GridBasicAdvect::Algorithm(glm::i32vec3 chunkId,
   sampleVelocity = velocitySourceChannelObject->SampleVectorAtCellCentreFast(X, Y, Z);
 
 
+  float dens = currentSourceChannelObject->SampleTrilinear(
+              X - sampleVelocity.x, Y -  sampleVelocity.y, Z - sampleVelocity.z, channel);
 
+//  if (X == 2 && Y == 2 && Z == 2)
+//      cout << "dens at  2 is " << dens << endl;
+//  if (X == -3 && Y == 2 && Z == 2)
+//      cout << "dens at -3 is " << dens << endl;
 
-  outChunk->chunkData[dataIndex] = currentSourceChannelObject->SampleTrilinear(
-      X - sampleVelocity.x, Y -  sampleVelocity.y, Z - sampleVelocity.z, channel);
+  outChunk->chunkData[dataIndex] = dens;
 
 }
 

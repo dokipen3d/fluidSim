@@ -39,6 +39,7 @@ void GridBouyancy::Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelPosition,
   float densSampleP1 = densitySourceChannel->SampleExplicit(X, Y, Z, 0);
 
 
+
   //float densSampleXP1 = currentSourceChannelObject->SampleExplicit(X+1, Y, Z, 0);
 
 
@@ -50,12 +51,20 @@ void GridBouyancy::Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelPosition,
   //expensive if we allow all three channels
   //glm::vec3 value = glm::vec3(((densSample+densSampleXP1)/2)*0.02f, ((densSample+densSampleP1)/2)*0.0f, 0.0f);
 
-  glm::vec3 value = glm::vec3(0.0f, ((densSample+densSampleP1)/2)*0.022f, 0.0f);
+  glm::vec3 value = glm::vec3(0.0f, ((densSample+densSampleP1)/2)*0.125f, 0.0f);
+
+
+
   //glm::vec3 value = glm::vec3(0.0f, 0.15f, 0.0f);
 
 
     //if (currentTime < 50000){
         float newVal = outChunk->chunkData[dataIndex]+ value[channel];
+
+//        if (X == 1 && Y == 2 && Z == 2 && channel == 1)
+//            cout << "bouyvel at  3 is " << newVal << endl;
+//        if (X == -2 && Y == 2 && Z == 2 && channel == 1)
+//            cout << "bouyvel at -4 is " << newVal << endl;
         outChunk->chunkData[dataIndex] = newVal;
     //}
 }
