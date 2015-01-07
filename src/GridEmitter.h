@@ -21,9 +21,9 @@ public:
   virtual ~GridEmitter();
 
   virtual void setupDefaults();
-  virtual void Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelPosition,
+  virtual void Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelWorldPosition,
                          Chunk *inChunk, Chunk *outChunk, uint32_t dataIndex,
-                         uint32_t channel);
+                         uint32_t channel, bool internalAccessible);
   float addPositiveDifference(float inputReference, float amountToAdd);
   float bandwidth = 4.0f;
   // virtual void PreChunkOp(Chunk* inChunk, glm::i32vec3 chunkIdSecondary)

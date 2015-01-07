@@ -50,7 +50,11 @@ public:
   bool SampleIsOutsideBounds(float x, float y, float z, uint32_t channel);
 
   glm::vec3 SampleVectorAtPositionVel(float x, float y, float z);
+  float SampleTrilinear2(float x, float y, float z, uint32_t channel);
+
 protected:
+  float getRidOfDivCalc;
+
   GridObject *parentGridObject =
       nullptr; // non owning pointer to parent for finding out chunksize.
   /* data */

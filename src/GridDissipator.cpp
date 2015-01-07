@@ -6,10 +6,10 @@ void GridDissipator::setupDefaults() { dissipationRate = 0.1; }
 
 void GridDissipator::Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelPosition,
                                Chunk *inChunk, Chunk *outChunk,
-                               uint32_t dataIndex, uint32_t channel) {
+                               uint32_t dataIndex, uint32_t channel, bool internalAccessible) {
   // if(!inChunk->empty)
   // inChunk->chunkData[dataIndex] = glm::max(0.0f ,
   // inChunk->chunkData[dataIndex]-0.08f) ;
   if (inChunk->chunkData[dataIndex] > 0)
-    inChunk->chunkData[dataIndex] -= 0.055f;
+    inChunk->chunkData[dataIndex] -= 0.03f;
 }

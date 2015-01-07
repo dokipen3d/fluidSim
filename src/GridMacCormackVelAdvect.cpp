@@ -75,18 +75,17 @@ void GridMacCormackVelAdvect::GridOp() {
 }
 //----------------------------------------------
 void GridMacCormackVelAdvect::Algorithm(glm::i32vec3 chunkId,
-                                glm::i32vec3 voxelPosition, Chunk *inChunk,
+                                glm::i32vec3 voxelWorldPosition, Chunk *inChunk,
                                 Chunk *outChunk, uint32_t dataIndex,
-                                uint32_t channel)
+                                uint32_t channel, bool internalAccessible)
 
 {
 
-  float X = ((chunkId.x * static_cast<int>(chnkSize)) + voxelPosition.x);
+    float X = voxelWorldPosition.x;
 
-  float Y = ((chunkId.y * static_cast<int>(chnkSize)) + voxelPosition.y);
+    float Y = voxelWorldPosition.y;
 
-  float Z = ((chunkId.z * static_cast<int>(chnkSize)) + voxelPosition.z);
-
+    float Z = voxelWorldPosition.z;
   //    float sample = sourceVolume->sampleVolume(glm::vec3(X+0.5, Y+0.5,
   //    Z+0.5));
 
@@ -94,32 +93,25 @@ void GridMacCormackVelAdvect::Algorithm(glm::i32vec3 chunkId,
 
   sampleVelocity = currentSourceChannelObject->SampleVectorAtCellCentreFast(X, Y, Z);
 
-//    float A = currentSourceChannelObject->SampleExplicit(X,Y+1,Z,channel);
-//    float B = currentSourceChannelObject->SampleExplicit(X,Y-1,Z,channel);
-//    float C = currentSourceChannelObject->SampleExplicit(X-1,Y,Z,channel);
-//    float D = currentSourceChannelObject->SampleExplicit(X+1,Y,Z,channel);
-//    float E = currentSourceChannelObject->SampleExplicit(X,Y,Z-1,channel);
-//    float F = currentSourceChannelObject->SampleExplicit(X,Y,Z+1,channel);
-//    float G = currentSourceChannelObject->SampleExplicit(X-1,Y-1,Z-1,channel);
-//    float H = currentSourceChannelObject->SampleExplicit(X-1,Y-1,Z+1,channel);
-//    float I = currentSourceChannelObject->SampleExplicit(X+1,Y-1,Z-1,channel);
-//    float J = currentSourceChannelObject->SampleExplicit(X+1,Y-1,Z+1,channel);
-//    float K = currentSourceChannelObject->SampleExplicit(X-1,Y+1,Z-1,channel);
-//    float L = currentSourceChannelObject->SampleExplicit(X-1,Y+1,Z+1,channel);
-//    float M = currentSourceChannelObject->SampleExplicit(X+1,Y+1,Z-1,channel);
-//    float N = currentSourceChannelObject->SampleExplicit(X+1,Y+1,Z+1,channel);
+  float A = currentSourceChannelObject->SampleExplicit(X-sampleVelocity.x,Y+1-sampleVelocity.y,Z-sampleVelocity.z,0);
+  float B = currentSourceChannelObject->SampleExplicit(X-sampleVelocity.x+1,Y-sampleVelocity.y,Z-sampleVelocity.z,0);
+  float C = currentSourceChannelObject->SampleExplicit(X-sampleVelocity.x,Y-sampleVelocity.y,Z-sampleVelocity.z+1,0);
+  float D = currentSourceChannelObject->SampleExplicit(X-sampleVelocity.x+1,Y-sampleVelocity.y+1,Z-sampleVelocity.z+1,0);
+  float E = currentSourceChannelObject->SampleExplicit(X-sampleVelocity.x+1,Y-sampleVelocity.y+1,Z-sampleVelocity.z,0);
+
+  float F = currentSourceChannelObject->SampleExplicit(X-sampleVelocity.x,Y-sampleVelocity.y+1,Z-sampleVelocity.z+1,0);
+  float G = currentSourceChannelObject->SampleExplicit(X-sampleVelocity.x+1,Y-sampleVelocity.y,Z-sampleVelocity.z+1,0);
 
 
 
   //phi_n
   float phi_n = inChunk->chunkData[dataIndex];
-//  float min =   glm::min(glm::min(glm::min(glm::min(glm::min(glm::min(
-//                glm::min(glm::min(glm::min(glm::min(glm::min(glm::min(glm::min(
-//                    A, B), C), D), E), F), G), H), I), J), K), L), M), N);
+  float min =   glm::min(glm::min(glm::min(glm::min(glm::min(glm::min(
+                    A, B), C), D), E), F), G);
 
-//  float max =   glm::max(glm::max(glm::max(glm::max(glm::max(glm::max(
-//                glm::max(glm::max(glm::max(glm::max(glm::max(glm::max(glm::max(
-//                    A, B), C), D), E), F), G), H), I), J), K), L), M), N);
+  float max =   glm::max(glm::max(glm::max(glm::max(glm::max(glm::max(
+                    A, B), C), D), E), F), G);
+
 
 
       //sampleVelocity = velocitySourceChannelObject->SampleVectorAtCellCentreFast(X, Y, Z);

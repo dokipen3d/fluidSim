@@ -14,9 +14,9 @@ public:
       cout << "in GridDivergence Constructor" << endl;
       setupDefaults();
     };
-    virtual void Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelPosition,
+    virtual void Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelWorldPosition,
                            Chunk *inChunk, Chunk *outChunk, uint32_t dataIndex,
-                           uint32_t channel);
+                           uint32_t channel, bool internalAccessible);
     virtual void setupDefaults();
 
     virtual ~GridPressureRBGS();

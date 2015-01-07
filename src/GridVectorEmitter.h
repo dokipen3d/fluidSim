@@ -23,7 +23,7 @@ public:
   virtual void setupDefaults();
   virtual void Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelPosition,
                          Chunk *inChunk, Chunk *outChunk, uint32_t dataIndex,
-                         uint32_t channnel);
+                         uint32_t channnel, bool internalAccessible);
   // float addPositiveDifference(float inputReference, float amountToAdd);
   // virtual void PreChunkOp(Chunk* inChunk, glm::i32vec3 chunkIdSecondary)
   // override;

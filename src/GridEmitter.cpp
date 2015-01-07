@@ -85,9 +85,9 @@ void GridEmitter::setupDefaults() {
 }
 
 //----------------------------------------------
-void GridEmitter::Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelPosition,
+void GridEmitter::Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelWorldPosition,
                             Chunk *inChunk, Chunk *outChunk, uint32_t dataIndex,
-                            uint32_t channel)
+                            uint32_t channel, bool internalAccessible)
 
 {
   // myString <<  "and data is " << inChunk->chunkData[chunkDataIndex] << endl;
@@ -120,16 +120,17 @@ void GridEmitter::Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelPosition,
 
   //    float Z = ((chunkId.z*(int)chnkSize)+voxelPosition.z);
 
-  float X = ((chunkId.x * (int)chnkSize) + voxelPosition.x);
+    float X = voxelWorldPosition.x;
 
-  float Y = ((chunkId.y * (int)chnkSize) + voxelPosition.y);
+    float Y = voxelWorldPosition.y;
 
-  float Z = ((chunkId.z * (int)chnkSize) + voxelPosition.z);
+    float Z = voxelWorldPosition.z;
+
 
 
   // float sampleA = sourceVolume->sampleVolume(glm::vec3(X, Y, Z));
   float sample =
-      sourceVolume->sampleVolume(glm::vec3(X  + 0.5f, Y + 0.5f, Z + 0.5f));//has to be offset by 0.5 because of central differnece ato make sphere sit at 0 (cell centres are at 0.5 on the 'world grid;
+      sourceVolume->sampleVolume(glm::vec3(voxelWorldPosition.x  + 0.5f, voxelWorldPosition.y + 0.5f, voxelWorldPosition.z + 0.5f));//has to be offset by 0.5 because of central differnece ato make sphere sit at 0 (cell centres are at 0.5 on the 'world grid;
 
   if (sample < bandwidth) {
     if (!currentTargetChannelObject->ChunkExists(chunkId.x, chunkId.y,
@@ -181,8 +182,8 @@ void GridEmitter::Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelPosition,
       //float value = glm::max(glm::cos(currentTime*1.2), 0.0);
       if (currentTime < 500) {
         //outChunk->chunkData[dataIndex] += 0.2f;
-        //float newval = addPositiveDifference(inChunk->chunkData[dataIndex],3.0f* glm::abs(glm::simplex(glm::vec3(X/16,Y/16-(currentTime*0.8),Z/16)) ) );
-          float newval = addPositiveDifference(inChunk->chunkData[dataIndex],3.0f);
+        float newval = addPositiveDifference(inChunk->chunkData[dataIndex],3.0f* glm::abs(glm::simplex(glm::vec3(X/10,Y/10-(currentTime*1.8),Z/10)) ) );
+          //float newval = addPositiveDifference(inChunk->chunkData[dataIndex],3.0f);
 
         outChunk->chunkData[dataIndex] = newval ;
       }

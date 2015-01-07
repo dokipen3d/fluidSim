@@ -25,13 +25,15 @@ void GridDivergence::setupDefaults()
 
 }
 
-void GridDivergence::Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelPosition,
+void GridDivergence::Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelWorldPosition,
                             Chunk *inChunk, Chunk *outChunk, uint32_t dataIndex,
-                            uint32_t channel){
+                            uint32_t channel, bool internalAccessible){
 
-  float X = ((chunkId.x * (int)chnkSize) + voxelPosition.x);
-  float Y = ((chunkId.y * (int)chnkSize) + voxelPosition.y);
-  float Z = ((chunkId.z * (int)chnkSize) + voxelPosition.z);
+    float X = voxelWorldPosition.x;
+
+    float Y = voxelWorldPosition.y;
+
+    float Z = voxelWorldPosition.z;
 
   //do scale here?
   float uDivergenceP1;
@@ -39,36 +41,36 @@ void GridDivergence::Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelPosition,
   float wDivergenceP1;
 
   float uDivergenceM1 = velocitySourceChannelObject->SampleExplicit(X-1, Y, Z, 0 );
-  if (velocitySourceChannelObject->SampleIsOutsideBounds(X+1, Y, Z, 0 ))
-  {
-    uDivergenceP1 = uDivergenceM1;
-  }
-  else
-  {
+//  if (velocitySourceChannelObject->SampleIsOutsideBounds(X+1, Y, Z, 0 ))
+//  {
+//    uDivergenceP1 = uDivergenceM1;
+//  }
+//  else
+//  {
     uDivergenceP1 = velocitySourceChannelObject->SampleExplicit(X+1, Y, Z, 0 );
-  }
+  //}
 
   float vDivergenceM1 = velocitySourceChannelObject->SampleExplicit(X, Y-1, Z, 1 );
 
-  if (velocitySourceChannelObject->SampleIsOutsideBounds(X, Y+1, Z, 1 ))
-  {
-    vDivergenceP1 = vDivergenceM1;
-  }
-  else
-  {
+//  if (velocitySourceChannelObject->SampleIsOutsideBounds(X, Y+1, Z, 1 ))
+//  {
+//    vDivergenceP1 = vDivergenceM1;
+//  }
+//  else
+//  {
     vDivergenceP1 = velocitySourceChannelObject->SampleExplicit(X, Y+1, Z, 1);
-  }
+  //}
 
   float wDivergenceM1 = velocitySourceChannelObject->SampleExplicit(X, Y, Z-1, 2 );
 
-  if(velocitySourceChannelObject->SampleIsOutsideBounds(X, Y, Z+1, 2 ))
-  {
-      wDivergenceP1 = wDivergenceM1;
-  }
-  else
-  {
+//  if(velocitySourceChannelObject->SampleIsOutsideBounds(X, Y, Z+1, 2 ))
+//  {
+//      wDivergenceP1 = wDivergenceM1;
+//  }
+//  else
+//  {
     wDivergenceP1 = velocitySourceChannelObject->SampleExplicit(X, Y, Z+1, 2 );
-  }
+  //}
 
   float Udiff = (uDivergenceP1 - uDivergenceM1);
   float Vdiff = (vDivergenceP1 - vDivergenceM1);
@@ -76,10 +78,17 @@ void GridDivergence::Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelPosition,
 
   float divergence = (scale * Udiff+Vdiff+Wdiff);
 
-//  if (X == 2 && Y == 2 && Z == 2)
-//      cout << "div at  2 is " << divergence << endl;
-//  if (X == -3 && Y == 2 && Z == 2)
-//      cout << "div at -3 is " << divergence << endl;
+//  if (debug){
+//      if (X == -16 && Y == 2 && Z == 2)
+//          cout << "div at -16 is " << divergence << endl;
+//      if (X == -15 && Y == 2&& Z == 2)
+//          cout << "div at -15 is " << divergence << endl;
+//      if (X ==  15 && Y == 2 && Z == 2)
+//          cout << "div at  15 is " << divergence << endl;
+//      if (X ==  14 && Y == 2&& Z == 2)
+//          cout << "div at  14 is " << divergence << endl;
+
+//      }
 
   outChunk->chunkData[dataIndex] = divergence;
 }

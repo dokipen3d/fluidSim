@@ -12,9 +12,9 @@ void GridPadCull::setupDefaults() {
   callPostChunkOp = true;
 }
 void GridPadCull::Algorithm(glm::i32vec3 chunkId,
-                            glm::i32vec3 voxelLocalPosition, Chunk *inChunk,
+                            glm::i32vec3 voxelWorldPosition, Chunk *inChunk,
                             Chunk *outChunk, u_int32_t dataIndex,
-                            uint32_t channel) {
+                            uint32_t channel, bool internalAccessible) {
   bool lValueFalse = false;
   bool lValueTrue = true;
   if (outChunk->chunkData[dataIndex] > 0.0005) {

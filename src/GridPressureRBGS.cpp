@@ -41,18 +41,19 @@ void GridPressureRBGS::PreChunkOp(Chunk *&inChunk, Chunk *&outChunk,
     callPreChunkOp = false;//not after first iteration
 }
 
-void GridPressureRBGS::Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelPosition,
-                            Chunk *inChunk, Chunk *outChunk, uint32_t dataIndex,
-                            uint32_t channel){
+void GridPressureRBGS::Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelWorldPosition,
+                                 Chunk *inChunk, Chunk *outChunk, uint32_t dataIndex,
+                                 uint32_t channel, bool internalAccessible){
 
 
 
 
 
-  float X = ((chunkId.x * (int)chnkSize) + voxelPosition.x);
-  float Y = ((chunkId.y * (int)chnkSize) + voxelPosition.y);
-  float Z = ((chunkId.z * (int)chnkSize) + voxelPosition.z);
+        float X = voxelWorldPosition.x;
 
+        float Y = voxelWorldPosition.y;
+
+        float Z = voxelWorldPosition.z;
   //add world scale here?
 
  // float P6 = inChunk->chunkData[dataIndex];
@@ -69,7 +70,6 @@ void GridPressureRBGS::Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelPositio
 
   float div = divergenceSource->SampleExplicit(X, Y, Z, 0);
 
-  float pressureVal = (Pip1JK + Pim1JK + PIjp1K + PIjm1K + PIJkp1 + PIJkm1 + (div*scaleSquared))/6;
 
   //float pressureVal = (P6 - Pip1JK - Pim1JK - PIjp1K - PIjm1K - PIJkp1 - PIJkm1 + div) * scaleSquared;
 //  float pressureVal = ( (div*scaleSquared) +((Pip1JK - P) - (P - Pim1JK)) +
@@ -94,7 +94,7 @@ void GridPressureRBGS::Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelPositio
 //                        ((P - PIJkp1) - (P - PIJkm1)) + (div*scaleSquared)  // ) is clearer
 //                        ) ;
 
-  outChunk->chunkData[dataIndex] = pressureVal;
+  outChunk->chunkData[dataIndex] = (Pip1JK + Pim1JK + PIjp1K + PIjm1K + PIJkp1 + PIJkm1 + (div*scaleSquared))/6;
 
 
 

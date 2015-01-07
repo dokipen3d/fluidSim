@@ -79,17 +79,17 @@ void GridMacCormackAdvect::GridOp() {
 }
 //----------------------------------------------
 void GridMacCormackAdvect::Algorithm(glm::i32vec3 chunkId,
-                                glm::i32vec3 voxelPosition, Chunk *inChunk,
+                                glm::i32vec3 voxelWorldPosition, Chunk *inChunk,
                                 Chunk *outChunk, uint32_t dataIndex,
-                                uint32_t channel)
+                                uint32_t channel, bool internalAccessible)
 
 {
 
-  float X = ((chunkId.x * static_cast<int>(chnkSize)) + voxelPosition.x);
+    float X = voxelWorldPosition.x;
 
-  float Y = ((chunkId.y * static_cast<int>(chnkSize)) + voxelPosition.y);
+    float Y = voxelWorldPosition.y;
 
-  float Z = ((chunkId.z * static_cast<int>(chnkSize)) + voxelPosition.z);
+    float Z = voxelWorldPosition.z;
 
   //    float sample = sourceVolume->sampleVolume(glm::vec3(X+0.5, Y+0.5,
   //    Z+0.5));
@@ -98,19 +98,25 @@ void GridMacCormackAdvect::Algorithm(glm::i32vec3 chunkId,
 
   sampleVelocity = velocitySourceChannelObject->SampleVectorAtCellCentreFast(X, Y, Z);
 
+  float A = currentSourceChannelObject->SampleExplicit(X-sampleVelocity.x,Y+1-sampleVelocity.y,Z-sampleVelocity.z,0);
+  float B = currentSourceChannelObject->SampleExplicit(X-sampleVelocity.x+1,Y-sampleVelocity.y,Z-sampleVelocity.z,0);
+  float C = currentSourceChannelObject->SampleExplicit(X-sampleVelocity.x,Y-sampleVelocity.y,Z-sampleVelocity.z+1,0);
+  float D = currentSourceChannelObject->SampleExplicit(X-sampleVelocity.x+1,Y-sampleVelocity.y+1,Z-sampleVelocity.z+1,0);
+  float E = currentSourceChannelObject->SampleExplicit(X-sampleVelocity.x+1,Y-sampleVelocity.y+1,Z-sampleVelocity.z,0);
+
+  float F = currentSourceChannelObject->SampleExplicit(X-sampleVelocity.x,Y-sampleVelocity.y+1,Z-sampleVelocity.z+1,0);
+  float G = currentSourceChannelObject->SampleExplicit(X-sampleVelocity.x+1,Y-sampleVelocity.y,Z-sampleVelocity.z+1,0);
 
 
 
   //phi_n
   float phi_n = inChunk->chunkData[dataIndex];
 
-//  float min =   glm::min(glm::min(glm::min(glm::min(glm::min(glm::min(
-//                glm::min(glm::min(glm::min(glm::min(glm::min(glm::min(glm::min(
-//                    A, B), C), D), E), F), G), H), I), J), K), L), M), N);
+  float min =   glm::min(glm::min(glm::min(glm::min(glm::min(glm::min(
+                    A, B), C), D), E), F), G);
 
-//  float max =   glm::max(glm::max(glm::max(glm::max(glm::max(glm::max(
-//                glm::max(glm::max(glm::max(glm::max(glm::max(glm::max(glm::max(
-//                    A, B), C), D), E), F), G), H), I), J), K), L), M), N);
+  float max =   glm::max(glm::max(glm::max(glm::max(glm::max(glm::max(
+                    A, B), C), D), E), F), G);
 
 
       //sampleVelocity = velocitySourceChannelObject->SampleVectorAtCellCentreFast(X, Y, Z);
@@ -120,20 +126,9 @@ void GridMacCormackAdvect::Algorithm(glm::i32vec3 chunkId,
               X - sampleVelocity.x, Y - sampleVelocity.y, Z - sampleVelocity.z, 0);
   outChunk->chunkData[dataIndex] = phi_np1_hat;
 
-//  float A = currentSourceChannelObject->SampleExplicit(X,Y+1,Z,0);
-//  float B = currentSourceChannelObject->SampleExplicit(X,Y-1,Z,0);
-//  float C = currentSourceChannelObject->SampleExplicit(X-1,Y,Z,0);
-//  float D = currentSourceChannelObject->SampleExplicit(X+1,Y,Z,0);
-//  float E = currentSourceChannelObject->SampleExplicit(X,Y,Z-1,0);
-//  float F = currentSourceChannelObject->SampleExplicit(X,Y,Z+1,0);
-//  float G = currentSourceChannelObject->SampleExplicit(X-1,Y-1,Z-1,0);
-//  float H = currentSourceChannelObject->SampleExplicit(X-1,Y-1,Z+1,0);
-//  float I = currentSourceChannelObject->SampleExplicit(X+1,Y-1,Z-1,0);
-//  float J = currentSourceChannelObject->SampleExplicit(X+1,Y-1,Z+1,0);
-//  float K = currentSourceChannelObject->SampleExplicit(X-1,Y+1,Z-1,0);
-//  float L = currentSourceChannelObject->SampleExplicit(X-1,Y+1,Z+1,0);
-//  float M = currentSourceChannelObject->SampleExplicit(X+1,Y+1,Z-1,0);
-//  float N = currentSourceChannelObject->SampleExplicit(X+1,Y+1,Z+1,0);
+
+
+
 
 
   //phi_n_hat backwards step
@@ -148,7 +143,7 @@ void GridMacCormackAdvect::Algorithm(glm::i32vec3 chunkId,
     float finalVal = phi_np1_hat +
             ( (phi_n - phi_n_hat)/2);
 
-    //finalVal =  glm::max(glm::min(finalVal, phi_np1_hat), phi_np1_hat);
+    finalVal =  glm::max(glm::min(finalVal, max), min);
     outChunk->chunkData[dataIndex] =finalVal;
 
 

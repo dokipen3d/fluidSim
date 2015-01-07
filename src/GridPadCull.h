@@ -20,13 +20,13 @@ public:
                            glm::i32vec3 chunkIdSecondary) override;
   virtual void GridOp() override;
 
-  virtual void Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelLocalPosition,
+  virtual void Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelWorldPosition,
                          Chunk *inChunk, Chunk *outChunk, u_int32_t dataIndex,
-                         uint32_t channel); // pure virtual. out chunk might not
+                         uint32_t channel, bool internalAccessible); // pure virtual. out chunk might not
                                             // be needed but if we write a node
                                             // that copies into a new grid we
                                             // need to know where
-  int chunksToPad = 2;
+  int chunksToPad = 1;
 };
 
 #endif // GRIDPADCULL_H

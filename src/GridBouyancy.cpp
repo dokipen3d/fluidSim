@@ -22,15 +22,16 @@ void GridBouyancy::setupDefaults() {
   // callGridOp = true;
 }
 
-void GridBouyancy::Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelPosition,
+void GridBouyancy::Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelWorldPosition,
                              Chunk *inChunk, Chunk *outChunk,
-                             uint32_t dataIndex, uint32_t channel) {
+                             uint32_t dataIndex, uint32_t channel, bool internalAccessible) {
 
-    float X = ((chunkId.x * static_cast<int>(chnkSize)) + voxelPosition.x);
+    float X = voxelWorldPosition.x;
 
-    float Y = ((chunkId.y * static_cast<int>(chnkSize)) + voxelPosition.y);
+    float Y = voxelWorldPosition.y;
 
-    float Z = ((chunkId.z * static_cast<int>(chnkSize)) + voxelPosition.z);
+    float Z = voxelWorldPosition.z;
+
     //if we are a vel operator and sampling a scalar, we need to do the inverse channel (could do it before calling algo)
 //  float densSample =
 //      inChunk
@@ -51,7 +52,7 @@ void GridBouyancy::Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelPosition,
   //expensive if we allow all three channels
   //glm::vec3 value = glm::vec3(((densSample+densSampleXP1)/2)*0.02f, ((densSample+densSampleP1)/2)*0.0f, 0.0f);
 
-  glm::vec3 value = glm::vec3(0.0f, ((densSample+densSampleP1)/2)*0.125f, 0.0f);
+  glm::vec3 value = glm::vec3(0.0f, ((densSample+densSampleP1)/2)*0.02, 0.0f);
 
 
 

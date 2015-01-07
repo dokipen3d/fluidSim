@@ -17,7 +17,7 @@ public:
   virtual void setupDefaults();
   virtual void Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelPosition,
                          Chunk *inChunk, Chunk *outChunk, uint32_t dataIndex,
-                         uint32_t channel);
+                         uint32_t channel, bool internalAccessible);
 
   float dissipationRate;
 };

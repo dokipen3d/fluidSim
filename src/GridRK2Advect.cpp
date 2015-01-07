@@ -78,19 +78,17 @@ void GridRK2Advect::GridOp() {
 }
 //----------------------------------------------
 void GridRK2Advect::Algorithm(glm::i32vec3 chunkId,
-                                glm::i32vec3 voxelPosition, Chunk *inChunk,
+                                glm::i32vec3 voxelWorldPosition, Chunk *inChunk,
                                 Chunk *outChunk, uint32_t dataIndex,
-                                uint32_t channel)
+                                uint32_t channel, bool internalAccessible)
 
 {
 
-  float X = ((chunkId.x * static_cast<int>(chnkSize)) + voxelPosition.x);
+    float X = voxelWorldPosition.x;
 
-  float Y = ((chunkId.y * static_cast<int>(chnkSize)) + voxelPosition.y);
+    float Y = voxelWorldPosition.y;
 
-  float Z = ((chunkId.z * static_cast<int>(chnkSize)) + voxelPosition.z);
-
-  //    float sample = sourceVolume->sampleVolume(glm::vec3(X+0.5, Y+0.5,
+    float Z = voxelWorldPosition.z;
   //    Z+0.5));
 
   glm::vec3 sampleVelocity{0.0};

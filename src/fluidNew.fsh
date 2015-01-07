@@ -98,5 +98,7 @@ void main()
     }
 
     FragColor.rgb = Lo;
-    FragColor.a = 1-(T)+0.05;
+    //FragColor.a = 1-(T)+0.05;
+    FragColor.a = 1-(T);
+
 }

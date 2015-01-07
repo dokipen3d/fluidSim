@@ -34,23 +34,25 @@ void GridProjection::setupDefaults()
 
 
 
-void GridProjection::Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelPosition,
+void GridProjection::Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelWorldPosition,
                             Chunk *inChunk, Chunk *outChunk, uint32_t dataIndex,
-                            uint32_t channel){
+                            uint32_t channel, bool internalAccessible){
 
 
 
 
 
-  float X = ((chunkId.x * (int)chnkSize) + voxelPosition.x);
-  float Y = ((chunkId.y * (int)chnkSize) + voxelPosition.y);
-  float Z = ((chunkId.z * (int)chnkSize) + voxelPosition.z);
+    float X = voxelWorldPosition.x;
+
+    float Y = voxelWorldPosition.y;
+
+    float Z = voxelWorldPosition.z;
 
   //add scale here?
   float Pm1;
 
     float P;
-    float Pp1;
+    //float Pp1;
 
 
 
@@ -60,14 +62,24 @@ void GridProjection::Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelPosition,
             P  = pressureSource->SampleExplicit(X, Y, Z, 0 );
             //Pp1  = pressureSource->SampleExplicit(X+1, Y, Z, 0 );
 
-//            float grad = (P - Pm1);
-//           // float gradalt = (Pm1 - Pmm1);
-//            float grad2 = (Pp1 - P);
+            //float grad = (P - Pm1);
+           // float gradalt = (Pm1 - Pmm1);
+            //float grad2 = (Pp1 - P);
+//            if (debug){
+//                if (X == -1 && Y == 2 && Z == 2){
+//                    cout << "grad at  -1 is " << grad << ", " << " P is " << P << ", Pm1 is " << Pm1 << endl;
+//                    cout << "velocity is " << outChunk->chunkData[dataIndex] << endl;
+//                }
+//                if (X == 1 && Y == 2 && Z == 2){
+//                    cout << "grad at  1 is " << grad << ", "  << " P is " << P << ", Pm1 is " << Pm1 << endl;
+//                    cout << "velocity is " << outChunk->chunkData[dataIndex] << endl;
+//                }
+//            }
 //            if (X == 2 && Y == 2 && Z == 2)
-//                cout << "grad at  2 is " << grad << " " << grad2 << endl;
+//                cout << "grad at  0 is " << grad << " " << grad2 << endl;
 //            if (X == -3 && Y == 2 && Z == 2)
 //                cout << "grad at -3 is " << grad << " " << grad2 << endl;
-            //outChunk->chunkData[dataIndex] -= (Pp1 - Pmm1);
+            //outChunk->chunkData[dataIndex] -= grad;
 
             ////outChunk->chunkData[dataIndex] -= (Pp1 - Pm1)*0.000001;
             //cout << "in channel 0 " << Pm1 << " " << Pp1 << endl;

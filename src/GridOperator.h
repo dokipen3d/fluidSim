@@ -27,9 +27,9 @@ public:
 
   virtual void setupDefaults() = 0;
   void SetGridObject(GridObject *inGridObject);
-  virtual void Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelLocalPosition,
+  virtual void Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelWorldPosition,
                          Chunk *inChunk, Chunk *outChunk, u_int32_t dataIndex,
-                         uint32_t channel) = 0; // pure virtual. out chunk might
+                         uint32_t channel, bool internalAccessible) = 0; // pure virtual. out chunk might
                                                 // not be needed but if we write
                                                 // a node that copies into a new
                                                 // grid we need to know where
@@ -54,7 +54,7 @@ public:
   u_int32_t numberOfIterations = 1;
   int startVoxel = 0;
   int skipAmount = 1;
-
+    bool debug = false;
   std::vector<chunkAddresses> chunks;
 
 protected:
@@ -69,10 +69,11 @@ protected:
   std::stringstream myString;
   bool createChunks;
   BoundingBox boundingBox;
-  u_int32_t chnkSize;
+  int chnkSize;
   uint32_t chunkOpCounter = 0;
   uint32_t totalChunksToOperateOn;
   int32_t internalChannels = 1;
+  int iteration;
 
 
 };

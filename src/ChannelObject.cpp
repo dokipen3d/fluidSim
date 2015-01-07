@@ -17,6 +17,8 @@ inline static uint32_t flatten3dCoordinatesto1D(uint32_t x, uint32_t y,
   return ((x) + (((y)*chunkSize)) + (((z)*chunkSize * chunkSize))) +
          (channel * chunkSize * chunkSize * chunkSize);
   // return ((x+channel) + ((y+channel) << 3 ) +  ((z+channel) << 3 << 3));
+//  return ((x) + (((y)<<3)) + (((z)<< 3 << 3))) +
+//         (channel << 3 << 3 << 3);
 
   // look into bit shifting
   // if chunksize is   4 we can just do (y+channel) << 2
@@ -35,15 +37,15 @@ inline static uint32_t flatten3dCoordinatesto1D(uint32_t x, uint32_t y,
 
 //----------------------------------------------
 inline static int integerHash3D(int a, int b, int c) {
-  return ((a * 73856093 + b * 19349663 + c * 83492791) % 2094967294) + 1;
+  return ((a * 73856093 + b * 19349663 + c * 83492791) & 2094967294) + 1;
   // return ((a*73856093 + b*19349663 + c*83492791)%4294967294)+1;
 
   // return ((a/73856093 + b*-19349663 - c*83492791)%4294967294)+1;
 }
 
 inline static uint32_t integerEncodeTo32BitInt(int x, int y, int z) {
-  return ((x + 813) + ((y + 813) * 1625) + ((z + 813) * 1625 * 1625)) + 1;
-  // return ((x+812) + ((y+812) << 10 ) + ((z+812) << 10 << 10) )+1;
+  //return ((x + 813) + ((y + 813) * 1625) + ((z + 813) * 1625 * 1625)) + 1;
+   return ((x+812) + ((y+812) << 10 ) + ((z+812) << 10 << 10) )+1;
 
   // return ((a*73856093 + b*19349663 + c*83492791)%4294967294)+1;
 
@@ -113,6 +115,8 @@ ChannelObject::ChannelObject(ChannelInfo inInfo, GridObject *parentGrid) {
                          channelAmount);
   // set a pointer in the hash table to where our dummy data is
   chunks->setDummyItem((void *)dummyChunk);
+  getRidOfDivCalc = 1.0f / parentChunkSize;
+
   // chunks->setDummyItem(dynamic_cast<void*>(dummyChunk));
 
   //    cout << "has of 2,2,2 is " << integerHash3D(2,2,2) << endl;
@@ -232,6 +236,7 @@ Chunk *ChannelObject::CreateChunk(int32_t x, int32_t y, int32_t z) {
   }
 
   uint32_t chunkKey = integerEncodeTo32BitInt(x, y, z);
+  //uint32_t chunkKey = integerHash3D(x, y, z);
 
   if (controlChannel) {
     // because we have two channels potentially for advecting/copying into (some
@@ -277,6 +282,7 @@ Chunk *ChannelObject::CreateChunk(int32_t x, int32_t y, int32_t z) {
 //----------------------------------------------
 Chunk *ChannelObject::GetChunk(int32_t x, int32_t y, int32_t z) {
   uint32_t chunkKey = integerEncodeTo32BitInt(x, y, z);
+  //uint32_t chunkKey = integerHash3D(x, y, z);
   return (Chunk *)chunks->GetItem(chunkKey);
 }
 
@@ -284,6 +290,8 @@ Chunk *ChannelObject::GetChunk(int32_t x, int32_t y, int32_t z) {
 bool ChannelObject::ChunkExists(int32_t x, int32_t y, int32_t z) {
   // cout << "checking exisitnece of " << x << y << z << endl;
   uint32_t chunkKey = integerEncodeTo32BitInt(x, y, z);
+   // uint32_t chunkKey = integerHash3D(x, y, z);
+
   //    if (x == 2 && y ==2 && z==2){
 
   //        cout << "222 is being checked in channel and hash is " << chunkKey
@@ -487,6 +495,424 @@ glm::vec3 ChannelObject::SampleVectorAtCellFaceFast(float x, float y, float z,
 void ChannelObject::printChunks() {
   cout << "num of chunks in hash table: " << chunks->GetItemCount() << endl;
 }
+//---------------------------------------------
+float ChannelObject::SampleTrilinear2(float x, float y, float z,
+                                     uint32_t channel) {
+
+    float getRidOfDivCalc = 1.0f / parentChunkSize;
+
+    int32_t chunkIndexDivX = glm::floor(x * getRidOfDivCalc);
+    int32_t chunkIndexDivY = glm::floor(y * getRidOfDivCalc);
+    int32_t chunkIndexDivZ = glm::floor(z * getRidOfDivCalc);
+
+
+
+    float fracX;
+    float fracY;
+    float fracZ;
+
+
+
+    uint32_t localGridIndexX;
+    uint32_t localGridIndexY;
+    uint32_t localGridIndexZ;
+
+    separateFracInt(x, fracX, localGridIndexX, fParentChunkSize);
+    separateFracInt(y, fracY, localGridIndexY, fParentChunkSize);
+    separateFracInt(z, fracZ, localGridIndexZ, fParentChunkSize);
+
+    // cout << localGridIndexX << localGridIndexY << localGridIndexZ <<endl;
+
+    // fracX < 0 ? 0.000001 : fracX;
+    // fracY < 0 ? 0.000001 : fracY;
+    // fracZ < 0 ? 0.000001 : fracZ;
+    // fracX > 1 ? 0.999999 : fracX;
+    // fracY < 1 ? 0.999999 : fracY;
+    // fracZ < 1 ? 0.999999 : fracZ;
+
+    //    if (chunkIndexDivX == 1 && chunkIndexDivY == 1  && chunkIndexDivZ == 1){
+    //        cout << "in box 2 : " << counter << endl;
+    //        counter++;
+    //    }
+  //      assert (fracX <= 1.0 && fracX >= 0);
+  //      assert (fracY <= 1.0 && fracY >= 0);
+  //      assert (fracZ <= 1.0 && fracZ >= 0);
+
+    Chunk *sampleChunk = GetChunk(chunkIndexDivX, chunkIndexDivY, chunkIndexDivZ);
+    //    if (sampleChunk == dummyChunk)
+    //        return defaultValue;
+    // cout << "got dummy first" << endl;
+
+    float tmp1{0.0f}, tmp2{0.0f}, tmp3{0.0f}, tmp4{0.0f}, tmp5{0.0f}, tmp6{0.0f},
+        tmp7{0.0f}, tmp8{0.0f};
+
+    // cout << "sampling " << chunkIndexDivX << " index " << localGridIndexX <<
+    // endl;
+
+    // cout << sampleChunk->chunkData[0] <<endl;
+    // cout <<
+    // flatten3dCoordinatesto1D(localGridIndexX,localGridIndexY,localGridIndexZ,
+    // currentChannelToSample,parentChunkSize ) << endl;
+    //    double tmp1 = (*this)(i,j,k);
+
+    //       double tmp12 = LERP(tmp1, tmp2, fracty);
+    //       double tmp34 = LERP(tmp3, tmp4, fracty);
+
+    //       double tmp56 = LERP(tmp5, tmp6, fracty);
+    //       double tmp78 = LERP(tmp7, tmp8, fracty);
+
+    //       double tmp1234 = LERP (tmp12, tmp34, fractx);
+    //       double tmp5678 = LERP (tmp56, tmp78, fractx);
+
+    //       double tmp = LERP(tmp1234, tmp5678, fractz);
+
+
+      localGridIndexX &= parentChunkSizeMinus1;
+
+      localGridIndexY &= parentChunkSizeMinus1;
+
+      localGridIndexZ &= parentChunkSizeMinus1;
+
+  //    localGridIndexX = glm::min(localGridIndexX, parentChunkSizeMinus1);
+
+  //    localGridIndexY = glm::min(localGridIndexY, parentChunkSizeMinus1);
+
+  //    localGridIndexZ = glm::min(localGridIndexZ, parentChunkSizeMinus1);
+
+    tmp1 = sampleChunk->chunkData[flatten3dCoordinatesto1D(
+        localGridIndexX, localGridIndexY, localGridIndexZ, channel,
+        parentChunkSize)];
+
+    if (localGridIndexX < parentChunkSizeMinus1 &&
+        localGridIndexY < parentChunkSizeMinus1 &&
+        localGridIndexZ < parentChunkSizeMinus1) // all 3
+    {
+
+      tmp2 = sampleChunk->chunkData[flatten3dCoordinatesto1D(
+          localGridIndexX, localGridIndexY + 1, localGridIndexZ, channel,
+          parentChunkSize)];
+
+      tmp3 = sampleChunk->chunkData[flatten3dCoordinatesto1D(
+          localGridIndexX + 1, localGridIndexY, localGridIndexZ, channel,
+          parentChunkSize)];
+      tmp4 = sampleChunk->chunkData[flatten3dCoordinatesto1D(
+          localGridIndexX + 1, localGridIndexY + 1, localGridIndexZ, channel,
+          parentChunkSize)];
+
+      tmp5 = sampleChunk->chunkData[flatten3dCoordinatesto1D(
+          localGridIndexX, localGridIndexY, localGridIndexZ + 1, channel,
+          parentChunkSize)];
+      tmp6 = sampleChunk->chunkData[flatten3dCoordinatesto1D(
+          localGridIndexX, localGridIndexY + 1, localGridIndexZ + 1, channel,
+          parentChunkSize)];
+
+      tmp7 = sampleChunk->chunkData[flatten3dCoordinatesto1D(
+          localGridIndexX + 1, localGridIndexY, localGridIndexZ + 1, channel,
+          parentChunkSize)];
+      tmp8 = sampleChunk->chunkData[flatten3dCoordinatesto1D(
+          localGridIndexX + 1, localGridIndexY + 1, localGridIndexZ + 1, channel,
+          parentChunkSize)];
+    }
+
+    else if (localGridIndexX == parentChunkSizeMinus1 &&
+             localGridIndexY < parentChunkSizeMinus1 &&
+             localGridIndexZ < parentChunkSizeMinus1) // only x at edge
+    {
+      // cout << "edge case" << endl;
+      Chunk *sampleChunkXp1 =
+          GetChunk(chunkIndexDivX + 1, chunkIndexDivY, chunkIndexDivZ);
+
+      tmp2 = sampleChunk->chunkData[flatten3dCoordinatesto1D(
+          localGridIndexX, localGridIndexY + 1, localGridIndexZ, channel,
+          parentChunkSize)];
+
+      tmp3 = sampleChunkXp1->chunkData[flatten3dCoordinatesto1D(
+          (localGridIndexX + 1) & parentChunkSizeMinus1, localGridIndexY,
+          localGridIndexZ, channel, parentChunkSize)];
+      tmp4 = sampleChunkXp1->chunkData[flatten3dCoordinatesto1D(
+          (localGridIndexX + 1) & parentChunkSizeMinus1, localGridIndexY + 1,
+          localGridIndexZ, channel, parentChunkSize)];
+
+      tmp5 = sampleChunk->chunkData[flatten3dCoordinatesto1D(
+          localGridIndexX, localGridIndexY, localGridIndexZ + 1, channel,
+          parentChunkSize)];
+      tmp6 = sampleChunk->chunkData[flatten3dCoordinatesto1D(
+          localGridIndexX, localGridIndexY + 1, localGridIndexZ + 1, channel,
+          parentChunkSize)];
+
+      tmp7 = sampleChunkXp1->chunkData[flatten3dCoordinatesto1D(
+          (localGridIndexX + 1) & parentChunkSizeMinus1, localGridIndexY,
+          localGridIndexZ + 1, channel, parentChunkSize)];
+      tmp8 = sampleChunkXp1->chunkData[flatten3dCoordinatesto1D(
+          (localGridIndexX + 1) & parentChunkSizeMinus1, localGridIndexY + 1,
+          localGridIndexZ + 1, channel, parentChunkSize)];
+    }
+
+    else if (localGridIndexX < parentChunkSizeMinus1 &&
+             localGridIndexY == parentChunkSizeMinus1 &&
+             localGridIndexZ < parentChunkSizeMinus1) // only y at edge
+    {
+      Chunk *sampleChunkYp1 =
+          GetChunk(chunkIndexDivX, chunkIndexDivY + 1, chunkIndexDivZ);
+
+      tmp2 = sampleChunkYp1->chunkData[flatten3dCoordinatesto1D(
+          localGridIndexX, (localGridIndexY + 1) & parentChunkSizeMinus1,
+          localGridIndexZ, channel, parentChunkSize)];
+
+      tmp3 = sampleChunk->chunkData[flatten3dCoordinatesto1D(
+          localGridIndexX + 1, localGridIndexY, localGridIndexZ, channel,
+          parentChunkSize)];
+      tmp4 = sampleChunkYp1->chunkData[flatten3dCoordinatesto1D(
+          localGridIndexX + 1, (localGridIndexY + 1) & parentChunkSizeMinus1,
+          localGridIndexZ, channel, parentChunkSize)];
+
+      tmp5 = sampleChunk->chunkData[flatten3dCoordinatesto1D(
+          localGridIndexX, localGridIndexY, localGridIndexZ + 1, channel,
+          parentChunkSize)];
+      tmp6 = sampleChunkYp1->chunkData[flatten3dCoordinatesto1D(
+          localGridIndexX, (localGridIndexY + 1) & parentChunkSizeMinus1,
+          localGridIndexZ + 1, channel, parentChunkSize)];
+
+      tmp7 = sampleChunk->chunkData[flatten3dCoordinatesto1D(
+          localGridIndexX + 1, localGridIndexY, localGridIndexZ + 1, channel,
+          parentChunkSize)];
+      tmp8 = sampleChunkYp1->chunkData[flatten3dCoordinatesto1D(
+          localGridIndexX + 1, (localGridIndexY + 1) & parentChunkSizeMinus1,
+          localGridIndexZ + 1, channel, parentChunkSize)];
+    }
+
+    else if (localGridIndexX < parentChunkSizeMinus1 &&
+             localGridIndexY < parentChunkSizeMinus1 &&
+             localGridIndexZ == parentChunkSizeMinus1) // only z at edge
+    {
+      Chunk *sampleChunkZp1 =
+          GetChunk(chunkIndexDivX, chunkIndexDivY, chunkIndexDivZ + 1);
+      tmp2 = sampleChunk->chunkData[flatten3dCoordinatesto1D(
+          localGridIndexX, localGridIndexY + 1, localGridIndexZ, channel,
+          parentChunkSize)];
+
+      tmp3 = sampleChunk->chunkData[flatten3dCoordinatesto1D(
+          localGridIndexX + 1, localGridIndexY, localGridIndexZ, channel,
+          parentChunkSize)];
+      tmp4 = sampleChunk->chunkData[flatten3dCoordinatesto1D(
+          localGridIndexX + 1, localGridIndexY + 1, localGridIndexZ, channel,
+          parentChunkSize)];
+
+      tmp5 = sampleChunkZp1->chunkData[flatten3dCoordinatesto1D(
+          localGridIndexX, localGridIndexY,
+          (localGridIndexZ + 1) & parentChunkSizeMinus1, channel, parentChunkSize)];
+      tmp6 = sampleChunkZp1->chunkData[flatten3dCoordinatesto1D(
+          localGridIndexX, localGridIndexY + 1,
+          (localGridIndexZ + 1) & parentChunkSizeMinus1, channel, parentChunkSize)];
+
+      tmp7 = sampleChunkZp1->chunkData[flatten3dCoordinatesto1D(
+          localGridIndexX + 1, localGridIndexY,
+          (localGridIndexZ + 1) & parentChunkSizeMinus1, channel, parentChunkSize)];
+      tmp8 = sampleChunkZp1->chunkData[flatten3dCoordinatesto1D(
+          localGridIndexX + 1, localGridIndexY + 1,
+          (localGridIndexZ + 1) & parentChunkSizeMinus1, channel, parentChunkSize)];
+    }
+
+    //
+    else if (localGridIndexX == parentChunkSizeMinus1 &&
+             localGridIndexY == parentChunkSizeMinus1 &&
+             localGridIndexZ < parentChunkSizeMinus1) // x&y at edge
+    {
+      Chunk *sampleChunkXp1 =
+          GetChunk(chunkIndexDivX + 1, chunkIndexDivY, chunkIndexDivZ);
+      Chunk *sampleChunkYp1 =
+          GetChunk(chunkIndexDivX, chunkIndexDivY + 1, chunkIndexDivZ);
+      Chunk *sampleChunkXp1Yp1 =
+          GetChunk(chunkIndexDivX + 1, chunkIndexDivY + 1, chunkIndexDivZ);
+
+      tmp2 = sampleChunkYp1->chunkData[flatten3dCoordinatesto1D(
+          localGridIndexX, (localGridIndexY + 1) & parentChunkSizeMinus1,
+          localGridIndexZ, channel, parentChunkSize)];
+
+      tmp3 = sampleChunkXp1->chunkData[flatten3dCoordinatesto1D(
+          (localGridIndexX + 1) & parentChunkSizeMinus1, localGridIndexY,
+          localGridIndexZ, channel, parentChunkSize)];
+      tmp4 = sampleChunkXp1Yp1->chunkData[flatten3dCoordinatesto1D(
+          (localGridIndexX + 1) & parentChunkSizeMinus1,
+          (localGridIndexY + 1) & parentChunkSizeMinus1, localGridIndexZ, channel,
+          parentChunkSize)];
+
+      tmp5 = sampleChunk->chunkData[flatten3dCoordinatesto1D(
+          localGridIndexX, localGridIndexY, localGridIndexZ + 1, channel,
+          parentChunkSize)];
+      tmp6 = sampleChunkYp1->chunkData[flatten3dCoordinatesto1D(
+          localGridIndexX, (localGridIndexY + 1) & parentChunkSizeMinus1,
+          localGridIndexZ + 1, channel, parentChunkSize)];
+
+      tmp7 = sampleChunkXp1->chunkData[flatten3dCoordinatesto1D(
+          (localGridIndexX + 1) & parentChunkSizeMinus1, localGridIndexY,
+          localGridIndexZ + 1, channel, parentChunkSize)];
+      tmp8 = sampleChunkXp1Yp1->chunkData[flatten3dCoordinatesto1D(
+          (localGridIndexX + 1) & parentChunkSizeMinus1,
+          (localGridIndexY + 1) & parentChunkSizeMinus1, localGridIndexZ + 1, channel,
+          parentChunkSize)];
+    }
+
+    else if ((localGridIndexX < parentChunkSizeMinus1) &&
+             (localGridIndexY == parentChunkSizeMinus1) &&
+             (localGridIndexZ == parentChunkSizeMinus1)) // y&z at edge
+    {
+
+      Chunk *sampleChunkYp1 =
+          GetChunk(chunkIndexDivX, chunkIndexDivY + 1, chunkIndexDivZ);
+      Chunk *sampleChunkZp1 =
+          GetChunk(chunkIndexDivX, chunkIndexDivY, chunkIndexDivZ + 1);
+      Chunk *sampleChunkYp1Zp1 =
+          GetChunk(chunkIndexDivX, chunkIndexDivY + 1, chunkIndexDivZ + 1);
+
+      tmp2 = sampleChunkYp1->chunkData[flatten3dCoordinatesto1D(
+          localGridIndexX, (localGridIndexY + 1) & parentChunkSizeMinus1,
+          localGridIndexZ, channel, parentChunkSize)];
+
+      tmp3 = sampleChunk->chunkData[flatten3dCoordinatesto1D(
+          localGridIndexX + 1, localGridIndexY, localGridIndexZ, channel,
+          parentChunkSize)];
+      tmp4 = sampleChunkYp1->chunkData[flatten3dCoordinatesto1D(
+          localGridIndexX + 1, (localGridIndexY + 1) & parentChunkSizeMinus1,
+          localGridIndexZ, channel, parentChunkSize)];
+
+      tmp5 = sampleChunkZp1->chunkData[flatten3dCoordinatesto1D(
+          localGridIndexX, localGridIndexY,
+          (localGridIndexZ + 1) & parentChunkSizeMinus1, channel, parentChunkSize)];
+      tmp6 = sampleChunkYp1Zp1->chunkData[flatten3dCoordinatesto1D(
+          localGridIndexX, (localGridIndexY + 1) & parentChunkSizeMinus1,
+          (localGridIndexZ + 1) & parentChunkSizeMinus1, channel, parentChunkSize)];
+
+      tmp7 = sampleChunkZp1->chunkData[flatten3dCoordinatesto1D(
+          localGridIndexX + 1, localGridIndexY,
+          (localGridIndexZ + 1) & parentChunkSizeMinus1, channel, parentChunkSize)];
+      tmp8 = sampleChunkYp1Zp1->chunkData[flatten3dCoordinatesto1D(
+          localGridIndexX + 1, (localGridIndexY + 1) & parentChunkSizeMinus1,
+          (localGridIndexZ + 1) & parentChunkSizeMinus1, channel, parentChunkSize)];
+    }
+
+    else if (localGridIndexX == parentChunkSizeMinus1 &&
+             localGridIndexY < parentChunkSizeMinus1 &&
+             localGridIndexZ == parentChunkSizeMinus1) // x&z at edge
+    {
+
+      Chunk *sampleChunkXp1 =
+          GetChunk(chunkIndexDivX + 1, chunkIndexDivY, chunkIndexDivZ);
+      Chunk *sampleChunkZp1 =
+          GetChunk(chunkIndexDivX, chunkIndexDivY, chunkIndexDivZ + 1);
+      Chunk *sampleChunkXp1Zp1 =
+          GetChunk(chunkIndexDivX + 1, chunkIndexDivY, chunkIndexDivZ + 1);
+
+      //       double tmp2 = (*this)(i,j+1,k);
+      //       double tmp3 = (*this)(i+1,j,k);
+      //       double tmp4 = (*this)(i+1,j+1,k);
+
+      //       double tmp5 = (*this)(i,j,k+1);
+      //       double tmp6 = (*this)(i,j+1,k+1);
+      //       double tmp7 = (*this)(i+1,j,k+1);
+      //       double tmp8 = (*this)(i+1,j+1,k+1);111
+      tmp2 = sampleChunk->chunkData[flatten3dCoordinatesto1D(
+          localGridIndexX, localGridIndexY + 1, localGridIndexZ, channel,
+          parentChunkSize)];
+
+      tmp3 = sampleChunkXp1->chunkData[flatten3dCoordinatesto1D(
+          (localGridIndexX + 1) & parentChunkSizeMinus1, localGridIndexY,
+          localGridIndexZ, channel, parentChunkSize)];
+      tmp4 = sampleChunkXp1->chunkData[flatten3dCoordinatesto1D(
+          (localGridIndexX + 1) & parentChunkSizeMinus1, localGridIndexY + 1,
+          localGridIndexZ, channel, parentChunkSize)];
+
+      tmp5 = sampleChunkZp1->chunkData[flatten3dCoordinatesto1D(
+          localGridIndexX, localGridIndexY,
+          (localGridIndexZ + 1) & parentChunkSizeMinus1, channel, parentChunkSize)];
+      tmp6 = sampleChunkZp1->chunkData[flatten3dCoordinatesto1D(
+          localGridIndexX, localGridIndexY + 1,
+          (localGridIndexZ + 1) & parentChunkSizeMinus1, channel, parentChunkSize)];
+
+      tmp7 = sampleChunkXp1Zp1->chunkData[flatten3dCoordinatesto1D(
+          (localGridIndexX + 1) & parentChunkSizeMinus1, localGridIndexY,
+          (localGridIndexZ + 1) & parentChunkSizeMinus1, channel, parentChunkSize)];
+      tmp8 = sampleChunkXp1Zp1->chunkData[flatten3dCoordinatesto1D(
+          (localGridIndexX + 1) & parentChunkSizeMinus1, localGridIndexY + 1,
+          (localGridIndexZ + 1) & parentChunkSizeMinus1, channel, parentChunkSize)];
+    }
+
+    else if (localGridIndexX == parentChunkSizeMinus1 &&
+             localGridIndexY == parentChunkSizeMinus1 &&
+             localGridIndexZ == parentChunkSizeMinus1) // x&y&z at edge
+    {
+      // cout << "err " << endl;
+
+      Chunk *sampleChunkXp1 =
+          GetChunk(chunkIndexDivX + 1, chunkIndexDivY, chunkIndexDivZ);
+      Chunk *sampleChunkYp1 =
+          GetChunk(chunkIndexDivX, chunkIndexDivY + 1, chunkIndexDivZ);
+      Chunk *sampleChunkZp1 =
+          GetChunk(chunkIndexDivX, chunkIndexDivY, chunkIndexDivZ + 1);
+
+      Chunk *sampleChunkXp1Yp1 =
+          GetChunk(chunkIndexDivX + 1, chunkIndexDivY + 1, chunkIndexDivZ);
+      Chunk *sampleChunkXp1Zp1 =
+          GetChunk(chunkIndexDivX + 1, chunkIndexDivY, chunkIndexDivZ + 1);
+      Chunk *sampleChunkYp1Zp1 =
+          GetChunk(chunkIndexDivX, chunkIndexDivY + 1, chunkIndexDivZ + 1);
+
+      Chunk *sampleChunkXp1Yp1Zp1 =
+          GetChunk(chunkIndexDivX + 1, chunkIndexDivY + 1, chunkIndexDivZ + 1);
+
+      // if (sampleChunkXp1Yp1Zp1 == dummyChunk)
+      // cout << "same as dummy chunk" << endl;
+
+      tmp2 = sampleChunkYp1->chunkData[flatten3dCoordinatesto1D(
+          localGridIndexX, (localGridIndexY + 1) & parentChunkSizeMinus1,
+          localGridIndexZ, channel, parentChunkSize)];
+
+      tmp3 = sampleChunkXp1->chunkData[flatten3dCoordinatesto1D(
+          (localGridIndexX + 1) & parentChunkSizeMinus1, localGridIndexY,
+          localGridIndexZ, channel, parentChunkSize)];
+      tmp4 = sampleChunkXp1Yp1->chunkData[flatten3dCoordinatesto1D(
+          (localGridIndexX + 1) & parentChunkSizeMinus1,
+          (localGridIndexY + 1) & parentChunkSizeMinus1, localGridIndexZ, channel,
+          parentChunkSize)];
+
+      tmp5 = sampleChunkZp1->chunkData[flatten3dCoordinatesto1D(
+          localGridIndexX, localGridIndexY,
+          (localGridIndexZ + 1) & parentChunkSizeMinus1, channel, parentChunkSize)];
+      tmp6 = sampleChunkYp1Zp1->chunkData[flatten3dCoordinatesto1D(
+          localGridIndexX, (localGridIndexY + 1) & parentChunkSizeMinus1,
+          (localGridIndexZ + 1) & parentChunkSizeMinus1, channel, parentChunkSize)];
+
+      tmp7 = sampleChunkXp1Zp1->chunkData[flatten3dCoordinatesto1D(
+          (localGridIndexX + 1) & parentChunkSizeMinus1, localGridIndexY,
+          (localGridIndexZ + 1) & parentChunkSizeMinus1, channel, parentChunkSize)];
+      tmp8 = sampleChunkXp1Yp1Zp1->chunkData[flatten3dCoordinatesto1D(
+          (localGridIndexX + 1) & parentChunkSizeMinus1,
+          (localGridIndexY + 1) & parentChunkSizeMinus1,
+          (localGridIndexZ + 1) & parentChunkSizeMinus1, channel, parentChunkSize)];
+    }
+
+    else {
+      cout << "something went wrong, voxel doesn't exist. chunk " <<  chunkIndexDivX << " " << chunkIndexDivY << " " << chunkIndexDivZ << " " << localGridIndexX << " " << localGridIndexY << " " << localGridIndexZ <<  "    : " << x << " " << y << " " << z << endl;
+      return -1;
+    }
+
+    float tmp12 = glm::mix(tmp1, tmp2, fracY);
+    float tmp34 = glm::mix(tmp3, tmp4, fracY);
+    float tmp56 = glm::mix(tmp5, tmp6, fracY);
+    float tmp78 = glm::mix(tmp7, tmp8, fracY);
+    // fracYfracX
+    float tmp1234 = glm::mix(tmp12, tmp34, fracX);
+    float tmp5678 = glm::mix(tmp56, tmp78, fracX);
+
+    float tmp = glm::mix(tmp1234, tmp5678, fracZ);
+
+    // cout <<tmp<<endl;
+    // cout << "sampling " << chunkIndexDivX << " index " << localGridIndexX <<
+    // "result " << tmp << endl;
+
+    return tmp;
+
+}
 
 //----------------------------------------------
 float ChannelObject::SampleTrilinear(float x, float y, float z,
@@ -517,7 +943,9 @@ float ChannelObject::SampleTrilinear(float x, float y, float z,
   // 15 %4 = 3, chunk 3
   // 0.0 and 3.0, index 3
 
-  float getRidOfDivCalc = 1.0f / parentChunkSize;
+
+
+
 
   int32_t chunkIndexDivX = glm::floor(x * getRidOfDivCalc);
   int32_t chunkIndexDivY = glm::floor(y * getRidOfDivCalc);
@@ -532,6 +960,8 @@ float ChannelObject::SampleTrilinear(float x, float y, float z,
   float fracX;
   float fracY;
   float fracZ;
+
+
 
   uint32_t localGridIndexX;
   uint32_t localGridIndexY;
@@ -939,7 +1369,6 @@ float ChannelObject::SampleExplicit(float x, float y, float z,
   // int32_t parentChunkSizeMinus1 = parentChunkSize - 1; // 7
 
 
-  float getRidOfDivCalc = 1.0f / parentChunkSize;
 
   //    int32_t chunkIndexDivX = glm::floor((x)/(parentChunkSize));
   //    int32_t chunkIndexDivY = glm::floor((y)/(parentChunkSize));

@@ -48,33 +48,58 @@ void GridPressure::PreChunkOp(Chunk *&inChunk, Chunk *&outChunk,
     //callPreChunkOp = false;//only call once;
 }
 
-void GridPressure::Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelPosition,
+void GridPressure::Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelWorldPosition,
                             Chunk *inChunk, Chunk *outChunk, uint32_t dataIndex,
-                            uint32_t channel){
+                            uint32_t channel, bool internalAccessible){
 
 
 
 
 
-  float X = ((chunkId.x * (int)chnkSize) + voxelPosition.x);
-  float Y = ((chunkId.y * (int)chnkSize) + voxelPosition.y);
-  float Z = ((chunkId.z * (int)chnkSize) + voxelPosition.z);
+//    float X = voxelWorldPosition.x;
+
+//    float Y = voxelWorldPosition.y;
+
+//    float Z = voxelWorldPosition.z;
 
   //add scale here?
 
  // float P6 = inChunk->chunkData[dataIndex];
   //float P  = currentSourceChannelObject->SampleExplicit(X, Y, Z, 0 );
 
-  float Pip1JK = currentSourceChannelObject->SampleExplicit(X+1, Y, Z, 0 );
-  float Pim1JK = currentSourceChannelObject->SampleExplicit(X-1, Y, Z, 0 );
+    float Pip1JK;
+    float Pim1JK;
 
-  float PIjp1K = currentSourceChannelObject->SampleExplicit(X, Y+1, Z, 0 );
-  float PIjm1K = currentSourceChannelObject->SampleExplicit(X, Y-1, Z, 0 );
+    float PIjp1K;
+    float PIjm1K;
 
-  float PIJkp1 = currentSourceChannelObject->SampleExplicit(X, Y, Z+1, 0 );
-  float PIJkm1 = currentSourceChannelObject->SampleExplicit(X, Y, Z-1, 0 );
+    float PIJkp1;
+    float PIJkm1;
 
-  float div = divergenceSource->SampleExplicit(X, Y, Z, 0);
+  if (internalAccessible){
+        Pip1JK = inChunk->chunkData[dataIndex+1];
+        Pim1JK = inChunk->chunkData[dataIndex-1];
+
+        PIjp1K = inChunk->chunkData[dataIndex+chnkSize];
+        PIjm1K = inChunk->chunkData[dataIndex-chnkSize];
+
+        PIJkp1 = inChunk->chunkData[dataIndex+(chnkSize*chnkSize)];
+        PIJkm1 = inChunk->chunkData[dataIndex-(chnkSize*chnkSize)];
+  }
+
+  else{
+   Pip1JK = currentSourceChannelObject->SampleExplicit(voxelWorldPosition.x+1, voxelWorldPosition.y, voxelWorldPosition.z, 0 );
+   Pim1JK = currentSourceChannelObject->SampleExplicit(voxelWorldPosition.x-1, voxelWorldPosition.y, voxelWorldPosition.z, 0 );
+
+   PIjp1K = currentSourceChannelObject->SampleExplicit(voxelWorldPosition.x, voxelWorldPosition.y+1, voxelWorldPosition.z, 0 );
+   PIjm1K = currentSourceChannelObject->SampleExplicit(voxelWorldPosition.x, voxelWorldPosition.y-1, voxelWorldPosition.z, 0 );
+
+   PIJkp1 = currentSourceChannelObject->SampleExplicit(voxelWorldPosition.x, voxelWorldPosition.y, voxelWorldPosition.z+1, 0 );
+   PIJkm1 = currentSourceChannelObject->SampleExplicit(voxelWorldPosition.x, voxelWorldPosition.y, voxelWorldPosition.z-1, 0 );
+
+  }
+
+  float div = divergenceSource->SampleExplicit(voxelWorldPosition.x, voxelWorldPosition.y, voxelWorldPosition.z, 0);
 
   //float pressureVal = ((P*6.0f) - Pip1JK - Pim1JK - PIjp1K - PIjm1K - PIJkp1 - PIJkm1 + div)/scaleSquared;
   //float pressureVal = (Pip1JK + Pim1JK + PIjp1K + PIjm1K + PIJkp1 + PIJkm1 + (div*scaleSquared))/6;
@@ -102,12 +127,31 @@ void GridPressure::Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelPosition,
 //                        ) ;
 
   //outChunk->chunkData[dataIndex] = pressureVal;
-  float pressure = (Pip1JK + Pim1JK + PIjp1K + PIjm1K + PIJkp1 + PIJkm1 + (div*scaleSquared))/6;
-    outChunk->chunkData[dataIndex] = pressure;
-//    if (X == 2 && Y == 2 && Z == 2 && channel == 0)
-//        cout << "pressure at   2 is " << pressure << endl;
-//    if (X == -3 && Y == 2 && Z == 2 && channel == 0)
-//        cout << "pressure at  -3 is " << pressure << endl;
+
+  //float pressure = (Pip1JK + Pim1JK + PIjp1K + PIjm1K + PIJkp1 + PIJkm1 + (div*scaleSquared))/6;
+    outChunk->chunkData[dataIndex] = (Pip1JK + Pim1JK + PIjp1K + PIjm1K + PIJkp1 + PIJkm1 + (div*scaleSquared))/6;;
+//    if(debug && iteration == numberOfIterations -1){
+//        if (X == -5 && Y == 2 && Z == 2 && channel == 0)
+//            cout << "pressure at  -5 is " << pressure << endl;
+//        if (X == -4 && Y == 2 && Z == 2 && channel == 0)
+//            cout << "pressure at  -4 is " << pressure << endl;
+//        if (X == -3 && Y == 2 && Z == 2 && channel == 0)
+//            cout << "pressure at  -3 is " << pressure << endl;
+//        if (X == -2 && Y == 2 && Z == 2 && channel == 0)
+//            cout << "pressure at  -2 is " << pressure << endl;
+//        if (X == -1 && Y == 2 && Z == 2 && channel == 0)
+//            cout << "pressure at  -1 is " << pressure << endl << "--------------------" << endl;
+//        if (X ==  0 && Y == 2 && Z == 2 && channel == 0)
+//            cout << "pressure at   0 is " << pressure << endl;
+//        if (X ==  1 && Y == 2 && Z == 2 && channel == 0)
+//            cout << "pressure at   1 is " << pressure << endl;
+//        if (X ==  2 && Y == 2 && Z == 2 && channel == 0)
+//            cout << "pressure at   2 is " << pressure << endl;
+//        if (X ==  3 && Y == 2 && Z == 2 && channel == 0)
+//            cout << "pressure at   3 is " << pressure << endl;
+//        if (X ==  4 && Y == 2 && Z == 2 && channel == 0)
+//            cout << "pressure at   4 is " << pressure << endl;
+//  }
 
 }
 

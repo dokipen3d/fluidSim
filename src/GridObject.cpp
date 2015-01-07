@@ -78,7 +78,7 @@ void GridObject::AddChannel(ChannelInfo inInfo) {
 
 //----------------------------------------------
 void GridObject::SetCommonOptions() {
-  chunkSize = 4;
+  chunkSize = 8;
   bucketSize = 1.0f;
   dx = bucketSize/(float)chunkSize;
   numChannels = 0;

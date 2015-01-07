@@ -30,7 +30,7 @@ GridOperator::GridOperator(GridObject *inGridObject) {
   this->boundingBox.fluidMin =
       glm::i32vec3(0.0); // set bounds to 0 so we dont emit anything
   this->boundingBox.fluidMax = glm::i32vec3(0.0);
-  chnkSize = gridObjectPtr->chunkSize;
+  chnkSize = (int)gridObjectPtr->chunkSize;
   // cout << "chnkSize is " << chnkSize << endl;
   // cout <<  channelName << endl;
 }
@@ -52,7 +52,7 @@ void GridOperator::SetGridObject(GridObject *inGridObject) {
 void GridOperator::IterateGrid() {
   double timeA = omp_get_wtime();
 //ITERATE-----------------------------------------------------------------------------
-for (int iteration = 0; iteration < numberOfIterations; iteration++){
+for (iteration = 0; iteration < numberOfIterations; iteration++){
 
     chunks.clear();
   chunkOpCounter = 0;
@@ -81,8 +81,8 @@ for (int iteration = 0; iteration < numberOfIterations; iteration++){
   int fMay = gridObjectPtr->boundingBox.fluidMax.y;
   int fMaz = gridObjectPtr->boundingBox.fluidMax.z;
 
-   cout << "<" << fmx << ", " << fmy << ", " << fmz << ">  to  <" << fMax <<
-   ", " << fMay << ", " << fMaz << "> ";
+//   cout << "<" << fmx << ", " << fmy << ", " << fmz << ">  to  <" << fMax <<
+//   ", " << fMay << ", " << fMaz << "> " << endl;
 
 
 
@@ -186,7 +186,7 @@ for (int iteration = 0; iteration < numberOfIterations; iteration++){
       }
     }
     // cout << "iterating through chunk vector " << i << endl;
-    #pragma omp parallel for ordered collapse(3)
+    //#pragma omp parallel for ordered collapse(3)
     for (int w = startVoxel; w < chnkSize; w += skipAmount) {//for skipping voxels in thr red black gauss seidel update
       for (int v = startVoxel; v < chnkSize; v += skipAmount) {//can do 1-startvoxel to ping pong between 1 & 0
         for (int u = startVoxel; u < chnkSize; u += skipAmount) {//and then do skipAmount = startVoxel+1 in each postgridop
@@ -203,11 +203,26 @@ for (int iteration = 0; iteration < numberOfIterations; iteration++){
             // w))    *a) + (a*chnkSize*chnkSize*chnkSize);
             // cout << "index " << chunkDataIndex << endl;
 
+            int X = ((chunks[i].chunkIndex.x * (int)chnkSize) + u);
+
+            int Y = ((chunks[i].chunkIndex.y * (int)chnkSize) + v);
+
+            int Z = ((chunks[i].chunkIndex.z * (int)chnkSize) + w);
+            bool accessable = false;
+
+
+            if (a == 0){
+
+            if (u > 0 && u < chnkSize-1){
+                if (v > 0 && v < chnkSize-1){
+                    if (w > 0 && w < chnkSize-1){
+                        accessable = true;}}}}
+
             this->Algorithm(
                 chunks[i].chunkIndex,
-                glm::i32vec3(u, v, w), // voxel position in local chunk space
+                glm::i32vec3(X, Y, Z), // voxel position in local chunk space
                 chunks[i].chunkSource, chunks[i].chunkTarget, chunkDataIndex,
-                a);
+                a, accessable);
             // myString.clear()
           }
         }
@@ -224,8 +239,9 @@ for (int iteration = 0; iteration < numberOfIterations; iteration++){
       }
     }
   }
+  if(numberOfIterations>1){
   cout << "end of " << name << " iteration: " << iteration+1 << " " << startVoxel << endl;
-
+}
 
 #pragma omp barrier
 
