@@ -52,7 +52,7 @@ void GridBouyancy::Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelWorldPositi
   //expensive if we allow all three channels
   //glm::vec3 value = glm::vec3(((densSample+densSampleXP1)/2)*0.02f, ((densSample+densSampleP1)/2)*0.0f, 0.0f);
 
-  glm::vec3 value = glm::vec3(0.0f, ((densSample+densSampleP1)/2)*0.02, 0.0f);
+  glm::vec3 value = glm::vec3(0.0f, ((densSample+densSampleP1)/2)*0.46, 0.0f);
 
 
 

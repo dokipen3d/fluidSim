@@ -15,6 +15,7 @@ void GridPadCull::Algorithm(glm::i32vec3 chunkId,
                             glm::i32vec3 voxelWorldPosition, Chunk *inChunk,
                             Chunk *outChunk, u_int32_t dataIndex,
                             uint32_t channel, bool internalAccessible) {
+
   bool lValueFalse = false;
   bool lValueTrue = true;
   if (outChunk->chunkData[dataIndex] > 0.0005) {
@@ -27,27 +28,25 @@ void GridPadCull::Algorithm(glm::i32vec3 chunkId,
     // }
     // }
     //}
-  } else {
-    //#pragma omp critical
-    // while(true){
-    // int store = inChunk->voxelCount;
-    // if(inChunk->voxelCount.compare_exchange_strong(store,
-    // store-1)){
-    // break;
-    // }
-    // }
-    outChunk->voxelCount--;
   }
+//  else {
+//    //#pragma omp critical
+//    // while(true){
+//    // int store = inChunk->voxelCount;
+//    // if(inChunk->voxelCount.compare_exchange_strong(store,
+//    // store-1)){
+//    // break;
+//    // }
+//    // }
+//    outChunk->voxelCount--;
+//  }
 }
 void GridPadCull::PostChunkOp(Chunk *&inChunk, Chunk *&outChunk,
                               glm::i32vec3 chunkIdSecondary) {
   bool padded = false;
   // cout << "voxCount = " << inChunk->voxelCount << endl;
-  if (outChunk->voxelCount == 0) {
-    // cout << "vox empty" << endl;
-    outChunk->empty = true;
-    //
-  } else {
+  if (!outChunk->empty) {
+
     outChunk->timeCreated = gridObjectPtr->simTime;
     //#pragma omp parrallel for collapse(3)
     //#pragma omp critical
@@ -79,6 +78,7 @@ void GridPadCull::PostChunkOp(Chunk *&inChunk, Chunk *&outChunk,
         }
       }
     }
+}
     //#pragma omp barrier
     // for (int i = 1; i <= chunksToPad; i++){
     // for (int j = 1; j <= chunksToPad; j++){
@@ -105,7 +105,7 @@ void GridPadCull::PostChunkOp(Chunk *&inChunk, Chunk *&outChunk,
     // }
     // }
     // }
-  }
+
   // if (inChunk->justCreatedOneFrameAgo){
   // inChunk->justCreatedOneFrameAgo = false;
   // }
@@ -145,8 +145,9 @@ void GridPadCull::PostChunkOp(Chunk *&inChunk, Chunk *&outChunk,
       boundingBox.fluidMax.z =
           glm::max(chunkIdSecondary.z + chunksToPad, boundingBox.fluidMax.z);
     }
-    int pcs = gridObjectPtr->chunkSize;
-    outChunk->voxelCount = pcs * pcs * pcs;
+    outChunk->voxelCount = currentSourceChannelObject->chunkSize *
+                            currentSourceChannelObject->chunkSize *
+                            currentSourceChannelObject->chunkSize;
   }
 }
 void GridPadCull::GridOp() {
@@ -155,3 +156,10 @@ void GridPadCull::GridOp() {
   gridObjectPtr->unifyBounds();
   boundingBox = BoundingBox();
 }
+
+void GridPadCull::PreChunkOp(Chunk *&inChunk, Chunk *&outChunk, glm::i32vec3 chunkIdSecondary)
+{
+    outChunk->empty = true;
+}
+
+

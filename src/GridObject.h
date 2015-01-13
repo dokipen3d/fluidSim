@@ -21,7 +21,7 @@ public:
 
   virtual ~GridObject();
   void resetGrid();
-  int chunkSize; // voxel dimensions in chunks
+  //int chunkSize; // voxel dimensions in chunks
   float bucketSize; // voxelSize;
   void unifyBounds(); // reset the geo bounds from the bucket bounds
   void AddChannel(ChannelInfo inInfo);
@@ -45,7 +45,11 @@ private:
   int channelIndex; // for going up two ints
   stringstream myString;
   std::vector<std::string> scalarChannelInit;
+  std::vector<int> scalarChannelRes;
+
   std::vector<std::string> vectorChannelInit;
+
+  std::vector<int> vectorChannelRes;
   std::vector<std::string> sdfChannelInit;
 };
 

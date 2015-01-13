@@ -1,4 +1,4 @@
-#include "GridEmitter.h"
+#include "GridEmitter2.h"
 #include "Chunk.h"
 #include "ChannelObject.h"
 #include "glm/vec3.hpp"
@@ -14,9 +14,9 @@ inline static float map_range(float value, float low1, float high1, float low2,
 }
 
 //----------------------------------------------
-GridEmitter::~GridEmitter() {}
+GridEmitter2::~GridEmitter2() {}
 
-void GridEmitter::setupDefaults() {
+void GridEmitter2::setupDefaults() {
   createChunks = true;
   std::string name = "sphereEmitter";
   forceInputBoundsIteration = true;
@@ -85,7 +85,7 @@ void GridEmitter::setupDefaults() {
 }
 
 //----------------------------------------------
-void GridEmitter::Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelWorldPosition,
+void GridEmitter2::Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelWorldPosition,
                             Chunk *inChunk, Chunk *outChunk, uint32_t dataIndex,
                             uint32_t channel, bool internalAccessible)
 
@@ -133,7 +133,7 @@ void GridEmitter::Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelWorldPositio
       sourceVolume->sampleVolume(glm::vec3(voxelWorldPosition.x  + 0.5f, voxelWorldPosition.y + 0.5f, voxelWorldPosition.z + 0.5f));//has to be offset by 0.5 because of central differnece ato make sphere sit at 0 (cell centres are at 0.5 on the 'world grid;
 
   if (sample < bandwidth) {
-    if (!currentTargetChannelObject->ChunkExists(chunkId.x, chunkId.y,
+    if (!currentTargetChannelObject->ChunkExists2(chunkId.x, chunkId.y,
                                                  chunkId.z)) {
       // do checks to emit
       // cout << "chunk id is " << chunkId.x <<  " " << chunkId.y << " " <<
@@ -146,7 +146,7 @@ void GridEmitter::Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelWorldPositio
       //                            chunkId.y, chunkId.z) << endl;
       //            }
 
-      outChunk = currentTargetChannelObject->CreateChunk(chunkId.x, chunkId.y,
+      outChunk = currentTargetChannelObject->CreateChunk2(chunkId.x, chunkId.y,
                                                          chunkId.z);
       // inChunk->chunkData[dataIndex] = 0;
       // myString << "empty ptr can creat if I want" << endl;
@@ -166,7 +166,7 @@ void GridEmitter::Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelWorldPositio
       //                }
       // myString << "getting chunk" << endl;
       outChunk =
-          currentTargetChannelObject->GetChunk(chunkId.x, chunkId.y, chunkId.z);
+          currentTargetChannelObject->GetChunk2(chunkId.x, chunkId.y, chunkId.z);
     }
 
     // can safely assume chunk exists?
@@ -211,12 +211,12 @@ void GridEmitter::Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelWorldPositio
   // myString << currentSourceChannelObject->channelInfo.channelName << endl;
 }
 
-float GridEmitter::addPositiveDifference(float inputReference,
+float GridEmitter2::addPositiveDifference(float inputReference,
                                          float amountToAdd) {
   return inputReference + (amountToAdd - inputReference);
 }
 
-// void GridEmitter::PreChunkOp(Chunk *inChunk, glm::i32vec3 chunkIdSecondary)
+// void GridEmitter2::PreChunkOp(Chunk *inChunk, glm::i32vec3 chunkIdSecondary)
 //{
 //    //here we do a presample of emission volume once per bucket. simple way to
 //    stop race condition if we were to do it per voxel.

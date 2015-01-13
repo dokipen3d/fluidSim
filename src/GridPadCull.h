@@ -19,6 +19,8 @@ public:
   virtual void PostChunkOp(Chunk *&inChunk, Chunk *&outChunk,
                            glm::i32vec3 chunkIdSecondary) override;
   virtual void GridOp() override;
+  virtual void PreChunkOp(Chunk *&inChunk, Chunk *&outChunk,
+                          glm::i32vec3 chunkIdSecondary) override;
 
   virtual void Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelWorldPosition,
                          Chunk *inChunk, Chunk *outChunk, u_int32_t dataIndex,
@@ -26,7 +28,7 @@ public:
                                             // be needed but if we write a node
                                             // that copies into a new grid we
                                             // need to know where
-  int chunksToPad = 1;
+  int chunksToPad = 2;
 };
 
 #endif // GRIDPADCULL_H

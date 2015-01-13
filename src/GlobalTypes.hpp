@@ -33,9 +33,10 @@ struct ChannelInfo
 {
 	uint32_t memoryIndex;
 	std::string channelName;
+        int res;
 	ChannelType channelType;
 	ChannelInfo(){};
-	ChannelInfo(int gridObjectMemIndex, std::string inName, ChannelType inType) : memoryIndex(gridObjectMemIndex), channelName(inName), channelType(inType){};
+        ChannelInfo(int gridObjectMemIndex, std::string inName, ChannelType inType, int resolution) : memoryIndex(gridObjectMemIndex), channelName(inName), channelType(inType), res(resolution){};
 
 };
 

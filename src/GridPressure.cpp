@@ -44,6 +44,10 @@ void GridPressure::PreChunkOp(Chunk *&inChunk, Chunk *&outChunk,
        //cout << "outChunk" << endl;
     }
 
+    //scaleSquared = currentSourceChannelObject->dx*currentSourceChannelObject->dx;
+    scaleSquared = -1;
+
+
     //std::fill(outChunk->chunkData.begin(),outChunk->chunkData.end(), 0.0f);
     //callPreChunkOp = false;//only call once;
 }
@@ -67,39 +71,39 @@ void GridPressure::Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelWorldPositi
  // float P6 = inChunk->chunkData[dataIndex];
   //float P  = currentSourceChannelObject->SampleExplicit(X, Y, Z, 0 );
 
-    float Pip1JK;
-    float Pim1JK;
+//    float Pip1JK;
+//    float Pim1JK;
 
-    float PIjp1K;
-    float PIjm1K;
+//    float PIjp1K;
+//    float PIjm1K;
 
-    float PIJkp1;
-    float PIJkm1;
+//    float PIJkp1;
+//    float PIJkm1;
 
-  if (internalAccessible){
-        Pip1JK = inChunk->chunkData[dataIndex+1];
-        Pim1JK = inChunk->chunkData[dataIndex-1];
+//  if (internalAccessible){
+//        Pip1JK = inChunk->chunkData[dataIndex+1];
+//        Pim1JK = inChunk->chunkData[dataIndex-1];
 
-        PIjp1K = inChunk->chunkData[dataIndex+chnkSize];
-        PIjm1K = inChunk->chunkData[dataIndex-chnkSize];
+//        PIjp1K = inChunk->chunkData[dataIndex+chnkSize];
+//        PIjm1K = inChunk->chunkData[dataIndex-chnkSize];
 
-        PIJkp1 = inChunk->chunkData[dataIndex+(chnkSize*chnkSize)];
-        PIJkm1 = inChunk->chunkData[dataIndex-(chnkSize*chnkSize)];
-  }
+//        PIJkp1 = inChunk->chunkData[dataIndex+(chnkSize*chnkSize)];
+//        PIJkm1 = inChunk->chunkData[dataIndex-(chnkSize*chnkSize)];
+//  }
 
-  else{
-   Pip1JK = currentSourceChannelObject->SampleExplicit(voxelWorldPosition.x+1, voxelWorldPosition.y, voxelWorldPosition.z, 0 );
-   Pim1JK = currentSourceChannelObject->SampleExplicit(voxelWorldPosition.x-1, voxelWorldPosition.y, voxelWorldPosition.z, 0 );
+//  else{
+//   Pip1JK = currentSourceChannelObject->SampleExplicit(voxelWorldPosition.x+1, voxelWorldPosition.y, voxelWorldPosition.z, 0 );
+//   Pim1JK = currentSourceChannelObject->SampleExplicit(voxelWorldPosition.x-1, voxelWorldPosition.y, voxelWorldPosition.z, 0 );
 
-   PIjp1K = currentSourceChannelObject->SampleExplicit(voxelWorldPosition.x, voxelWorldPosition.y+1, voxelWorldPosition.z, 0 );
-   PIjm1K = currentSourceChannelObject->SampleExplicit(voxelWorldPosition.x, voxelWorldPosition.y-1, voxelWorldPosition.z, 0 );
+//   PIjp1K = currentSourceChannelObject->SampleExplicit(voxelWorldPosition.x, voxelWorldPosition.y+1, voxelWorldPosition.z, 0 );
+//   PIjm1K = currentSourceChannelObject->SampleExplicit(voxelWorldPosition.x, voxelWorldPosition.y-1, voxelWorldPosition.z, 0 );
 
-   PIJkp1 = currentSourceChannelObject->SampleExplicit(voxelWorldPosition.x, voxelWorldPosition.y, voxelWorldPosition.z+1, 0 );
-   PIJkm1 = currentSourceChannelObject->SampleExplicit(voxelWorldPosition.x, voxelWorldPosition.y, voxelWorldPosition.z-1, 0 );
+//   PIJkp1 = currentSourceChannelObject->SampleExplicit(voxelWorldPosition.x, voxelWorldPosition.y, voxelWorldPosition.z+1, 0 );
+//   PIJkm1 = currentSourceChannelObject->SampleExplicit(voxelWorldPosition.x, voxelWorldPosition.y, voxelWorldPosition.z-1, 0 );
 
-  }
+  //}
 
-  float div = divergenceSource->SampleExplicit(voxelWorldPosition.x, voxelWorldPosition.y, voxelWorldPosition.z, 0);
+ // float div = divergenceSource->SampleExplicit(voxelWorldPosition.x, voxelWorldPosition.y, voxelWorldPosition.z, 0);
 
   //float pressureVal = ((P*6.0f) - Pip1JK - Pim1JK - PIjp1K - PIjm1K - PIJkp1 - PIJkm1 + div)/scaleSquared;
   //float pressureVal = (Pip1JK + Pim1JK + PIjp1K + PIjm1K + PIJkp1 + PIJkm1 + (div*scaleSquared))/6;
@@ -129,7 +133,18 @@ void GridPressure::Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelWorldPositi
   //outChunk->chunkData[dataIndex] = pressureVal;
 
   //float pressure = (Pip1JK + Pim1JK + PIjp1K + PIjm1K + PIJkp1 + PIJkm1 + (div*scaleSquared))/6;
-    outChunk->chunkData[dataIndex] = (Pip1JK + Pim1JK + PIjp1K + PIjm1K + PIJkp1 + PIJkm1 + (div*scaleSquared))/6;;
+    //outChunk->chunkData[dataIndex] = (Pip1JK + Pim1JK + PIjp1K + PIjm1K + PIJkp1 + PIJkm1 + (div*scaleSquared))/6;;
+  outChunk->chunkData[dataIndex] = (   currentSourceChannelObject->SampleExplicit(voxelWorldPosition.x+1, voxelWorldPosition.y, voxelWorldPosition.z, 0 )+
+                                        currentSourceChannelObject->SampleExplicit(voxelWorldPosition.x-1, voxelWorldPosition.y, voxelWorldPosition.z, 0 )+
+                                        currentSourceChannelObject->SampleExplicit(voxelWorldPosition.x, voxelWorldPosition.y+1, voxelWorldPosition.z, 0 )+
+                                        currentSourceChannelObject->SampleExplicit(voxelWorldPosition.x, voxelWorldPosition.y-1, voxelWorldPosition.z, 0 )+
+                                        currentSourceChannelObject->SampleExplicit(voxelWorldPosition.x, voxelWorldPosition.y, voxelWorldPosition.z+1, 0 )+
+                                        currentSourceChannelObject->SampleExplicit(voxelWorldPosition.x, voxelWorldPosition.y, voxelWorldPosition.z-1, 0 )+
+                                        divergenceSource->SampleExplicit(voxelWorldPosition.x, voxelWorldPosition.y, voxelWorldPosition.z, 0)*-1)/6;
+
+
+
+
 //    if(debug && iteration == numberOfIterations -1){
 //        if (X == -5 && Y == 2 && Z == 2 && channel == 0)
 //            cout << "pressure at  -5 is " << pressure << endl;

@@ -70,7 +70,7 @@ GridObject::~GridObject() {
 //----------------------------------------------
 void GridObject::AddChannel(ChannelInfo inInfo) {
   channelDetails[inInfo.channelName] =
-      ChannelInfo(numChannels, inInfo.channelName, inInfo.channelType);
+      ChannelInfo(numChannels, inInfo.channelName, inInfo.channelType, inInfo.res);
   numChannels++;
   cout << "channel added" << endl;
   resetGrid();
@@ -78,9 +78,9 @@ void GridObject::AddChannel(ChannelInfo inInfo) {
 
 //----------------------------------------------
 void GridObject::SetCommonOptions() {
-  chunkSize = 8;
+  //chunkSize = 8;
   bucketSize = 1.0f;
-  dx = bucketSize/(float)chunkSize;
+  //dx = bucketSize/(float)chunkSize;
   numChannels = 0;
   boundingBox.min = glm::vec3(0.0);
   boundingBox.max = glm::vec3(0.0);
@@ -120,13 +120,14 @@ void GridObject::SetDefaultChannels() {
   // {string("density"),string("temperature"),string("fuel"),string("pressure")
   // };
   scalarChannelInit = {string("density"), string("pressure"), string("divergence")};
-
+    scalarChannelRes = {8, 8, 8};
   vectorChannelInit = {string("velocity")};
+  vectorChannelRes = {8};
 
   // prepare the info structures for passing into the channel objects
   for (int i = 0; i < scalarChannelInit.size(); i++) {
     channelDetails[scalarChannelInit.at(i)] =
-        ChannelInfo(channelIndex, scalarChannelInit.at(i), ChannelType::scalar);
+        ChannelInfo(channelIndex, scalarChannelInit.at(i), ChannelType::scalar, scalarChannelRes.at(i));
     //inc index twice because we'll be swapping/pingponging channel
     channelIndex++;
     channelIndex++;
@@ -136,7 +137,7 @@ void GridObject::SetDefaultChannels() {
 
   for (int i = 0; i < vectorChannelInit.size(); i++) {
     channelDetails[vectorChannelInit.at(i)] =
-        ChannelInfo(channelIndex, vectorChannelInit.at(i), ChannelType::vector);
+        ChannelInfo(channelIndex, vectorChannelInit.at(i), ChannelType::vector, vectorChannelRes.at(i));
     channelIndex++;
     channelIndex++;
 
@@ -145,7 +146,7 @@ void GridObject::SetDefaultChannels() {
 
   for (int i = 0; i < sdfChannelInit.size(); i++) {
     channelDetails[sdfChannelInit.at(i)] =
-        ChannelInfo(channelIndex, sdfChannelInit.at(i), ChannelType::sdf);
+        ChannelInfo(channelIndex, sdfChannelInit.at(i), ChannelType::sdf,0);
     channelIndex++;
     channelIndex++;
 
@@ -177,8 +178,9 @@ void GridObject::resetGrid() {
     ;
   }
   // channelObjs.front()->controlChannel = true;
-  channelObjs.at(0)->controlChannel = true;
-  channelObjs.at(1)->controlChannel = true;
+  channelObjs.at(GetMemoryIndexForChannelName(std::string("density")))->controlChannel = true;
+  channelObjs.at(GetMemoryIndexForChannelName(std::string("density"))+1)->controlChannel = true;
+
 
   cout << " chanObjs size is " << channelObjs.size() << endl;
   cout << "grid reset" << endl;
@@ -186,12 +188,11 @@ void GridObject::resetGrid() {
 
 void GridObject::unifyBounds() {
 
-  boundingBox.min.x = boundingBox.fluidMin.x * chunkSize;
-  boundingBox.min.y = boundingBox.fluidMin.y * chunkSize;
-  boundingBox.min.z = boundingBox.fluidMin.z * chunkSize;
-  boundingBox.max.x = (boundingBox.fluidMax.x + 1) * chunkSize;
-  boundingBox.max.y = (boundingBox.fluidMax.y + 1) * chunkSize;
-  ;
-  boundingBox.max.z = (boundingBox.fluidMax.z + 1) * chunkSize;
+  boundingBox.min.x = boundingBox.fluidMin.x * channelObjs.at(GetMemoryIndexForChannelName(std::string("density")))->chunkSize;
+  boundingBox.min.y = boundingBox.fluidMin.y * channelObjs.at(GetMemoryIndexForChannelName(std::string("density")))->chunkSize;
+  boundingBox.min.z = boundingBox.fluidMin.z * channelObjs.at(GetMemoryIndexForChannelName(std::string("density")))->chunkSize;;
+  boundingBox.max.x = (boundingBox.fluidMax.x + 1) * channelObjs.at(GetMemoryIndexForChannelName(std::string("density")))->chunkSize;
+  boundingBox.max.y = (boundingBox.fluidMax.y + 1) * channelObjs.at(GetMemoryIndexForChannelName(std::string("density")))->chunkSize;
+  boundingBox.max.z = (boundingBox.fluidMax.z + 1) * channelObjs.at(GetMemoryIndexForChannelName(std::string("density")))->chunkSize;;
   ;
 }

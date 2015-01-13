@@ -76,7 +76,7 @@ void GridDivergence::Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelWorldPosi
   float Vdiff = (vDivergenceP1 - vDivergenceM1);
   float Wdiff = (wDivergenceP1 - wDivergenceM1);
 
-  float divergence = (scale * Udiff+Vdiff+Wdiff);
+  float divergence = (1 * Udiff+Vdiff+Wdiff);
 
 //  if (debug){
 //      if (X == -16 && Y == 2 && Z == 2)

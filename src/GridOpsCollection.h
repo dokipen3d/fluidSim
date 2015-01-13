@@ -1,5 +1,7 @@
 #include "GridObject.h"
 #include "GridEmitter.h"
+#include "GridEmitter2.h"
+
 #include "GridDissipator.h"
 #include "GridPadCull.h"
 #include "GridVectorEmitter.h"

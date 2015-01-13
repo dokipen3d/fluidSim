@@ -52,7 +52,7 @@ int main(int argc, char *argv[]) {
   cout << *argv[argc - 1] << endl;
 bool operate = false;
 
-  omp_set_num_threads(6);
+  omp_set_num_threads(1);
   int input, input2;
   SDL_Event keyevent;
   bool eventLoop = true;
@@ -65,7 +65,7 @@ bool operate = false;
 
   auto grid_obj = make_unique<GridObject>();
 
-  auto gridEmit = make_unique<GridEmitter>(grid_obj.get());
+  auto gridEmit = make_unique<GridEmitter2>(grid_obj.get());
   gridEmit->setNodeName(std::string("emitter"));
 
   auto gridDiss = make_unique<GridDissipator>(grid_obj.get());
@@ -80,8 +80,8 @@ bool operate = false;
 
   //auto basicAdvect = make_unique<GridMacCormackAdvect>(grid_obj.get());
 
-  //auto basicAdvect = make_unique<GridRK2Advect>(grid_obj.get());
-  auto basicAdvect = make_unique<GridBasicAdvect>(grid_obj.get());
+  auto basicAdvect = make_unique<GridRK2Advect>(grid_obj.get());
+  //auto basicAdvect = make_unique<GridBasicAdvect>(grid_obj.get());
 
   basicAdvect->setNodeName(std::string("basicAdvect"));
 
@@ -190,28 +190,28 @@ bool operate = false;
       }
     }
 
-
+//for (int r= 0; r<10;r++){
     //if (operate){
     gridEmit->IterateGrid();
-    gridPad->IterateGrid();
+//    gridPad->IterateGrid();
 
-    //vecEmit->IterateGrid();
+//    //vecEmit->IterateGrid();
 
-    gridDiss->IterateGrid();
-    bouyancy->IterateGrid();
-    divergence->IterateGrid();
-    pressure->IterateGrid();
-    projection->IterateGrid();
-    basicAdvect->IterateGrid();
-    basicVelAdvect->IterateGrid();
+//    gridDiss->IterateGrid();
+//    bouyancy->IterateGrid();
+//    divergence->IterateGrid();
+//    pressure->IterateGrid();
+//    projection->IterateGrid();
+//    basicAdvect->IterateGrid();
+//    basicVelAdvect->IterateGrid();
 
 
-
+//}
 
 
 
     //only render every x frames
-    if (frameCount == 1){
+    if (frameCount == 4){
         renderer->Render();
         frameCount = 0;
     }
@@ -222,7 +222,7 @@ bool operate = false;
     grid_obj->incrementSimTime(0.041666666f);
 
     /* Swap our back buffer to the front */
-    SDL_GL_SwapWindow(window);
+   SDL_GL_SwapWindow(window);
     double timeB = omp_get_wtime();
     double frameTime = timeB - timeA;
     elapsedTime += frameTime;
@@ -233,8 +233,8 @@ bool operate = false;
     operate = false;
 //    if (grid_obj->simTime > 0.05)
 //        eventLoop = false;
+ // }
   }
-  //}
 
   /* Clear our buffer with a red background */
 
