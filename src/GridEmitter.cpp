@@ -182,7 +182,7 @@ void GridEmitter::Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelWorldPositio
       //float value = glm::max(glm::cos(currentTime*1.2), 0.0);
       if (currentTime < 500) {
         //outChunk->chunkData[dataIndex] += 0.2f;
-        float newval = addPositiveDifference(inChunk->chunkData[dataIndex],3.0f* glm::abs(glm::simplex(glm::vec3(X/10,Y/10-(currentTime*1.8),Z/10)) ) );
+        float newval = addPositiveDifference(outChunk->chunkData[dataIndex],3.0f* glm::abs(glm::simplex(glm::vec3(X/19,Y/19-(currentTime*2.4),Z/19)) ) );
           //float newval = addPositiveDifference(inChunk->chunkData[dataIndex],3.0f);
 
         outChunk->chunkData[dataIndex] = newval ;

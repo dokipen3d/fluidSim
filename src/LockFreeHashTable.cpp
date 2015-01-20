@@ -18,6 +18,8 @@ inline static uint32_t integerHash(uint32_t h) {
   h ^= h >> 16;
   return h;
 }
+
+
 //---------------------------------}
 
 // inline static uint32_t integerHash(uint64_t h)
@@ -32,7 +34,7 @@ inline static uint32_t integerHash(uint32_t h) {
 //----------------------------------------------
 LockFreeHashTable::LockFreeHashTable(uint32_t arraySize) {
   // Initialize cells
-  assert((arraySize & (arraySize - 1)) == 0); // Must be a power of 2
+  //assert((arraySize & (arraySize - 1)) == 0); // Must be a power of 2
   m_arraySize = arraySize;
   m_entries = new Entry[arraySize];
   Clear();
@@ -47,8 +49,8 @@ LockFreeHashTable::~LockFreeHashTable() {
 //----------------------------------------------
 
 void LockFreeHashTable::SetItem(uint32_t key, uintptr_t value) {
-  assert(key != 0);
-  assert(value != 0);
+  //assert(key != 0);
+  //assert(value != 0);
 
   uint32_t idx = integerHash(key);
   // cout << idx << endl;
@@ -88,7 +90,7 @@ void LockFreeHashTable::SetItem(uint32_t key, uintptr_t value) {
 
 //----------------------------------------------
 uintptr_t LockFreeHashTable::GetItem(uint32_t key) {
-  assert(key != 0);
+  //assert(key != 0);
 
   uint32_t idx = integerHash(key);
   // stringstream ss;
@@ -112,13 +114,15 @@ uintptr_t LockFreeHashTable::GetItem(uint32_t key) {
       if (m_entries[idx].value) {
         return m_entries[idx].value;
       } else {
-        return (uintptr_t)dummy;
-        // return static_cast<uintptr_t>(dummy);
+        //return (uintptr_t)dummy;
+         return reinterpret_cast<uintptr_t>(dummy);
       }
 
     if (probedKey == 0) {
       // cout << "probed key 0" << std::endl;
-      return (uintptr_t)dummy;
+      //return (uintptr_t)dummy;
+      return reinterpret_cast<uintptr_t>(dummy);
+
     }
     // return static_cast<uintptr_t>(dummy);
 
@@ -134,7 +138,7 @@ void LockFreeHashTable::setDummyItem(
 
 //-----------------------------------------------
 void LockFreeHashTable::ClearKey(uint32_t key) {
-  assert(key != 0);
+  //assert(key != 0);
 
   uint32_t idx = integerHash(key);
 
@@ -159,7 +163,7 @@ void LockFreeHashTable::ClearKey(uint32_t key) {
 
 //-----------------------------------------------
 bool LockFreeHashTable::KeyExists(uint32_t key) {
-  assert(key != 0);
+  //assert(key != 0);
 
   uint32_t idx = integerHash(key);
   // bool searching = true;
@@ -179,7 +183,7 @@ bool LockFreeHashTable::KeyExists(uint32_t key) {
 
     if (probedKey == key) {
       if ((m_entries[idx].value != 0) &&
-          m_entries[idx].value != (uintptr_t)dummy)
+          m_entries[idx].value != reinterpret_cast<uintptr_t>(dummy))
         return true;
       else
         return false;

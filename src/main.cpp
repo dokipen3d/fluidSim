@@ -52,7 +52,7 @@ int main(int argc, char *argv[]) {
   cout << *argv[argc - 1] << endl;
 bool operate = false;
 
-  omp_set_num_threads(6);
+  //omp_set_num_threads(6);
   int input, input2;
   SDL_Event keyevent;
   bool eventLoop = true;
@@ -90,7 +90,7 @@ bool operate = false;
   //auto basicVelAdvect = make_unique<GridRK2VelAdvect>(grid_obj.get());
   auto basicVelAdvect = make_unique<GridBasicVelAdvect>(grid_obj.get());
 
-  //basicVelAdvect->setNodeName(std::string("basicVelAdvect"));
+  basicVelAdvect->setNodeName(std::string("basicVelAdvect"));
 
   auto bouyancy = make_unique<GridBouyancy>(grid_obj.get());
   bouyancy->setNodeName(std::string("bouyancy"));
@@ -100,8 +100,8 @@ bool operate = false;
 
   //auto pressure = make_unique<GridPressure>(grid_obj.get());
 
-  //auto pressure = make_unique<GridPressure>(grid_obj.get());
   auto pressure = make_unique<GridPressure>(grid_obj.get());
+  //auto pressure = make_unique<GridPressureRBGS>(grid_obj.get());
 
   pressure->setNodeName(std::string("pressure oper"));
 
@@ -197,7 +197,7 @@ bool operate = false;
 
     //vecEmit->IterateGrid();
 
-    gridDiss->IterateGrid();
+    //gridDiss->IterateGrid();
     bouyancy->IterateGrid();
     divergence->IterateGrid();
     pressure->IterateGrid();
@@ -211,7 +211,7 @@ bool operate = false;
 
 
     //only render every x frames
-    if (frameCount == 1){
+    if (frameCount == 3){
         renderer->Render();
         frameCount = 0;
     }

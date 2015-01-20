@@ -24,6 +24,7 @@ void GridPressure::setupDefaults()
 
     callGridOp = true;
     callPreChunkOp = true;
+    callPostChunkOp = true;
     scale = 1.0f;
     scaleSquared = -(scale*scale);
     numberOfIterations = 20;
@@ -75,31 +76,53 @@ void GridPressure::Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelWorldPositi
 
     float PIJkp1;
     float PIJkm1;
+    float div;
 
-  if (internalAccessible){
-        Pip1JK = inChunk->chunkData[dataIndex+1];
-        Pim1JK = inChunk->chunkData[dataIndex-1];
+//  if (internalAccessible){
+//        Pip1JK = inChunk->chunkData[dataIndex+1];
+//        Pim1JK = inChunk->chunkData[dataIndex-1];
 
-        PIjp1K = inChunk->chunkData[dataIndex+chnkSize];
-        PIjm1K = inChunk->chunkData[dataIndex-chnkSize];
+//        PIjp1K = inChunk->chunkData[dataIndex+chnkSize];
+//        PIjm1K = inChunk->chunkData[dataIndex-chnkSize];
 
-        PIJkp1 = inChunk->chunkData[dataIndex+(chnkSize*chnkSize)];
-        PIJkm1 = inChunk->chunkData[dataIndex-(chnkSize*chnkSize)];
-  }
+//        PIJkp1 = inChunk->chunkData[dataIndex+(chnkSize*chnkSize)];
+//        PIJkm1 = inChunk->chunkData[dataIndex-(chnkSize*chnkSize)];
+//  }
 
-  else{
+//  else{
+//#pragma omp parallel sections
+    {
+
+//#pragma omp  section
+    {
    Pip1JK = currentSourceChannelObject->SampleExplicit(voxelWorldPosition.x+1, voxelWorldPosition.y, voxelWorldPosition.z, 0 );
-   Pim1JK = currentSourceChannelObject->SampleExplicit(voxelWorldPosition.x-1, voxelWorldPosition.y, voxelWorldPosition.z, 0 );
-
-   PIjp1K = currentSourceChannelObject->SampleExplicit(voxelWorldPosition.x, voxelWorldPosition.y+1, voxelWorldPosition.z, 0 );
+        }
+  // #pragma omp  section
+    {
+   Pim1JK = currentSourceChannelObject->SampleExplicit(voxelWorldPosition.x-1, voxelWorldPosition.y, voxelWorldPosition.z, 0 );}
+//#pragma omp  section
+   {
+   PIjp1K = currentSourceChannelObject->SampleExplicit(voxelWorldPosition.x, voxelWorldPosition.y+1, voxelWorldPosition.z, 0 );}
+  //      #pragma omp  section
+    {
    PIjm1K = currentSourceChannelObject->SampleExplicit(voxelWorldPosition.x, voxelWorldPosition.y-1, voxelWorldPosition.z, 0 );
-
-   PIJkp1 = currentSourceChannelObject->SampleExplicit(voxelWorldPosition.x, voxelWorldPosition.y, voxelWorldPosition.z+1, 0 );
+    }
+//#pragma omp  section
+    {
+   PIJkp1 = currentSourceChannelObject->SampleExplicit(voxelWorldPosition.x, voxelWorldPosition.y, voxelWorldPosition.z+1, 0 );}
+  // #pragma omp  section
+{
    PIJkm1 = currentSourceChannelObject->SampleExplicit(voxelWorldPosition.x, voxelWorldPosition.y, voxelWorldPosition.z-1, 0 );
+    }
+   //#pragma omp  section
+        {
+     div = divergenceSource->SampleExplicit(voxelWorldPosition.x, voxelWorldPosition.y, voxelWorldPosition.z, 0);
+        }
 
-  }
+}
 
-  float div = divergenceSource->SampleExplicit(voxelWorldPosition.x, voxelWorldPosition.y, voxelWorldPosition.z, 0);
+  //}
+
 
   //float pressureVal = ((P*6.0f) - Pip1JK - Pim1JK - PIjp1K - PIjm1K - PIJkp1 - PIJkm1 + div)/scaleSquared;
   //float pressureVal = (Pip1JK + Pim1JK + PIjp1K + PIjm1K + PIJkp1 + PIJkm1 + (div*scaleSquared))/6;
@@ -130,6 +153,9 @@ void GridPressure::Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelWorldPositi
 
   //float pressure = (Pip1JK + Pim1JK + PIjp1K + PIjm1K + PIJkp1 + PIJkm1 + (div*scaleSquared))/6;
     outChunk->chunkData[dataIndex] = (Pip1JK + Pim1JK + PIjp1K + PIjm1K + PIJkp1 + PIJkm1 + (div*scaleSquared))/6;;
+
+  //outChunk->chunkData[dataIndex] = calcPressure(Pip1JK, Pim1JK, PIjp1K, PIjm1K, PIJkp1, PIJkm1, div, 0);
+
 //    if(debug && iteration == numberOfIterations -1){
 //        if (X == -5 && Y == 2 && Z == 2 && channel == 0)
 //            cout << "pressure at  -5 is " << pressure << endl;
@@ -185,3 +211,16 @@ void GridPressure::GridOp() {
   gridObjectPtr->SwapChannelPointers(std::string("pressure"));
 }
 
+//#pragma omp declare simd
+float GridPressure::calcPressure(float a, float b, float c, float d, float e, float f, float g, float h){
+
+return (a + b + c + d + e + f + (g)*0.166666666666);
+}
+
+void GridPressure::PostChunkOp(Chunk *&inChunk, Chunk *&outChunk,
+                         glm::i32vec3 chunkIdSecondary){
+
+    std::swap(inChunk, outChunk);
+
+
+}

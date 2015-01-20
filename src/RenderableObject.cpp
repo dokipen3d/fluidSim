@@ -65,8 +65,8 @@ void RenderableObject::setupObjects() {
 
   // cout << "loading shaders" << endl;
   if (!shader->loadProgram(
-          "/Users/dokipen/Documents/Projects/fluidSim/src/vertexShader.vert",
-          "/Users/dokipen/Documents/Projects/fluidSim/src/"
+          "/Users/delliott/Documents/Projects/fluidSim/src/vertexShader.vert",
+          "/Users/delliott/Documents/Projects/fluidSim/src/"
           "fragmentShader.frag")) {
 
     printf("Unable to load basic shader!\n");
@@ -75,8 +75,8 @@ void RenderableObject::setupObjects() {
   // glEnable (GL_TEXTURE_RECTANGLE_ARB);
   // cout << "loading shaders" << endl;
   if (!volumeShader->loadProgram(
-          "/Users/dokipen/Documents/Projects/fluidSim/src/vertexShader.vert",
-          "/Users/dokipen/Documents/Projects/fluidSim/src/fluidNew.fsh")) {
+          "/Users/delliott/Documents/Projects/fluidSim/src/vertexShader.vert",
+          "/Users/delliott/Documents/Projects/fluidSim/src/fluidNew.fsh")) {
 
     printf("Unable to load volume shader!\n");
   }
@@ -257,7 +257,7 @@ void RenderableObject::fillTexture() {
 
                 //sampleObject->SampleTrilinear(posX-0.5, posY-0.5, posZ-0.5, 0)*20.0f;
 
-                glm::abs(sampleObject->SampleTrilinear(posX , posY, posZ, 0))*8.0f;
+                glm::abs(sampleObject->SampleTrilinear(posX , posY, posZ, 0))*1.0f;
         // cout << sample << " ";
         //}
 

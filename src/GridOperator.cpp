@@ -51,12 +51,13 @@ void GridOperator::SetGridObject(GridObject *inGridObject) {
 //----------------------------------------------
 void GridOperator::IterateGrid() {
   double timeA = omp_get_wtime();
+   double timeC, timeD;
 //ITERATE-----------------------------------------------------------------------------
-for (iteration = 0; iteration < numberOfIterations; iteration++){
+
 
     chunks.clear();
   chunkOpCounter = 0;
-  this->PreGridOp();
+this->PreGridOp();
 
   currentTime = gridObjectPtr->simTime;
 
@@ -88,7 +89,7 @@ for (iteration = 0; iteration < numberOfIterations; iteration++){
 
 // cout << "source channel is " << name << " " <<
 // currentSourceChannelObject->channelInfo.channelName << endl;
-
+double timeE = omp_get_wtime();
 //SORTING BOUNDS------------------------------------------------------------------------------
 #pragma omp parallel for collapse(3)
   for (int i = fmx; i <= fMax; i++) {
@@ -156,26 +157,32 @@ for (iteration = 0; iteration < numberOfIterations; iteration++){
       }
     }
   }
+
+double timeF = omp_get_wtime();
+
 //END OF FORCE SORTING BOUNDS------------------------------------------------------------------------------
 
   // loop through this operator bounding box and push chunks to vector (even
   // though they dont exists. we will check in algorithm if they are null
 
-  if (iteration == 0){
-  totalChunksToOperateOn = chunks.size();
-  cout << "chunks to iterate through: " << totalChunksToOperateOn << " with "
-       << totalChunksToOperateOn *chnkSize *chnkSize *chnkSize << " voxels"
-       << endl;
-    }
+
 // cout << myString.str() << endl;
 // myString.str("");
 // double timeA = omp_get_wtime();
 //#pragma omp parallel for
 // dx =
 // currentSourceChannelObject->parentDx/currentSourceChannelObject->parentChunkSize;
-
-
 #pragma omp barrier
+
+for (iteration = 0; iteration < numberOfIterations; iteration++){
+    if (iteration == 0){
+    totalChunksToOperateOn = chunks.size();
+    cout << "chunks to iterate through: " << totalChunksToOperateOn << " with "
+         << totalChunksToOperateOn *chnkSize *chnkSize *chnkSize << " voxels"
+         << endl;
+      }
+this->PreGridOp();
+
 #pragma omp parallel for
   for (int i = 0; i < chunks.size(); i++) {
     if (callPreChunkOp) {
@@ -186,7 +193,8 @@ for (iteration = 0; iteration < numberOfIterations; iteration++){
       }
     }
     // cout << "iterating through chunk vector " << i << endl;
-    //#pragma omp parallel for ordered collapse(3)
+      timeC = omp_get_wtime();
+    //#pragma omp parallel for collapse(3)
     for (int w = startVoxel; w < chnkSize; w += skipAmount) {//for skipping voxels in thr red black gauss seidel update
       for (int v = startVoxel; v < chnkSize; v += skipAmount) {//can do 1-startvoxel to ping pong between 1 & 0
         for (int u = startVoxel; u < chnkSize; u += skipAmount) {//and then do skipAmount = startVoxel+1 in each postgridop
@@ -211,12 +219,12 @@ for (iteration = 0; iteration < numberOfIterations; iteration++){
             bool accessable = false;
 
 
-            if (a == 0){
+//            if (a == 0){
 
-            if (u > 0 && u < chnkSize-1){
-                if (v > 0 && v < chnkSize-1){
-                    if (w > 0 && w < chnkSize-1){
-                        accessable = true;}}}}
+//            if (u > 0 && u < chnkSize-1){
+//                if (v > 0 && v < chnkSize-1){
+//                    if (w > 0 && w < chnkSize-1){
+//                        accessable = true;}}}}
 
             this->Algorithm(
                 chunks[i].chunkIndex,
@@ -228,6 +236,7 @@ for (iteration = 0; iteration < numberOfIterations; iteration++){
         }
       }
     }
+    timeD = omp_get_wtime();
 // cout << "sending through chunk " << chunks[i].chunkIndex.x << " " <<
 // chunks[i].chunkIndex.y << " " << chunks[i].chunkIndex.z << endl;
 #pragma omp critical
@@ -243,19 +252,23 @@ for (iteration = 0; iteration < numberOfIterations; iteration++){
   cout << "end of " << name << " iteration: " << iteration+1 << " " << startVoxel << endl;
 }
 
-#pragma omp barrier
+//#pragma omp barrier
 
-  if (callGridOp) {
-    this->GridOp();
-  }
+
 }
-
+if (callGridOp) {
+  this->GridOp();
+}
 
 //END OF ITERATE-----------------------------------------------------------------------------
 
 
   double timeB = omp_get_wtime();
   cout << "grid operator " << name << " took " << timeB - timeA << " seconds"
+       << endl;
+  cout << "grid operator " << name << " inside loop took " << timeD - timeC << " seconds"
+       << endl;
+  cout << "grid operator " << name << " sorting took " << timeF - timeE << " seconds"
        << endl;
 
   // cout << myString.str() << endl;

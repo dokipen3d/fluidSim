@@ -13,7 +13,7 @@ set(LIBRARY_SEARCH_PATH
   /usr
   /opt
   /Library/Frameworks
-  /Users/dokipen/code/openmp/runtime/exports/mac_32e/lib
+  /Users/delliott/code/openmp/runtime/exports/mac_32e/lib
 )
 
 set(HEADER_SEARCH_PATH
@@ -36,17 +36,17 @@ find_library(SDL2LIB sdl2 ${LIBRARY_SEARCH_PATH})
 MESSAGE(STATUS "Found sdl2 in: ${SDL2LIB}")
 
 
-set(CMAKE_C_COMPILER /Users/dokipen/code/llvm/build/Release/bin/clang2)
-set(CMAKE_CXX_COMPILER /Users/dokipen/code/llvm/build/Release/bin/clang2++)
+set(CMAKE_C_COMPILER /Users/delliott/code/llvm/build/Release/bin/clang2)
+set(CMAKE_CXX_COMPILER /Users/delliott/code/llvm/build/Release/bin/clang2++)
 
-include_directories(/Users/dokipen/code/llvm/build/include/c++/v1)
-include_directories(/Users/dokipen/code/openmp/runtime/build)
+include_directories(/Users/delliott/code/llvm/projects/libcxx/include)
+include_directories(/Users/delliott/code/openmp/runtime/build)
 include_directories(${HEADER_SEARCH_PATH})
 
 #-lstdc++ -stdlib=libc++
 
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp -std=c++1y -pedantic -mfpmath=sse -msse2 -msse3 -msse4 -msse4.1 -msse4.2 -O3")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp -std=c++1y -mfpmath=sse -msse2 -msse3 -msse4 -msse4.1 -msse4.2 -O4")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp=libiomp5 -std=c++1y  -O3")
 
 aux_source_directory(src/ SRC_LIST)
 add_executable(${PROJECT_NAME} ${SRC_LIST})
@@ -54,14 +54,14 @@ add_executable(${PROJECT_NAME} ${SRC_LIST})
 
 find_package(OpenGL)
 link_directories(/usr/local/lib/)
-#link_directories(/Users/dokipen/code/openmp/runtime/exports/mac_32e/lib)
+#link_directories(/Users/delliott/code/openmp/runtime/exports/mac_32e/lib)
 #set(CMAKE_EXE_LINKER_FLAGS "-framework iomp5")
 
-#find_library(iomp5 NAMES libiomp5.dylib PATHS /Users/dokipen/code/openmp/runtime/exports/build/)
+#find_library(iomp5 NAMES libiomp5.dylib PATHS /Users/delliott/code/openmp/runtime/exports/build/)
 
 #MESSAGE(STATUS "Found iomp5 in: ${iomp5}")
 
-#link_directories(/Users/dokipen/code/libcxx/build/lib)
+#link_directories(/Users/delliott/code/libcxx/build/lib)
 
 #target_link_libraries(${PROJECT_NAME} SDL2 GLEW ${OPENGL_LIBRARIES})
 target_link_libraries(${PROJECT_NAME} ${GLEWLIB} ${SDL2LIB} ${IOMP5_LIBRARIES} ${OPENGL_LIBRARIES})

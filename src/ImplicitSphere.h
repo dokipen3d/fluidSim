@@ -10,7 +10,7 @@ public:
   };
   void setepDefaults();
   virtual float sampleVolume(glm::vec3 pos);
-  float radius = 8;
+  float radius = 53;
 
 
 };
