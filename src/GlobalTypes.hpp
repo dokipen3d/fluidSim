@@ -13,6 +13,11 @@
 enum class SamplerMode {trilinear, cubic, catmull_rom};
 enum class ChannelType {scalar, sdf, vector};
 
+//raw is straight memcpy in and out no padding
+//fd is copy centre in rows and pad 1 voxel around edges
+//staggered is copy 1 edge at top middle and side.
+enum class TileImportType { raw, finiteDifference, staggered};
+
 //----------------------------------------------
 struct BoundingBox
 {
