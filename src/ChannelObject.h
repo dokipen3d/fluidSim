@@ -13,7 +13,7 @@ class GridObject;
 
 class ChannelObject {
 public:
-  ChannelObject(ChannelInfo inInfo, GridObject *parentGrid);
+  ChannelObject(EChannelInfo inInfo, GridObject *parentGrid);
   ~ChannelObject();
   void ClearChunks();
   Chunk *CreateChunk(int32_t x, int32_t y, int32_t z);
@@ -29,7 +29,7 @@ public:
 
   //void separateFracInt(const float &in, float &floatPart,
   //                                   u_int32_t &intPart, const float &chunkSize);
-  ChannelInfo channelInfo;
+  EChannelInfo channelInfo;
   float defaultValue;
   bool boundsSet;
   uint32_t parentChunkSize;

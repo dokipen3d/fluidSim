@@ -64,7 +64,7 @@ protected:
   ChannelObject *currentTargetChannelObject; // might make this a vector of
                                              // pointers to dynamically add
                                              // channels and pick from multiple
-  ChannelType typeToOperateOn;
+  EChannelType typeToOperateOn;
   std::string channelName;
   std::stringstream myString;
   bool createChunks;
@@ -74,6 +74,7 @@ protected:
   uint32_t totalChunksToOperateOn;
   int32_t internalChannels = 1;
   int iteration;
+  ETileImportType tileImportType;
 
 
 };

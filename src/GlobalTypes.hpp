@@ -10,13 +10,13 @@
 #include <string>
 
 
-enum class SamplerMode {trilinear, cubic, catmull_rom};
-enum class ChannelType {scalar, sdf, vector};
+enum class ESamplerMode {trilinear, cubic, catmull_rom};
+enum class EChannelType {scalar, sdf, vector};
 
 //raw is straight memcpy in and out no padding
 //fd is copy centre in rows and pad 1 voxel around edges
 //staggered is copy 1 edge at top middle and side.
-enum class TileImportType { raw, finiteDifference, staggered};
+enum class ETileImportType { raw, finiteDifference, staggered};
 
 //----------------------------------------------
 struct BoundingBox
@@ -34,13 +34,13 @@ struct BoundingBox
 };
 
 //----------------------------------------------
-struct ChannelInfo
+struct EChannelInfo
 {
 	uint32_t memoryIndex;
 	std::string channelName;
-	ChannelType channelType;
-	ChannelInfo(){};
-	ChannelInfo(int gridObjectMemIndex, std::string inName, ChannelType inType) : memoryIndex(gridObjectMemIndex), channelName(inName), channelType(inType){};
+        EChannelType channelType;
+        EChannelInfo(){};
+        EChannelInfo(int gridObjectMemIndex, std::string inName, EChannelType inType) : memoryIndex(gridObjectMemIndex), channelName(inName), channelType(inType){};
 
 };
 

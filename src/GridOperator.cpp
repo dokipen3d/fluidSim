@@ -68,7 +68,7 @@ this->PreGridOp();
 
   internalChannels = 1; // for making scalar or vector
   if (currentTargetChannelObject->channelInfo.channelType ==
-      ChannelType::vector) {
+      EChannelType::vector) {
     internalChannels = 3;
     // cout << "channels : " << internalChannels << endl;
   }

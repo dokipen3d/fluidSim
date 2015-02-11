@@ -81,7 +81,7 @@ inline static void separateFracIntFast(const float &in,
 }
 
 //----------------------------------------------
-ChannelObject::ChannelObject(ChannelInfo inInfo, GridObject *parentGrid) {
+ChannelObject::ChannelObject(EChannelInfo inInfo, GridObject *parentGrid) {
   // chunks = std::unique_ptr<LockFreeHashTable>(new
   // LockFreeHashTable(65536));//default size of 2^16, 16-bit
   //chunks = std::make_unique<LockFreeHashTable>(65536);
@@ -104,7 +104,7 @@ ChannelObject::ChannelObject(ChannelInfo inInfo, GridObject *parentGrid) {
                               // overloaded SampleTrilinear, use this to go 0-2.
                               // dont forget to set it back to 0;
   channelAmount = 1;          // for making scalar or cevtor
-  if (channelInfo.channelType == ChannelType::vector) {
+  if (channelInfo.channelType == EChannelType::vector) {
     channelAmount = 3;
   }
 
@@ -231,7 +231,7 @@ Chunk *ChannelObject::CreateChunk(int32_t x, int32_t y, int32_t z) {
     // "bounds max is "<< parentGridObject->boundingBox.max.x << endl;
   }
 
-  if (channelInfo.channelType == ChannelType::vector) {
+  if (channelInfo.channelType == EChannelType::vector) {
     vec = 3;
   }
 

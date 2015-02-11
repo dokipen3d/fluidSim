@@ -18,11 +18,11 @@ struct chunkAddresses {
   glm::i32vec3 chunkIndex;
 };
 
-class GridOperator {
+class GridTiledOperator {
 
 public:
-  GridOperator(GridObject *inGridObject);
-  virtual ~GridOperator();
+  GridTiledOperator(GridObject *inGridObject, ETileImportType processType);
+  virtual ~GridTiledOperator();
 
   virtual void setupDefaults() = 0;
   void SetGridObject(GridObject *inGridObject);
@@ -39,6 +39,10 @@ public:
   virtual void PreGridOp();
 
   virtual void GridOp();
+  void copyRawInput(glm::i32vec3 chunkCoords, uint32_t channel);
+  void copyStaggeredInput();
+  void copyFiniteDifferenceInput(glm::i32vec3 chunkCoords, Chunk* main, uint32_t channel);
+
   void SetChannelName(std::string nameToSet);
   std::string name;
   void setNodeName(std::string nameIn);
@@ -53,6 +57,8 @@ public:
   int skipAmount = 1;
     bool debug = false;
   std::vector<chunkAddresses> chunks;
+  std::vector<float> inTile;
+  std::vector<float> outTile;
 
 protected:
   double currentTime;
@@ -61,7 +67,8 @@ protected:
   ChannelObject *currentTargetChannelObject; // might make this a vector of
                                              // pointers to dynamically add
                                              // channels and pick from multiple
-  ChannelType typeToOperateOn;
+  EChannelType typeToOperateOn;
+  ETileImportType tileImportType;
   std::string channelName;
   std::stringstream myString;
   bool createChunks;
@@ -71,6 +78,7 @@ protected:
   uint32_t totalChunksToOperateOn;
   int32_t internalChannels = 1;
   int iteration;
+
 
 
 };
