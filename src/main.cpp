@@ -112,7 +112,7 @@ pressuretiled->setNodeName(std::string("tiledpress"));
   projection->setNodeName(std::string("projection oper"));
 
 
-   gridEmit->IterateGrid();
+  gridEmit->IterateGrid();
 
   SDL_Window *window = NULL; // The surface contained by the window
   SDL_GLContext maincontext; /* Our opengl context handle */
@@ -201,7 +201,7 @@ pressuretiled->setNodeName(std::string("tiledpress"));
     //vecEmit->IterateGrid();
 
     //gridDiss->IterateGrid();
-    //bouyancy->IterateGrid();
+    bouyancy->IterateGrid();
     //divergence->IterateGrid();
     //pressure->IterateGrid();
     pressuretiled->IterateGrid();

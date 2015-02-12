@@ -17,6 +17,30 @@ inline static uint32_t flatten3dCoordinatesto1D(uint32_t x, uint32_t y,
     //return ((x + channel) + ((y + channel) << 3) + ((z + channel) << 3 << 3));
 }
 
+inline static uint32_t flatten3dPaddedCoordinatesto1D(uint32_t x, uint32_t y,
+                                                uint32_t z,
+                                                uint32_t chunkSize) {
+  // return   (        (x + chunkSize * (y + chunkSize * z))  *channel) +
+  // (channel*chunkSize*chunkSize*chunkSize);
+  return ((x+1) + (((y+1)*chunkSize+2)) + (((z+1)*chunkSize+2 * chunkSize+2)));
+  // return ((x+channel) + ((y+channel) << 3 ) +  ((z+channel) << 3 << 3));
+//  return ((x) + (((y)<<3)) + (((z)<< 3 << 3))) +
+//         (channel << 3 << 3 << 3);
+
+  // look into bit shifting
+  // if chunksize is   4 we can just do (y+channel) << 2
+  //                  8 we can just do (y+channel) << 3
+  //                  16 we can just do (y+channel) << 4
+  //                  32 we can just do (y+channel) << 5
+  //                  64 we can just do (y+channel) << 6
+  //                  128 we can just do (y+channel) << 7
+  //                  256 we can just do (y+channel) << 8
+  //                  512 we can just do (y+channel) << 9
+  //                  1024 we can just do (y+channel) << 10
+
+  // same with encoding integerto32bit but limited to 1024 in each direction
+  // (512 +/-)
+}
 
 
 //----------------------------------------------
@@ -237,6 +261,7 @@ void GridTiledOperator::IterateGrid()
                  copyFiniteDifferenceInput(chunks[i].chunkIndex, chunks[i].chunkSource, a);
              }
 
+#pragma omp simd collapse(3)
              for (int w = startVoxel; w < chnkSize; w += skipAmount)
                  {//for skipping voxels in thr red black gauss seidel update
                      for (int v = startVoxel; v < chnkSize; v += skipAmount)
@@ -249,9 +274,9 @@ void GridTiledOperator::IterateGrid()
                                  // int threadid  = omp_get_thread_num();
                                  // cout << threadid << endl;
                                  // myString << "in cell " << u+a<<v+a<<w+a<<endl;
-                                 uint32_t chunkDataIndex =
-                                     ((u) + (((v)*chnkSize)) + (((w)*chnkSize * chnkSize))) +
-                                     (a * chnkSize * chnkSize * chnkSize);
+//                                 uint32_t chunkDataIndex =
+//                                     ((u) + (((v)*chnkSize)) + (((w)*chnkSize * chnkSize))) +
+//                                     (a * chnkSize * chnkSize * chnkSize);
                                  // uint32_t chunkDataIndex = (       (u + chnkSize * (v + chnkSize *
                                  // w))    *a) + (a*chnkSize*chnkSize*chnkSize);
                                  // cout << "index " << chunkDataIndex << endl;

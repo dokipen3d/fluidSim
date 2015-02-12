@@ -3,7 +3,30 @@
 #include "GridObject.h"
 
 
+inline static uint32_t flatten3dCoordinatesto1D(uint32_t x, uint32_t y,
+                                                uint32_t z,
+                                                uint32_t chunkSize) {
+  // return   (        (x + chunkSize * (y + chunkSize * z))  *channel) +
+  // (channel*chunkSize*chunkSize*chunkSize);
+  return ((x+1) + (((y+1)*chunkSize+2)) + (((z+1)*chunkSize+2 * chunkSize+2)));
+  // return ((x+channel) + ((y+channel) << 3 ) +  ((z+channel) << 3 << 3));
+//  return ((x) + (((y)<<3)) + (((z)<< 3 << 3))) +
+//         (channel << 3 << 3 << 3);
 
+  // look into bit shifting
+  // if chunksize is   4 we can just do (y+channel) << 2
+  //                  8 we can just do (y+channel) << 3
+  //                  16 we can just do (y+channel) << 4
+  //                  32 we can just do (y+channel) << 5
+  //                  64 we can just do (y+channel) << 6
+  //                  128 we can just do (y+channel) << 7
+  //                  256 we can just do (y+channel) << 8
+  //                  512 we can just do (y+channel) << 9
+  //                  1024 we can just do (y+channel) << 10
+
+  // same with encoding integerto32bit but limited to 1024 in each direction
+  // (512 +/-)
+}
 
 
 void GridTiledPressure::setupDefaults()
@@ -27,7 +50,7 @@ void GridTiledPressure::setupDefaults()
     callPostChunkOp = true;
     scale = 1.0f;
     scaleSquared = -(scale*scale);
-    numberOfIterations = 200;
+    numberOfIterations = 30;
 
 }
 
@@ -49,11 +72,18 @@ void GridTiledPressure::PreChunkOp(Chunk *&inChunk, Chunk *&outChunk,
     //callPreChunkOp = false;//only call once;
 }
 
-
 void GridTiledPressure::Algorithm(int worldX, int worldY, int worldZ, int indexX, int indexY, int indexZ)
 {
 
-    outTile[0] = GridTiledPressure::calcPressure(outTile[0],outTile[0],outTile[0], outTile[0], outTile[0], outTile[0], outTile[0], outTile[0]);
+    outTile[indexX+(indexY*chnkSize)+ (indexZ*chnkSize*chnkSize)] =// inTile[1]+inTile[2]+inTile[4]+inTile[6]+inTile[8]+inTile[10]+inTile[12]+inTile[14]*0.13;
+
+
+            inTile[flatten3dCoordinatesto1D(indexX-1, indexY, indexZ,8)]+
+            inTile[flatten3dCoordinatesto1D(indexX+1, indexY, indexZ,8)]+
+            inTile[flatten3dCoordinatesto1D(indexX, indexY-1, indexZ,8)]+
+            inTile[flatten3dCoordinatesto1D(indexX, indexY+1, indexZ,8)]+
+            inTile[flatten3dCoordinatesto1D(indexX, indexY, indexZ-1,8)]+
+            inTile[flatten3dCoordinatesto1D(indexX, indexY, indexZ+1,8)]*0.13;
 
 }
 

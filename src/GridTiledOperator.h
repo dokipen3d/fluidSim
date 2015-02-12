@@ -26,6 +26,7 @@ public:
 
   virtual void setupDefaults() = 0;
   void SetGridObject(GridObject *inGridObject);
+#pragma omp declare simd
   virtual void Algorithm(int worldX, int worldY, int worldZ, int indexX, int indexY, int indexZ) = 0; // pure virtual. out chunk might
                                                 // not be needed but if we write
                                                 // a node that copies into a new

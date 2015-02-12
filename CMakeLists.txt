@@ -29,7 +29,7 @@ set(LIBRARY_SEARCH_PATH
 
 #-lstdc++ -stdlib=libc++
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp -std=c++1y -pedantic -mfpmath=sse -msse2 -msse3 -msse4 -msse4.1 -msse4.2 -O3")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -v -Wa,-q -fopenmp -ffast-math -std=c++1y -mfpmath=sse -msse2 -msse3 -msse4 -msse4.1 -msse4.2 -O3")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -v -Wa,-q -fopenmp -std=c++1y -ftree-vectorizer-verbose=6")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -v -fopenmp -ffast-math -std=c++1y -ftree-vectorize -O3")
 
 aux_source_directory(src/ SRC_LIST)

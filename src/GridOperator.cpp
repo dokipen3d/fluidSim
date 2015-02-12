@@ -248,9 +248,9 @@ this->PreGridOp();
       }
     }
   }
-  if(numberOfIterations>1){
-  cout << "end of " << name << " iteration: " << iteration+1 << " " << startVoxel << endl;
-}
+//  if(numberOfIterations>1){
+//  cout << "end of " << name << " iteration: " << iteration+1 << " " << startVoxel << endl;
+//}
 
 //#pragma omp barrier
 
@@ -266,10 +266,10 @@ if (callGridOp) {
   double timeB = omp_get_wtime();
   cout << "grid operator " << name << " took " << timeB - timeA << " seconds"
        << endl;
-  cout << "grid operator " << name << " inside loop took " << timeD - timeC << " seconds"
-       << endl;
-  cout << "grid operator " << name << " sorting took " << timeF - timeE << " seconds"
-       << endl;
+//  cout << "grid operator " << name << " inside loop took " << timeD - timeC << " seconds"
+//       << endl;
+//  cout << "grid operator " << name << " sorting took " << timeF - timeE << " seconds"
+//       << endl;
 
   // cout << myString.str() << endl;
   //    cout << currentSourceChannelObject->numChunks << " chunks created " <<
