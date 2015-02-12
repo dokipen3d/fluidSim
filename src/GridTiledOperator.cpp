@@ -5,7 +5,7 @@
 #include "glm/gtc/type_precision.hpp"
 
 #include <omp.h>
-#include <algorithm>
+//#include <algorithm>
 #include <cstring>
 
 inline static uint32_t flatten3dCoordinatesto1D(uint32_t x, uint32_t y,
@@ -36,16 +36,20 @@ GridTiledOperator::GridTiledOperator(GridObject *inGridObject, ETileImportType p
     tileImportType = processType;
     if(tileImportType == ETileImportType::raw)
     {
-        inTile.reserve(chnkSize*chnkSize*chnkSize);
+        inTile.resize(chnkSize*chnkSize*chnkSize);
     }
     else if(tileImportType == ETileImportType::staggered)
     {
-        inTile.reserve((chnkSize+1)*(chnkSize+1)*(chnkSize+1));
+        inTile.resize((chnkSize+1)*(chnkSize+1)*(chnkSize+1));
     }
     else if(tileImportType == ETileImportType::finiteDifference)
     {
-        inTile.reserve((chnkSize+2)*(chnkSize+2)*(chnkSize+2));
+        inTile.resize((chnkSize+2)*(chnkSize+2)*(chnkSize+2));
     }
+
+    outTile.resize ((chnkSize)*(chnkSize)*(chnkSize));
+    //std::fill(outTile.begin(), outTile.end(), 5);
+
     // cout << "chnkSize is " << chnkSize << endl;
     // cout <<  channelName << endl;
 }
@@ -120,7 +124,7 @@ void GridTiledOperator::IterateGrid()
             // cout <<" jhjhdjs" <<endl;
             // myString << "iterating in operator " << name <<  " chunk "  <<
             // i<<j<<k<<endl;
-            chunkAddresses newChunkAddresses;
+            chunkAddresses2 newChunkAddresses;
             newChunkAddresses.chunkSource =
             currentSourceChannelObject->GetChunk(i, j, k);
             newChunkAddresses.chunkTarget = currentTargetChannelObject->GetChunk(i, j, k); // if we are writing into the same grid/channel, then set
@@ -154,7 +158,7 @@ void GridTiledOperator::IterateGrid()
           for (int k = this->boundingBox.fluidMin.x;
                k <= this->boundingBox.fluidMax.x; k++) {
 
-            chunkAddresses newChunkAddresses;
+            chunkAddresses2 newChunkAddresses;
             newChunkAddresses.chunkSource = nullptr;
             newChunkAddresses.chunkTarget = nullptr;
             newChunkAddresses.chunkIndex = glm::i32vec3(i, j, k);
@@ -199,6 +203,7 @@ void GridTiledOperator::IterateGrid()
         }
     this->PreGridOp();
 
+
     #pragma omp parallel for
     for (int i = 0; i < chunks.size(); i++)
     {
@@ -209,6 +214,7 @@ void GridTiledOperator::IterateGrid()
                            chunks[i].chunkIndex);
         }
       }
+
 
       // cout << "iterating through chunk vector " << i << endl;
       //used to loop over voxels then channels but here we are doing tiles so we loop over each tile channel by channel.
@@ -228,8 +234,8 @@ void GridTiledOperator::IterateGrid()
              else if(tileImportType == ETileImportType::finiteDifference)
              {
 
+                 copyFiniteDifferenceInput(chunks[i].chunkIndex, chunks[i].chunkSource, a);
              }
-
 
              for (int w = startVoxel; w < chnkSize; w += skipAmount)
                  {//for skipping voxels in thr red black gauss seidel update
@@ -257,16 +263,19 @@ void GridTiledOperator::IterateGrid()
                                  int Z = ((chunks[i].chunkIndex.z * (int)chnkSize) + w);
 
 
-                                 this->Algorithm(
-                                     X, Y, Z);
+                                this->Algorithm(X, Y, Z,
+                                                 u, v, w);
                              }
                      }
              }
+             //copy back mem
+             copyTileBack(chunks[i].chunkIndex);
+
          }
 
     // cout << "sending through chunk " << chunks[i].chunkIndex.x << " " <<
     // chunks[i].chunkIndex.y << " " << chunks[i].chunkIndex.z << endl;
-    #pragma omp critical
+    //#pragma omp critical
       if (callPostChunkOp) {
 
         {
@@ -275,9 +284,9 @@ void GridTiledOperator::IterateGrid()
         }
       }
     }
-    if(numberOfIterations>1){
-    cout << "end of " << name << " iteration: " << iteration+1 << " " << startVoxel << endl;
-}
+    //if(numberOfIterations>1){
+    //cout << "end of " << name << " iteration: " << iteration+1 << " " << startVoxel << endl;
+//}
 
 #pragma omp barrier
 
@@ -334,17 +343,19 @@ void GridTiledOperator::copyRawInput(glm::i32vec3 chunkCoords, uint32_t channel)
 void GridTiledOperator::copyFiniteDifferenceInput(glm::i32vec3 chunkCoords, Chunk *main, uint32_t channel)
 {
 
+
     //copy over rows at a time
     for(int k = 0; k < chnkSize; k++)
     {
         for(int j = 0; j < chnkSize; j++)
         {
             memcpy  (   &inTile[ 1 + ((j*chnkSize+2) + (k*chnkSize+2 * chnkSize+2)) ],
-                        &main->chunkData[ ((j*chnkSize) + (k*chnkSize * chnkSize)) + channel*(chnkSize*chnkSize*chnkSize) ],
+                        &main->chunkData[ ((j*chnkSize) + (k*chnkSize * chnkSize)) + (channel*(chnkSize*chnkSize*chnkSize)) ],
                         sizeof(float)*(chnkSize));
 
         }
     }
+
 
     //-x edge
     float *mXedge = &currentSourceChannelObject->GetChunk(chunkCoords.x-1, chunkCoords.y, chunkCoords.z)->chunkData[0];
@@ -355,10 +366,12 @@ void GridTiledOperator::copyFiniteDifferenceInput(glm::i32vec3 chunkCoords, Chun
         for(int j = 0; j < chnkSize; j++)
         {
             inTile[ ((j+1*(chnkSize+2)) + (k+1*(chnkSize+2 * chnkSize+2)))  ] =
-                    mXedge[chnkSize +  ((j*chnkSize) + (k*chnkSize * chnkSize)) + channel*(chnkSize*chnkSize*chnkSize) ];
+                    mXedge[chnkSize +  ((j*chnkSize) + (k*chnkSize * chnkSize)) + (channel*(chnkSize*chnkSize*chnkSize)) ];
 
         }
     }
+
+//    //cout << "passed" << endl;
 
     //+x edge
     float *pXedge = &currentSourceChannelObject->GetChunk(chunkCoords.x+1, chunkCoords.y, chunkCoords.z)->chunkData[0];
@@ -368,7 +381,7 @@ void GridTiledOperator::copyFiniteDifferenceInput(glm::i32vec3 chunkCoords, Chun
         for(int j = 0; j < chnkSize; j++)
         {
             inTile[ chnkSize + 1 + ((j+1*chnkSize+2) + (k+1*chnkSize+2 * chnkSize+2)) ] =
-                    pXedge[0 +  ((j*chnkSize) + (k*chnkSize * chnkSize)) + channel*(chnkSize*chnkSize*chnkSize) ];
+                    pXedge[0 +  ((j*chnkSize) + (k*chnkSize * chnkSize)) + (channel*(chnkSize*chnkSize*chnkSize)) ];
 
         }
     }
@@ -381,7 +394,7 @@ void GridTiledOperator::copyFiniteDifferenceInput(glm::i32vec3 chunkCoords, Chun
         for( int i = 0; i < chnkSize; i++)
         {
             inTile[ i + 1 + (k+1*chnkSize+2 * chnkSize+2) ] =
-                    mYedge[(i) +  (chnkSize-1*chnkSize) + (k*chnkSize * chnkSize) + channel*(chnkSize*chnkSize*chnkSize) ];
+                    mYedge[(i) +  (chnkSize-1*chnkSize) + (k*chnkSize * chnkSize) + (channel*(chnkSize*chnkSize*chnkSize)) ];
 
         }
     }
@@ -394,35 +407,45 @@ void GridTiledOperator::copyFiniteDifferenceInput(glm::i32vec3 chunkCoords, Chun
         for( int i = 0; i < chnkSize; i++)
         {
             inTile[ i + 1 + (chnkSize+1*chnkSize+2) + (k+1*chnkSize+2 * chnkSize+2) ] =
-                    pYedge[i + 0  + (k*chnkSize * chnkSize) + channel*(chnkSize*chnkSize*chnkSize) ];
+                    pYedge[i + 0  + (k*chnkSize * chnkSize) + (channel*(chnkSize*chnkSize*chnkSize)) ];
 
         }
     }
 
     //-z edge
-    float *mZedge = &currentSourceChannelObject->GetChunk(chunkCoords.x, chunkCoords.y-1, chunkCoords.z)->chunkData[0];
+    float *mZedge = &currentSourceChannelObject->GetChunk(chunkCoords.x, chunkCoords.y, chunkCoords.z-1)->chunkData[0];
 
     for(int j = 0; j < chnkSize; j++)
     {
         for( int i = 0; i < chnkSize; i++)
         {
-            inTile[ i + 1 + (j+1*chnkSize+2) ] =
-                    mZedge[i +  (j*chnkSize) + (chnkSize-1 *chnkSize * chnkSize) + channel*(chnkSize*chnkSize*chnkSize) ];
+            inTile[ i + 1 + (j+1*chnkSize+2) + 0 ] =
+                    mZedge[i +  (j*chnkSize) + ((chnkSize-1) *chnkSize * chnkSize) + (channel*(chnkSize*chnkSize*chnkSize)) ];
 
         }
     }
+
     //+z edge
-    float *pZedge = &currentSourceChannelObject->GetChunk(chunkCoords.x, chunkCoords.y-1, chunkCoords.z)->chunkData[0];
+    float *pZedge = &currentSourceChannelObject->GetChunk(chunkCoords.x, chunkCoords.y, chunkCoords.z+1)->chunkData[0];
 
     for(int j = 0; j < chnkSize; j++)
     {
         for( int i = 0; i < chnkSize; i++)
         {
             inTile[ i + 1 + (j+1*chnkSize+2) + (chnkSize+1*chnkSize+2 * chnkSize+2) ] =
-                    pZedge[i +  (j*chnkSize) + channel*(chnkSize*chnkSize*chnkSize) ];
+                    pZedge[i +  (j*chnkSize) + (channel*(chnkSize*chnkSize*chnkSize)) ];
 
         }
     }
+
+}
+
+void GridTiledOperator::copyTileBack(glm::i32vec3 chunkCoords)
+{
+    memcpy  (   &currentTargetChannelObject->GetChunk(chunkCoords.x, chunkCoords.y, chunkCoords.z)->chunkData[0],
+                &outTile[0],
+                sizeof(float)*(chnkSize*chnkSize*chnkSize)
+            );
 
 }
 

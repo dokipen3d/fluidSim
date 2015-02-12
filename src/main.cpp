@@ -105,11 +105,14 @@ bool operate = false;
 
   pressure->setNodeName(std::string("pressure oper"));
 
+  auto pressuretiled = make_unique<GridTiledPressure>(grid_obj.get(), ETileImportType::finiteDifference);
+pressuretiled->setNodeName(std::string("tiledpress"));
+
   auto projection = make_unique<GridProjection>(grid_obj.get());
   projection->setNodeName(std::string("projection oper"));
 
 
-  // gridEmit->IterateGrid();
+   gridEmit->IterateGrid();
 
   SDL_Window *window = NULL; // The surface contained by the window
   SDL_GLContext maincontext; /* Our opengl context handle */
@@ -192,18 +195,19 @@ bool operate = false;
 
 
     //if (operate){
-    gridEmit->IterateGrid();
-    gridPad->IterateGrid();
+    //gridEmit->IterateGrid();
+    //gridPad->IterateGrid();
 
     //vecEmit->IterateGrid();
 
     //gridDiss->IterateGrid();
-    bouyancy->IterateGrid();
-    divergence->IterateGrid();
-    pressure->IterateGrid();
-    projection->IterateGrid();
-    basicAdvect->IterateGrid();
-    basicVelAdvect->IterateGrid();
+    //bouyancy->IterateGrid();
+    //divergence->IterateGrid();
+    //pressure->IterateGrid();
+    pressuretiled->IterateGrid();
+    //projection->IterateGrid();
+    //basicAdvect->IterateGrid();
+    //basicVelAdvect->IterateGrid();
 
 
 

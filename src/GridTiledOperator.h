@@ -12,7 +12,7 @@ class GridObject;
 class ChannelObject;
 class Chunk;
 
-struct chunkAddresses {
+struct chunkAddresses2 {
   Chunk *chunkSource;
   Chunk *chunkTarget;
   glm::i32vec3 chunkIndex;
@@ -26,7 +26,7 @@ public:
 
   virtual void setupDefaults() = 0;
   void SetGridObject(GridObject *inGridObject);
-  virtual void Algorithm(int worldX, int worldY, int worldZ) = 0; // pure virtual. out chunk might
+  virtual void Algorithm(int worldX, int worldY, int worldZ, int indexX, int indexY, int indexZ) = 0; // pure virtual. out chunk might
                                                 // not be needed but if we write
                                                 // a node that copies into a new
                                                 // grid we need to know where
@@ -40,8 +40,10 @@ public:
 
   virtual void GridOp();
   void copyRawInput(glm::i32vec3 chunkCoords, uint32_t channel);
+
   void copyStaggeredInput();
   void copyFiniteDifferenceInput(glm::i32vec3 chunkCoords, Chunk* main, uint32_t channel);
+  void copyTileBack(glm::i32vec3 chunkCoords);
 
   void SetChannelName(std::string nameToSet);
   std::string name;
@@ -56,7 +58,7 @@ public:
   int startVoxel = 0;
   int skipAmount = 1;
     bool debug = false;
-  std::vector<chunkAddresses> chunks;
+  std::vector<chunkAddresses2> chunks;
   std::vector<float> inTile;
   std::vector<float> outTile;
 
