@@ -26,7 +26,7 @@ public:
 
   virtual void setupDefaults() = 0;
   void SetGridObject(GridObject *inGridObject);
-#pragma omp declare simd
+//#pragma omp declare simd
   virtual void Algorithm(int worldX, int worldY, int worldZ, int indexX, int indexY, int indexZ) = 0; // pure virtual. out chunk might
                                                 // not be needed but if we write
                                                 // a node that copies into a new
@@ -44,6 +44,8 @@ public:
 
   void copyStaggeredInput();
   void copyFiniteDifferenceInput(glm::i32vec3 chunkCoords, Chunk* main, uint32_t channel);
+  void copyFiniteDifferenceInputSingleChannel(glm::i32vec3 chunkCoords, Chunk* main);
+
   void copyTileBack(glm::i32vec3 chunkCoords);
 
   void SetChannelName(std::string nameToSet);

@@ -52,7 +52,7 @@ int main(int argc, char *argv[]) {
   cout << *argv[argc - 1] << endl;
 bool operate = false;
 
-  //omp_set_num_threads(6);
+  omp_set_num_threads(6);
   int input, input2;
   SDL_Event keyevent;
   bool eventLoop = true;
@@ -195,19 +195,19 @@ pressuretiled->setNodeName(std::string("tiledpress"));
 
 
     //if (operate){
-    //gridEmit->IterateGrid();
+    gridEmit->IterateGrid();
     //gridPad->IterateGrid();
 
     //vecEmit->IterateGrid();
 
     //gridDiss->IterateGrid();
     bouyancy->IterateGrid();
-    //divergence->IterateGrid();
-    //pressure->IterateGrid();
+    divergence->IterateGrid();
+    pressure->IterateGrid();
     pressuretiled->IterateGrid();
-    //projection->IterateGrid();
-    //basicAdvect->IterateGrid();
-    //basicVelAdvect->IterateGrid();
+    projection->IterateGrid();
+    basicAdvect->IterateGrid();
+    basicVelAdvect->IterateGrid();
 
 
 
@@ -215,7 +215,7 @@ pressuretiled->setNodeName(std::string("tiledpress"));
 
 
     //only render every x frames
-    if (frameCount == 3){
+    if (frameCount == 1){
         renderer->Render();
         frameCount = 0;
     }

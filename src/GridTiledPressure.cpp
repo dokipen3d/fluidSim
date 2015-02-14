@@ -83,7 +83,10 @@ void GridTiledPressure::Algorithm(int worldX, int worldY, int worldZ, int indexX
             inTile[flatten3dCoordinatesto1D(indexX, indexY-1, indexZ,8)]+
             inTile[flatten3dCoordinatesto1D(indexX, indexY+1, indexZ,8)]+
             inTile[flatten3dCoordinatesto1D(indexX, indexY, indexZ-1,8)]+
-            inTile[flatten3dCoordinatesto1D(indexX, indexY, indexZ+1,8)]*0.13;
+            inTile[flatten3dCoordinatesto1D(indexX, indexY, indexZ+1,8)]*scaleSquared/6;
+
+            outTile[indexX+(indexY*chnkSize)+ (indexZ*chnkSize*chnkSize)] = inTile[flatten3dCoordinatesto1D(indexX, indexY, indexZ,8)];
+
 
 }
 

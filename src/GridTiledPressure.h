@@ -14,7 +14,7 @@ public:
       cout << "in GridDivergence Constructor" << endl;
       setupDefaults();
     };
-    #pragma omp declare simd
+    //#pragma omp declare simd
     virtual void Algorithm(int worldX, int worldY, int worldZ, int indexX, int indexY, int indexZ);
     virtual void setupDefaults();
     float calcPressure(float a, float b, float c, float d, float e, float f, float g, float h);

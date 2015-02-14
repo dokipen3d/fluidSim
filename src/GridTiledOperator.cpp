@@ -8,6 +8,7 @@
 //#include <algorithm>
 #include <cstring>
 
+//#pragma omp declare simd
 inline static uint32_t flatten3dCoordinatesto1D(uint32_t x, uint32_t y,
                                             uint32_t z, uint32_t channel,
                                             uint32_t chunkSize)
@@ -260,8 +261,12 @@ void GridTiledOperator::IterateGrid()
 
                  copyFiniteDifferenceInput(chunks[i].chunkIndex, chunks[i].chunkSource, a);
              }
+             else if(tileImportType == ETileImportType::finiteDifferenceSingleChannel)
+             {
+                 copyFiniteDifferenceInputSingleChannel(chunks[i].chunkIndex, chunks[i].chunkSource);
+             }
 
-#pragma omp simd collapse(3)
+//#pragma omp simd collapse(3)
              for (int w = startVoxel; w < chnkSize; w += skipAmount)
                  {//for skipping voxels in thr red black gauss seidel update
                      for (int v = startVoxel; v < chnkSize; v += skipAmount)
@@ -300,7 +305,7 @@ void GridTiledOperator::IterateGrid()
 
     // cout << "sending through chunk " << chunks[i].chunkIndex.x << " " <<
     // chunks[i].chunkIndex.y << " " << chunks[i].chunkIndex.z << endl;
-    //#pragma omp critical
+    //#pragma omp barrier
       if (callPostChunkOp) {
 
         {
@@ -459,6 +464,106 @@ void GridTiledOperator::copyFiniteDifferenceInput(glm::i32vec3 chunkCoords, Chun
         {
             inTile[ i + 1 + (j+1*chnkSize+2) + (chnkSize+1*chnkSize+2 * chnkSize+2) ] =
                     pZedge[i +  (j*chnkSize) + (channel*(chnkSize*chnkSize*chnkSize)) ];
+
+        }
+    }
+
+}
+
+void GridTiledOperator::copyFiniteDifferenceInputSingleChannel(glm::i32vec3 chunkCoords, Chunk *main)
+{
+
+
+    //copy over rows at a time
+    for(int k = 0; k < chnkSize; k++)
+    {
+        for(int j = 0; j < chnkSize; j++)
+        {
+            memcpy  (   &inTile[ 1 + ((j*chnkSize+2) + (k*chnkSize+2 * chnkSize+2)) ],
+                        &main->chunkData[ ((j*chnkSize) + (k*chnkSize * chnkSize))  ],
+                        sizeof(float)*(chnkSize));
+
+        }
+    }
+
+
+    //-x edge
+    float *mXedge = &currentSourceChannelObject->GetChunk(chunkCoords.x-1, chunkCoords.y, chunkCoords.z)->chunkData[0];
+
+    //start at one to skip a voxel in Y and Z
+    for(int k = 0; k < chnkSize; k++)
+    {
+        for(int j = 0; j < chnkSize; j++)
+        {
+            inTile[ ((j+1*(chnkSize+2)) + (k+1*(chnkSize+2 * chnkSize+2)))  ] =
+                    mXedge[chnkSize +  ((j*chnkSize) + (k*chnkSize * chnkSize))  ];
+
+        }
+    }
+
+//    //cout << "passed" << endl;
+
+    //+x edge
+    float *pXedge = &currentSourceChannelObject->GetChunk(chunkCoords.x+1, chunkCoords.y, chunkCoords.z)->chunkData[0];
+
+    for(int k = 0; k < chnkSize; k++)
+    {
+        for(int j = 0; j < chnkSize; j++)
+        {
+            inTile[ chnkSize + 1 + ((j+1*chnkSize+2) + (k+1*chnkSize+2 * chnkSize+2)) ] =
+                    pXedge[0 +  ((j*chnkSize) + (k*chnkSize * chnkSize)) ];
+
+        }
+    }
+
+    //-y edge
+    float *mYedge = &currentSourceChannelObject->GetChunk(chunkCoords.x, chunkCoords.y-1, chunkCoords.z)->chunkData[0];
+
+    for(int k = 0; k < chnkSize; k++)
+    {
+        for( int i = 0; i < chnkSize; i++)
+        {
+            inTile[ i + 1 + (k+1*chnkSize+2 * chnkSize+2) ] =
+                    mYedge[(i) +  (chnkSize-1*chnkSize) + (k*chnkSize * chnkSize) ];
+
+        }
+    }
+
+    //+y edge
+    float *pYedge = &currentSourceChannelObject->GetChunk(chunkCoords.x, chunkCoords.y+1, chunkCoords.z)->chunkData[0];
+
+    for(int k = 0; k < chnkSize; k++)
+    {
+        for( int i = 0; i < chnkSize; i++)
+        {
+            inTile[ i + 1 + (chnkSize+1*chnkSize+2) + (k+1*chnkSize+2 * chnkSize+2) ] =
+                    pYedge[i + 0  + (k*chnkSize * chnkSize) ];
+
+        }
+    }
+
+    //-z edge
+    float *mZedge = &currentSourceChannelObject->GetChunk(chunkCoords.x, chunkCoords.y, chunkCoords.z-1)->chunkData[0];
+
+    for(int j = 0; j < chnkSize; j++)
+    {
+        for( int i = 0; i < chnkSize; i++)
+        {
+            inTile[ i + 1 + (j+1*chnkSize+2) + 0 ] =
+                    mZedge[i +  (j*chnkSize) + ((chnkSize-1) *chnkSize * chnkSize) ];
+
+        }
+    }
+
+    //+z edge
+    float *pZedge = &currentSourceChannelObject->GetChunk(chunkCoords.x, chunkCoords.y, chunkCoords.z+1)->chunkData[0];
+
+    for(int j = 0; j < chnkSize; j++)
+    {
+        for( int i = 0; i < chnkSize; i++)
+        {
+            inTile[ i + 1 + (j+1*chnkSize+2) + (chnkSize+1*chnkSize+2 * chnkSize+2) ] =
+                    pZedge[i +  (j*chnkSize) ];
 
         }
     }
