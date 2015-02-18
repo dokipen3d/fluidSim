@@ -148,12 +148,12 @@ ChannelObject::~ChannelObject() {
 
 //----------------------------------------------
 void ChannelObject::ClearChunks() {
-  for (int k = parentGridObject->boundingBox.fluidMin.z;
-       k <= parentGridObject->boundingBox.fluidMax.z; k++) {
-    for (int j = parentGridObject->boundingBox.fluidMin.y;
-         j <= parentGridObject->boundingBox.fluidMax.y; j++) {
-      for (int i = parentGridObject->boundingBox.fluidMin.x;
-           i <= parentGridObject->boundingBox.fluidMax.x; i++) {
+  for (int k = parentGridObject->boundingBox.fluidMinZ;
+       k <= parentGridObject->boundingBox.fluidMaxZ; k++) {
+    for (int j = parentGridObject->boundingBox.fluidMinY;
+         j <= parentGridObject->boundingBox.fluidMaxY; j++) {
+      for (int i = parentGridObject->boundingBox.fluidMinX;
+           i <= parentGridObject->boundingBox.fluidMaxZ; i++) {
         DeleteChunk(i, j, k);
       }
     }
@@ -182,18 +182,13 @@ Chunk *ChannelObject::CreateChunk(int32_t x, int32_t y, int32_t z) {
   //    float maxZ = (z+1)*pcs;
 
   if (boundsSet == false) {
-    parentGridObject->boundingBox.fluidMin.x = x;
-    parentGridObject->boundingBox.fluidMin.y = y;
-    parentGridObject->boundingBox.fluidMin.z = z;
-    parentGridObject->boundingBox.fluidMax.x = x;
-    parentGridObject->boundingBox.fluidMax.y = y;
-    parentGridObject->boundingBox.fluidMax.z = z;
-    parentGridObject->boundingBox.min.x = minX;
-    parentGridObject->boundingBox.min.y = minY;
-    parentGridObject->boundingBox.min.z = minZ;
-    parentGridObject->boundingBox.max.x = minX;
-    parentGridObject->boundingBox.max.y = minY;
-    parentGridObject->boundingBox.max.z = minZ;
+    parentGridObject->boundingBox.setmin(x, y, z);
+    parentGridObject->boundingBox.setmax(x, y, z);
+
+    parentGridObject->boundingBox.setfmin(minX, minY, minZ);
+
+    parentGridObject->boundingBox.setfmax(maxX, maxY, maxZ);
+
     // cout << "bounds min is " << parentGridObject->boundingBox.min.x <<
     // "bounds max is "<< parentGridObject->boundingBox.max.x << endl;
 
@@ -202,33 +197,14 @@ Chunk *ChannelObject::CreateChunk(int32_t x, int32_t y, int32_t z) {
   }
 
   else {
-    parentGridObject->boundingBox.fluidMin.x =
-        glm::min(x, parentGridObject->boundingBox.fluidMin.x);
-    parentGridObject->boundingBox.fluidMin.y =
-        glm::min(y, parentGridObject->boundingBox.fluidMin.y);
-    parentGridObject->boundingBox.fluidMin.z =
-        glm::min(z, parentGridObject->boundingBox.fluidMin.z);
-    parentGridObject->boundingBox.fluidMax.x =
-        glm::max(x, parentGridObject->boundingBox.fluidMax.x);
-    parentGridObject->boundingBox.fluidMax.y =
-        glm::max(y, parentGridObject->boundingBox.fluidMax.y);
-    parentGridObject->boundingBox.fluidMax.z =
-        glm::max(z, parentGridObject->boundingBox.fluidMax.z);
+    parentGridObject->boundingBox.setmin(x, y, z);
 
-    parentGridObject->boundingBox.min.x =
-        glm::min(minX, parentGridObject->boundingBox.min.x);
-    parentGridObject->boundingBox.min.y =
-        glm::min(minY, parentGridObject->boundingBox.min.y);
-    parentGridObject->boundingBox.min.z =
-        glm::min(minZ, parentGridObject->boundingBox.min.z);
-    parentGridObject->boundingBox.max.x =
-        glm::max(maxX + pcs, parentGridObject->boundingBox.max.x);
-    parentGridObject->boundingBox.max.y =
-        glm::max(maxY + pcs, parentGridObject->boundingBox.max.y);
-    parentGridObject->boundingBox.max.z =
-        glm::max(maxZ + pcs, parentGridObject->boundingBox.max.z);
-    // cout << "bounds min is " << parentGridObject->boundingBox.min.x <<
-    // "bounds max is "<< parentGridObject->boundingBox.max.x << endl;
+    parentGridObject->boundingBox.setmax(x, y, z);
+
+
+    parentGridObject->boundingBox.setfmin(minX, minY, minZ);
+
+    parentGridObject->boundingBox.setfmax(maxZ, maxY, maxZ);
   }
 
   if (channelInfo.channelType == EChannelType::vector) {

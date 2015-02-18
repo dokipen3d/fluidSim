@@ -6,10 +6,10 @@ using namespace std;
 
 void ImplicitSphere::setepDefaults() {
   // glm::vec3
-  this->boundingBox.min = glm::vec3(-1 * radius);
-  this->boundingBox.max = glm::vec3(radius);
-  cout << "bbox of sphere is " << this->boundingBox.min.x << " "
-       << this->boundingBox.max.x << endl;
+  this->boundingBox.setfmin(-1*radius, -1*radius, -1*radius);
+  this->boundingBox.setfmax(radius, radius, radius);
+  cout << "bbox of sphere is " << this->boundingBox.minX << " "
+       << this->boundingBox.maxX << endl;
 }
 
 glm::float32 ImplicitSphere::sampleVolume(glm::vec3 pos) {

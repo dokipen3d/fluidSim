@@ -37,8 +37,19 @@ void GridEmitter::setupDefaults() {
   //    int maxX =  glm::ceil(sourceVolume->boundingBox.max.x/chnkSize);
   //    int maxY =  glm::ceil(sourceVolume->boundingBox.max.y/chnkSize);
   //    int maxZ =  glm::ceil(sourceVolume->boundingBox.max.z/chnkSize);
-  this->boundingBox.min = sourceVolume->boundingBox.min;
-  this->boundingBox.max = sourceVolume->boundingBox.max;
+
+
+  this->boundingBox.minX = sourceVolume->boundingBox.minX.load();
+  this->boundingBox.minY = sourceVolume->boundingBox.minY.load();
+
+  this->boundingBox.minZ = sourceVolume->boundingBox.minZ.load();
+
+  this->boundingBox.maxX = sourceVolume->boundingBox.maxX.load();
+  this->boundingBox.maxY = sourceVolume->boundingBox.maxY.load();
+
+  this->boundingBox.maxZ = sourceVolume->boundingBox.maxZ.load();
+
+
 
   float intPartMinX;
   float intPartMinY;
@@ -48,40 +59,46 @@ void GridEmitter::setupDefaults() {
   float intPartMaxZ;
 
   // sep sphere bounds into frac and int
-  float minX_a = std::modf(this->boundingBox.min.x, &intPartMinX);
-  float minY_a = std::modf(this->boundingBox.min.y, &intPartMinY);
-  float minZ_a = std::modf(this->boundingBox.min.z, &intPartMinZ);
+  float minX_a = std::modf(this->boundingBox.minX, &intPartMinX);
+  float minY_a = std::modf(this->boundingBox.minY, &intPartMinY);
+  float minZ_a = std::modf(this->boundingBox.minZ, &intPartMinZ);
 
-  float maxX_a = std::modf(this->boundingBox.max.x, &intPartMaxX);
-  float maxY_a = std::modf(this->boundingBox.max.y, &intPartMaxY);
-  float maxZ_a = std::modf(this->boundingBox.max.z, &intPartMaxZ);
+  float maxX_a = std::modf(this->boundingBox.maxX, &intPartMaxX);
+  float maxY_a = std::modf(this->boundingBox.maxY, &intPartMaxY);
+  float maxZ_a = std::modf(this->boundingBox.maxZ, &intPartMaxZ);
 
   cout << "inpart is " << intPartMinX << " - " << intPartMaxX << endl;
   cout << "floatPart is " << minX_a << " - " << maxX_a << endl;
 
-  int minX = glm::floor(sourceVolume->boundingBox.min.x /
+  int minX = glm::floor(sourceVolume->boundingBox.minX /
                         chnkSize); // only which chunk ids should exists
-  int minY = glm::floor(sourceVolume->boundingBox.min.y / chnkSize);
-  int minZ = glm::floor(sourceVolume->boundingBox.min.z / chnkSize);
-  int maxX = glm::floor((sourceVolume->boundingBox.max.x) / chnkSize);
-  int maxY = glm::floor((sourceVolume->boundingBox.max.y) / chnkSize);
-  int maxZ = glm::floor((sourceVolume->boundingBox.max.z) / chnkSize);
+  int minY = glm::floor(sourceVolume->boundingBox.minY / chnkSize);
+  int minZ = glm::floor(sourceVolume->boundingBox.minZ / chnkSize);
+  int maxX = glm::floor((sourceVolume->boundingBox.maxX) / chnkSize);
+  int maxY = glm::floor((sourceVolume->boundingBox.maxY) / chnkSize);
+  int maxZ = glm::floor((sourceVolume->boundingBox.maxZ) / chnkSize);
 
-  this->boundingBox.fluidMin = glm::i32vec3(minX, minY, minZ);
-  this->boundingBox.fluidMax = glm::i32vec3(maxX, maxY, maxZ);
-  cout << "emitter bounds is" << this->boundingBox.min.x << " to "
-       << this->boundingBox.max.x << endl;
-  cout << "emitter bounds is" << this->boundingBox.min.y << " to "
-       << this->boundingBox.max.y << endl;
-  cout << "emitter bounds is" << this->boundingBox.min.z << " to "
-       << this->boundingBox.max.z << endl;
+  this->boundingBox.fluidMinX = minX;
+  this->boundingBox.fluidMinY = minY;
+  this->boundingBox.fluidMinZ = minZ;
 
-  cout << "grid emitter bounds set" << this->boundingBox.fluidMin.x << " to "
-       << this->boundingBox.fluidMax.x << endl;
-  cout << "grid emitter bounds set" << this->boundingBox.fluidMin.y << " to "
-       << this->boundingBox.fluidMax.y << endl;
-  cout << "grid emitter bounds set" << this->boundingBox.fluidMin.z << " to "
-       << this->boundingBox.fluidMax.z << endl;
+  this->boundingBox.fluidMaxX = maxX;
+  this->boundingBox.fluidMaxY = maxY;
+  this->boundingBox.fluidMaxZ = maxZ;
+
+  cout << "emitter bounds is" << this->boundingBox.minX << " to "
+       << this->boundingBox.maxX << endl;
+  cout << "emitter bounds is" << this->boundingBox.minY << " to "
+       << this->boundingBox.maxY << endl;
+  cout << "emitter bounds is" << this->boundingBox.minZ << " to "
+       << this->boundingBox.maxZ << endl;
+
+  cout << "grid emitter bounds set" << this->boundingBox.fluidMinX << " to "
+       << this->boundingBox.fluidMaxX << endl;
+  cout << "grid emitter bounds set" << this->boundingBox.fluidMinY << " to "
+       << this->boundingBox.fluidMaxY << endl;
+  cout << "grid emitter bounds set" << this->boundingBox.fluidMinZ << " to "
+       << this->boundingBox.fluidMaxZ << endl;
 }
 
 //----------------------------------------------

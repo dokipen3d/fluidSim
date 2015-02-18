@@ -86,8 +86,8 @@ void RenderableObject::setupObjects() {
   //    cout << "bbox is " << bbox.min.y << " to " << bbox.max.y << endl;
   //    cout << "bbox is " << bbox.min.z << " to " << bbox.max.z << endl;
 
-  updateQuad(bbox.min.x, bbox.min.y, bbox.min.z, bbox.max.x, bbox.max.y,
-             bbox.max.z);
+  updateQuad(bbox.minX, bbox.minY, bbox.minZ, bbox.maxX, bbox.maxY,
+             bbox.maxZ);
 
   auto emitterSphere = make_shared<ImplicitSphere>(name);
   sourceVolume = emitterSphere;
@@ -216,8 +216,8 @@ void RenderableObject::SetGridObject(GridObject *inGridObject) {
 void RenderableObject::fillTexture() {
   // cout << "uploading 3d data" << endl;
   bbox = gridObjectPtr->boundingBox;
-  updateQuad(bbox.min.x, bbox.min.y, bbox.min.z, bbox.max.x, bbox.max.y,
-             bbox.max.z);
+  updateQuad(bbox.minX, bbox.minY, bbox.minZ, bbox.maxX, bbox.maxY,
+             bbox.maxZ);
   vao->bind(); // first bind vao to start recording state
   // std::cout << "first bind" << std::endl;
   pos->uploadData(108 * sizeof(float), positions);
@@ -228,7 +228,7 @@ void RenderableObject::fillTexture() {
   // threeD = new float[res*res*res];
   //std::fill_n(threeD, (res * res * res), 0);
   uint32_t divergenceTarget =
-  gridObjectPtr->GetMemoryIndexForChannelName(std::string("density"));
+  gridObjectPtr->GetMemoryIndexForChannelName(std::string("pressure"));
  cout << "channel index for rendering is " << divergenceTarget << endl;
   sampleObject = gridObjectPtr->channelObjs[divergenceTarget].get();
   // cout << "in renerable " << sampleObject << endl << endl;
@@ -237,7 +237,7 @@ void RenderableObject::fillTexture() {
 
   const float div = 1.0 / (res);
 
-//    cout << "bbox is " << bbox.min.x << " " << bbox.max.x << endl;
+    cout << "render bbox is " << bbox.minX << " " << bbox.maxX << endl;
 //    cout << "bbox is " << bbox.min.y << " " << bbox.max.y << endl;
 //    cout << "bbox is " << bbox.min.z << " " << bbox.max.z << endl;
 
@@ -245,9 +245,9 @@ void RenderableObject::fillTexture() {
   for (int k = 0; k < res; k++) {
     for (int j = 0; j < res; j++) {
       for (int i = 0; i < res; i++) {
-        float posX = glm::mix(bbox.min.x, bbox.max.x, div * i);
-        float posY = glm::mix(bbox.min.y, bbox.max.y, div * j);
-        float posZ = glm::mix(bbox.min.z, bbox.max.z, div * k);
+        float posX = glm::mix(bbox.minX.load(memory_order_relaxed), bbox.maxX.load(memory_order_relaxed), div * i);
+        float posY = glm::mix(bbox.minY.load(memory_order_relaxed), bbox.maxY.load(memory_order_relaxed), div * j);
+        float posZ = glm::mix(bbox.minZ.load(memory_order_relaxed), bbox.maxZ.load(memory_order_relaxed), div * k);
         // cout << "pos " << posX << endl;
         //                if (implicit == 0)
         //                {
@@ -257,7 +257,7 @@ void RenderableObject::fillTexture() {
 
                 //sampleObject->SampleTrilinear(posX-0.5, posY-0.5, posZ-0.5, 0)*20.0f;
 
-                glm::abs(sampleObject->SampleTrilinear(posX , posY, posZ, 0))*1.0f;
+                glm::abs(sampleObject->SampleTrilinear(posX , posY, posZ, 0))*20.0f;
         // cout << sample << " ";
         //}
 

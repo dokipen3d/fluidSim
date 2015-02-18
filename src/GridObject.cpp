@@ -82,10 +82,10 @@ void GridObject::SetCommonOptions() {
   bucketSize = 1.0f;
   dx = bucketSize/(float)chunkSize;
   numChannels = 0;
-  boundingBox.min = glm::vec3(0.0);
-  boundingBox.max = glm::vec3(0.0);
-  boundingBox.fluidMin = glm::i32vec3(0, 0, 0);
-  boundingBox.fluidMax = glm::i32vec3(0, 0, 0);
+  boundingBox.setmin(0,0,0);
+  boundingBox.setmax(0,0,0);
+  boundingBox.setfmin (0.0, 0.0, 0.0);
+  boundingBox.setfmax (0.0, 0.0, 0.0);
 }
 
 //----------------------------------------------
@@ -186,12 +186,11 @@ void GridObject::resetGrid() {
 
 void GridObject::unifyBounds() {
 
-  boundingBox.min.x = boundingBox.fluidMin.x * chunkSize;
-  boundingBox.min.y = boundingBox.fluidMin.y * chunkSize;
-  boundingBox.min.z = boundingBox.fluidMin.z * chunkSize;
-  boundingBox.max.x = (boundingBox.fluidMax.x + 1) * chunkSize;
-  boundingBox.max.y = (boundingBox.fluidMax.y + 1) * chunkSize;
-  ;
-  boundingBox.max.z = (boundingBox.fluidMax.z + 1) * chunkSize;
-  ;
+  boundingBox.minX = boundingBox.fluidMinX * chunkSize;
+  boundingBox.minY = boundingBox.fluidMinY * chunkSize;
+  boundingBox.minZ = boundingBox.fluidMinZ * chunkSize;
+  boundingBox.maxX = (boundingBox.fluidMaxX + 1) * chunkSize;
+  boundingBox.maxY = (boundingBox.fluidMaxY + 1) * chunkSize;
+  boundingBox.maxZ = (boundingBox.fluidMaxZ + 1) * chunkSize;
+
 }

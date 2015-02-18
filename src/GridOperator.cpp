@@ -27,9 +27,8 @@ GridOperator::GridOperator(GridObject *inGridObject) {
 
   refreshSourceAndTargetChannelDetails();
   createChunks = false;
-  this->boundingBox.fluidMin =
-      glm::i32vec3(0.0); // set bounds to 0 so we dont emit anything
-  this->boundingBox.fluidMax = glm::i32vec3(0.0);
+  this->boundingBox.setmin(0.0f, 0.0f, 0.0f);
+  this->boundingBox.setmax(0.0f, 0.0f, 0.0f);
   chnkSize = (int)gridObjectPtr->chunkSize;
   // cout << "chnkSize is " << chnkSize << endl;
   // cout <<  channelName << endl;
@@ -74,13 +73,13 @@ this->PreGridOp();
   }
 
   // cout << "iterating grid" << endl;
-  int fmz = gridObjectPtr->boundingBox.fluidMin.z;
-  int fmy = gridObjectPtr->boundingBox.fluidMin.y;
-  int fmx = gridObjectPtr->boundingBox.fluidMin.x;
+  int fmz = gridObjectPtr->boundingBox.fluidMinZ;
+  int fmy = gridObjectPtr->boundingBox.fluidMinY;
+  int fmx = gridObjectPtr->boundingBox.fluidMinX;
 
-  int fMax = gridObjectPtr->boundingBox.fluidMax.x;
-  int fMay = gridObjectPtr->boundingBox.fluidMax.y;
-  int fMaz = gridObjectPtr->boundingBox.fluidMax.z;
+  int fMax = gridObjectPtr->boundingBox.fluidMaxX;
+  int fMay = gridObjectPtr->boundingBox.fluidMaxY;
+  int fMaz = gridObjectPtr->boundingBox.fluidMaxZ;
 
 //   cout << "<" << fmx << ", " << fmy << ", " << fmz << ">  to  <" << fMax <<
 //   ", " << fMay << ", " << fMaz << "> " << endl;
@@ -131,12 +130,12 @@ double timeE = omp_get_wtime();
   if (forceInputBoundsIteration) {
 
 #pragma omp parallel for collapse(3)
-    for (int i = this->boundingBox.fluidMin.z;
-         i <= this->boundingBox.fluidMax.z; i++) {
-      for (int j = this->boundingBox.fluidMin.y;
-           j <= this->boundingBox.fluidMax.y; j++) {
-        for (int k = this->boundingBox.fluidMin.x;
-             k <= this->boundingBox.fluidMax.x; k++) {
+    for (int i = this->boundingBox.fluidMinZ;
+         i <= this->boundingBox.fluidMaxZ; i++) {
+      for (int j = this->boundingBox.fluidMinY;
+           j <= this->boundingBox.fluidMaxY; j++) {
+        for (int k = this->boundingBox.fluidMinX;
+             k <= this->boundingBox.fluidMaxX; k++) {
 
           chunkAddresses newChunkAddresses;
           newChunkAddresses.chunkSource = nullptr;

@@ -7,10 +7,10 @@ using namespace std;
 
 void ImplicitTorus::setepDefaults() {
   // glm::vec3
-  this->boundingBox.min = glm::vec3(-1 * (radiusA + (radiusB)));
-  this->boundingBox.max = glm::vec3(radiusA + (radiusB));
-  cout << "bbox of torus is " << this->boundingBox.min.x << " "
-       << this->boundingBox.max.x << endl;
+  this->boundingBox.setmin(-1 * radiusA + (radiusB), -1 * radiusA + (radiusB), -1 * radiusA + (radiusB));
+  this->boundingBox.setmax(radiusA + (radiusB), radiusA + (radiusB), radiusA + (radiusB));
+  cout << "bbox of torus is " << this->boundingBox.minX << " "
+       << this->boundingBox.maxX << endl;
 }
 
 glm::float32 ImplicitTorus::sampleVolume(glm::vec3 pos) {

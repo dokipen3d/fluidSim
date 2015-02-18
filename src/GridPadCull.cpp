@@ -119,31 +119,17 @@ void GridPadCull::PostChunkOp(Chunk *&inChunk, Chunk *&outChunk,
     // cout << "deleted chunk " << chunkIdSecondary.x << endl;
   } else {
     if (!padded) {
-      boundingBox.fluidMin.x =
-          glm::min(chunkIdSecondary.x, boundingBox.fluidMin.x);
-      boundingBox.fluidMin.y =
-          glm::min(chunkIdSecondary.y, boundingBox.fluidMin.y);
-      boundingBox.fluidMin.z =
-          glm::min(chunkIdSecondary.z, boundingBox.fluidMin.z);
-      boundingBox.fluidMax.x =
-          glm::max(chunkIdSecondary.x, boundingBox.fluidMax.x);
-      boundingBox.fluidMax.y =
-          glm::max(chunkIdSecondary.y, boundingBox.fluidMax.y);
-      boundingBox.fluidMax.z =
-          glm::max(chunkIdSecondary.z, boundingBox.fluidMax.z);
+      boundingBox.setmin(chunkIdSecondary.x, chunkIdSecondary.y, chunkIdSecondary.z);
+
+      boundingBox.setmax(chunkIdSecondary.x, chunkIdSecondary.y, chunkIdSecondary.z);
+
     } else {
-      boundingBox.fluidMin.x =
-          glm::min(chunkIdSecondary.x - chunksToPad, boundingBox.fluidMin.x);
-      boundingBox.fluidMin.y =
-          glm::min(chunkIdSecondary.y - chunksToPad, boundingBox.fluidMin.y);
-      boundingBox.fluidMin.z =
-          glm::min(chunkIdSecondary.z - chunksToPad, boundingBox.fluidMin.z);
-      boundingBox.fluidMax.x =
-          glm::max(chunkIdSecondary.x + chunksToPad, boundingBox.fluidMax.x);
-      boundingBox.fluidMax.y =
-          glm::max(chunkIdSecondary.y + chunksToPad, boundingBox.fluidMax.y);
-      boundingBox.fluidMax.z =
-          glm::max(chunkIdSecondary.z + chunksToPad, boundingBox.fluidMax.z);
+
+        boundingBox.setmin(chunkIdSecondary.x - chunksToPad, chunkIdSecondary.y - chunksToPad, chunkIdSecondary.z - chunksToPad);
+        boundingBox.setmax(chunkIdSecondary.x + chunksToPad, chunkIdSecondary.y + chunksToPad, chunkIdSecondary.z  + chunksToPad);
+
+
+
     }
     int pcs = gridObjectPtr->chunkSize;
     outChunk->voxelCount = pcs * pcs * pcs;
