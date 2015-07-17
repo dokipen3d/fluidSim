@@ -3,8 +3,8 @@ cmake_minimum_required(VERSION 2.8)
 
 
 message("system: ${CMAKE_SYSTEM_PREFIX_PATH}")
-set(CMAKE_C_COMPILER "/usr/local/bin/gcc")
-set(CMAKE_CXX_COMPILER "/usr/local/bin/g++")
+set(CMAKE_C_COMPILER "/usr/local/bin/gcc-5")
+set(CMAKE_CXX_COMPILER "/usr/local/bin/g++-5")
 
 set(LIBRARY_SEARCH_PATH
   /usr/local
@@ -29,7 +29,7 @@ set(LIBRARY_SEARCH_PATH
 
 #-lstdc++ -stdlib=libc++
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp -std=c++1y -pedantic -mfpmath=sse -msse2 -msse3 -msse4 -msse4.1 -msse4.2 -O3")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2  -fopenmp -std=c++1y  -Wa,-q " )
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -flto  -fopenmp -std=c++1y  -Wa,-q " )
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -v -fopenmp -ffast-math -std=c++1y -ftree-vectorize -O3")
 
 aux_source_directory(src/ SRC_LIST)

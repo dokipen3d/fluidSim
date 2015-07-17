@@ -228,7 +228,7 @@ void RenderableObject::fillTexture() {
   // threeD = new float[res*res*res];
   //std::fill_n(threeD, (res * res * res), 0);
   uint32_t divergenceTarget =
-  gridObjectPtr->GetMemoryIndexForChannelName(std::string("pressure"));
+  gridObjectPtr->GetMemoryIndexForChannelName(std::string("density"));
  cout << "channel index for rendering is " << divergenceTarget << endl;
   sampleObject = gridObjectPtr->channelObjs[divergenceTarget].get();
   // cout << "in renerable " << sampleObject << endl << endl;
@@ -257,7 +257,7 @@ void RenderableObject::fillTexture() {
 
                 //sampleObject->SampleTrilinear(posX-0.5, posY-0.5, posZ-0.5, 0)*20.0f;
 
-                glm::abs(sampleObject->SampleTrilinear(posX , posY, posZ, 0))*20.0f;
+                glm::abs(sampleObject->SampleTrilinear(posX , posY, posZ, 0))*2.0f;
         // cout << sample << " ";
         //}
 

@@ -3,7 +3,7 @@
 #include "GridObject.h"
 
 
-inline static uint32_t flatten3dCoordinatesto1D(uint32_t x, uint32_t y,
+inline static uint32_t flatten3dCoordinatesPaddedTo1D(uint32_t x, uint32_t y,
                                                 uint32_t z,
                                                 uint32_t chunkSize) {
 
@@ -82,16 +82,16 @@ void GridTiledPressure::Algorithm(int worldX, int worldY, int worldZ, int indexX
     outTile[indexX+(indexY*chnkSize)+ (indexZ*chnkSize*chnkSize)] =// inTile[1]+inTile[2]+inTile[4]+inTile[6]+inTile[8]+inTile[10]+inTile[12]+inTile[14]*0.13;
 
 
-           (inTile[flatten3dCoordinatesto1D(indexX-1, indexY, indexZ,8)]+
-            inTile[flatten3dCoordinatesto1D(indexX+1, indexY, indexZ,8)]+
-            inTile[flatten3dCoordinatesto1D(indexX, indexY-1, indexZ,8)]+
-            inTile[flatten3dCoordinatesto1D(indexX, indexY+1, indexZ,8)]+
-            inTile[flatten3dCoordinatesto1D(indexX, indexY, indexZ-1,8)]+
-            inTile[flatten3dCoordinatesto1D(indexX, indexY, indexZ+1,8)]+(
-                divergenceSource->SampleExplicit(worldX, worldY, worldZ, 0)*
+           (inTile[flatten3dCoordinatesPaddedTo1D(indexX-1, indexY, indexZ,8)]+
+            inTile[flatten3dCoordinatesPaddedTo1D(indexX+1, indexY, indexZ,8)]+
+            inTile[flatten3dCoordinatesPaddedTo1D(indexX, indexY-1, indexZ,8)]+
+            inTile[flatten3dCoordinatesPaddedTo1D(indexX, indexY+1, indexZ,8)]+
+            inTile[flatten3dCoordinatesPaddedTo1D(indexX, indexY, indexZ-1,8)]+
+            inTile[flatten3dCoordinatesPaddedTo1D(indexX, indexY, indexZ+1,8)]+(
+                //divergenceSource->SampleExplicit(worldX, worldY, worldZ, 0)*
                 scaleSquared))/6;
 
-            //outTile[indexX+(indexY*chnkSize)+ (indexZ*chnkSize*chnkSize)] = inTile[flatten3dCoordinatesto1D(indexX, indexY, indexZ,8)];
+            //outTile[indexX+(indexY*chnkSize)+ (indexZ*chnkSize*chnkSize)] = inTile[flatten3dCoordinatesPaddedTo1D(indexX, indexY, indexZ,8)];
 
 
 }

@@ -386,9 +386,11 @@ void GridTiledOperator::copyFiniteDifferenceInput(glm::i32vec3 chunkCoords, Chun
     {
         for(int j = 0; j < chnkSize; j++)
         {
-            memcpy  (   &inTile[ 1 + ((j*chnkSize+2) + (k*chnkSize+2 * chnkSize+2)) ],
+            for(int i = 0; i < chnkSize; i++)
+
+            memcpy  (   &inTile[ (i+1) + ((j+1)*chnkSize+2) + ((k+1)*chnkSize+2 * chnkSize+2) ],
                         &main->chunkData[ ((j*chnkSize) + (k*chnkSize * chnkSize)) + (channel*(chnkSize*chnkSize*chnkSize)) ],
-                        sizeof(float)*(chnkSize));
+                        sizeof(float));
 
         }
     }
@@ -481,14 +483,28 @@ void GridTiledOperator::copyFiniteDifferenceInputSingleChannel(glm::i32vec3 chun
 {
 
 
+//    //copy over rows at a time
+//    for(int k = 0; k < chnkSize; k++)
+//    {
+//        for(int j = 0; j < chnkSize; j++)
+//        {
+//            memcpy  (   &inTile[ 1 + ((j+1*(chnkSize+2)) + (k+1*(chnkSize+2) * (chnkSize+2))) ],
+//                        &main->chunkData[ ((j*chnkSize) + (k*chnkSize * chnkSize))],
+//                        sizeof(float)*(chnkSize));
+
+//        }
+//    }
+
     //copy over rows at a time
     for(int k = 0; k < chnkSize; k++)
     {
         for(int j = 0; j < chnkSize; j++)
         {
-            memcpy  (   &inTile[ 1 + ((j+1*(chnkSize+2)) + (k+1*(chnkSize+2) * (chnkSize+2))) ],
-                        &main->chunkData[ ((j*chnkSize) + (k*chnkSize * chnkSize))],
-                        sizeof(float)*(chnkSize));
+            for(int i = 0; i < chnkSize; i++)
+            {
+
+                inTile[ (i+1) + ((j+1)*(chnkSize+2)) + ((k+1)*(chnkSize+2) * (chnkSize+2)) ] = main->chunkData[ i + ((j*chnkSize) + (k*chnkSize * chnkSize))  ];
+            }
 
         }
     }
@@ -503,7 +519,7 @@ void GridTiledOperator::copyFiniteDifferenceInputSingleChannel(glm::i32vec3 chun
 //    {
 //        for(int j = 0; j < chnkSize; j++)
 //        {
-//            inTile[ ((j+1*(chnkSize+2)) + (k+1*(chnkSize+2 * chnkSize+2)))  ] =
+//            inTile[ ((j+1*(chnkSize+2)) + (k+1*((chnkSize+2) * (chnkSize+2))))  ] =
 //                    mXedge[chnkSize +  ((j*chnkSize) + (k*chnkSize * chnkSize))  ];
 
 //        }
@@ -518,7 +534,7 @@ void GridTiledOperator::copyFiniteDifferenceInputSingleChannel(glm::i32vec3 chun
 //    {
 //        for(int j = 0; j < chnkSize; j++)
 //        {
-//            inTile[ chnkSize + 1 + ((j+1*chnkSize+2) + (k+1*chnkSize+2 * chnkSize+2)) ] =
+//            inTile[ ((chnkSize + 1) + ((j+1)*(chnkSize+2)) + ((k+1)*(chnkSize+2) * (chnkSize+2))) ] =
 //                    pXedge[0 +  ((j*chnkSize) + (k*chnkSize * chnkSize)) ];
 
 //        }
@@ -531,8 +547,8 @@ void GridTiledOperator::copyFiniteDifferenceInputSingleChannel(glm::i32vec3 chun
 //    {
 //        for( int i = 0; i < chnkSize; i++)
 //        {
-//            inTile[ i + 1 + (k+1*chnkSize+2 * chnkSize+2) ] =
-//                    mYedge[(i) +  (chnkSize-1*chnkSize) + (k*chnkSize * chnkSize) ];
+//            inTile[ i + 1 + ((k+1)*(chnkSize+2) * (chnkSize+2)) ] =
+//                    mYedge[(i) +  ((chnkSize-1)*chnkSize) + (k*chnkSize * chnkSize) ];
 
 //        }
 //    }
@@ -544,7 +560,7 @@ void GridTiledOperator::copyFiniteDifferenceInputSingleChannel(glm::i32vec3 chun
 //    {
 //        for( int i = 0; i < chnkSize; i++)
 //        {
-//            inTile[ i + 1 + (chnkSize+1*chnkSize+2) + (k+1*chnkSize+2 * chnkSize+2) ] =
+//            inTile[ i + 1 + ((chnkSize+1)*(chnkSize+2)) + ((k+1)*(chnkSize+2) * (chnkSize+2)) ] =
 //                    pYedge[i + 0  + (k*chnkSize * chnkSize) ];
 
 //        }

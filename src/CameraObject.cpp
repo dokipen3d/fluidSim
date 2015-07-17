@@ -13,7 +13,7 @@ void CameraObject::setupDefaults() {
 
 void CameraObject::moveCamUp() {
   camY += 0.0;
-  camZ -= 0.6;
+  //camZ -= 0.6;
   //camX -= 0.2;
 
   setupDefaults();
