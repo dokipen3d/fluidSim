@@ -21,7 +21,7 @@ struct chunkAddresses2 {
 class GridTiledOperator {
 
 public:
-  GridTiledOperator(GridObject *inGridObject, ETileImportType processType);
+  GridTiledOperator(GridObject *inGridObject, std::vector<std::string> inChannelNames);
   virtual ~GridTiledOperator();
 
   virtual void setupDefaults() = 0;
@@ -40,6 +40,7 @@ public:
   virtual void PreGridOp();
 
   virtual void GridOp();
+
   void copyRawInput(glm::i32vec3 chunkCoords, uint32_t channel);
 
   void copyStaggeredInput();
@@ -60,10 +61,11 @@ public:
   u_int32_t numberOfIterations = 1;
   int startVoxel = 0;
   int skipAmount = 1;
-    bool debug = false;
+  bool debug = false;
   std::vector<chunkAddresses2> chunks;
   std::vector<float> inTile;
   std::vector<float> outTile;
+  std::vector<std::string> copyInChannelNames;
 
 protected:
   double currentTime;

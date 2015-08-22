@@ -105,7 +105,7 @@ bool operate = false;
 
   pressure->setNodeName(std::string("pressure oper"));
 
-  auto pressuretiled = make_unique<GridTiledPressure>(grid_obj.get(), ETileImportType::finiteDifferenceSingleChannel);
+  auto pressuretiled = make_unique<GridTiledPressure>(grid_obj.get(), std::vector<string> {});
 pressuretiled->setNodeName(std::string("tiledpress"));
 
   auto projection = make_unique<GridProjection>(grid_obj.get());
@@ -203,8 +203,8 @@ pressuretiled->setNodeName(std::string("tiledpress"));
     //gridDiss->IterateGrid();
     bouyancy->IterateGrid();
     divergence->IterateGrid();
-    //pressuretiled->IterateGrid();
-    pressure->IterateGrid();
+    pressuretiled->IterateGrid();
+    //pressure->IterateGrid();
 
     projection->IterateGrid();
     basicAdvect->IterateGrid();

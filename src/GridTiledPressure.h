@@ -10,7 +10,7 @@ using namespace std;
 class GridTiledPressure : public GridTiledOperator
 {
 public:
-    GridTiledPressure(GridObject *inGridObject, ETileImportType processType) : GridTiledOperator(inGridObject,processType) {
+    GridTiledPressure(GridObject *inGridObject, std::vector<std::string> inChannelNames) : GridTiledOperator(inGridObject,inChannelNames) {
       cout << "in GridDivergence Constructor" << endl;
       setupDefaults();
     };

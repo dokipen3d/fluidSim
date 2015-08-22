@@ -79,7 +79,7 @@ void GridTiledPressure::PreChunkOp(Chunk *&inChunk, Chunk *&outChunk,
 void GridTiledPressure::Algorithm(int worldX, int worldY, int worldZ, int indexX, int indexY, int indexZ)
 {
 
-    outTile[indexX+(indexY*chnkSize)+ (indexZ*chnkSize*chnkSize)] =// inTile[1]+inTile[2]+inTile[4]+inTile[6]+inTile[8]+inTile[10]+inTile[12]+inTile[14]*0.13;
+    outTile[indexX+(indexY*chnkSize)+ (indexZ*chnkSize*chnkSize)] =
 
 
            (inTile[flatten3dCoordinatesPaddedTo1D(indexX-1, indexY, indexZ,8)]+
@@ -88,10 +88,9 @@ void GridTiledPressure::Algorithm(int worldX, int worldY, int worldZ, int indexX
             inTile[flatten3dCoordinatesPaddedTo1D(indexX, indexY+1, indexZ,8)]+
             inTile[flatten3dCoordinatesPaddedTo1D(indexX, indexY, indexZ-1,8)]+
             inTile[flatten3dCoordinatesPaddedTo1D(indexX, indexY, indexZ+1,8)]+(
-                //divergenceSource->SampleExplicit(worldX, worldY, worldZ, 0)*
+                divergenceSource->SampleExplicit(worldX, worldY, worldZ, 0)*
                 scaleSquared))/6;
 
-            //outTile[indexX+(indexY*chnkSize)+ (indexZ*chnkSize*chnkSize)] = inTile[flatten3dCoordinatesPaddedTo1D(indexX, indexY, indexZ,8)];
 
 
 }
@@ -135,7 +134,7 @@ return (a + b + c + d + e + f + (g)*0.166666666666);
 void GridTiledPressure::PostChunkOp(Chunk *&inChunk, Chunk *&outChunk,
                          glm::i32vec3 chunkIdSecondary){
 
-    std::swap(inChunk, outChunk);
+    //std::swap(inChunk, outChunk);
 
 
 }

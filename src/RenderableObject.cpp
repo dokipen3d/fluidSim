@@ -257,7 +257,7 @@ void RenderableObject::fillTexture() {
 
                 //sampleObject->SampleTrilinear(posX-0.5, posY-0.5, posZ-0.5, 0)*20.0f;
 
-                glm::abs(sampleObject->SampleTrilinear(posX , posY, posZ, 0))*2.0f;
+                glm::abs(sampleObject->SampleTrilinear(posX , posY, posZ, 0))*4.0f;
         // cout << sample << " ";
         //}
 
