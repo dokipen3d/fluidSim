@@ -52,7 +52,7 @@ int main(int argc, char *argv[]) {
   cout << *argv[argc - 1] << endl;
 bool operate = false;
 
-  omp_set_num_threads(8);
+ omp_set_num_threads(1);
   int input, input2;
   SDL_Event keyevent;
   bool eventLoop = true;

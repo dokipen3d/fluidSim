@@ -76,20 +76,43 @@ void GridTiledPressure::PreChunkOp(Chunk *&inChunk, Chunk *&outChunk,
     //callPreChunkOp = false;//only call once;
 }
 
-void GridTiledPressure::Algorithm(int worldX, int worldY, int worldZ, int indexX, int indexY, int indexZ)
+void GridTiledPressure::Algorithm(int worldX, int worldY, int worldZ, uint32_t indexX, uint32_t indexY, uint32_t indexZ)
 {
 
-    outTile[indexX+(indexY*chnkSize)+ (indexZ*chnkSize*chnkSize)] =
+    uint32_t index = indexX + (indexY*chnkSize) + (indexZ*chnkSize*chnkSize);
+    float divergence = divergenceSource->SampleExplicit(worldX, worldY, worldZ, 0);
+//    float Pip1JK = currentSourceChannelObject->SampleExplicit(worldX+1, worldY, worldZ, 0 );
+//    float Pim1JK = currentSourceChannelObject->SampleExplicit(worldX-1, worldY, worldZ, 0 );
+//    float PIjp1K = currentSourceChannelObject->SampleExplicit(worldX, worldY+1, worldZ, 0 );
+//    float PIjm1K = currentSourceChannelObject->SampleExplicit(worldX, worldY-1, worldZ, 0 );
+//    float PIJkp1 = currentSourceChannelObject->SampleExplicit(worldX, worldY, worldZ+1, 0 );
+//    float PIJkm1 = currentSourceChannelObject->SampleExplicit(worldX, worldY, worldZ-1, 0 );
+
+    float Pip1JK = inTile[flatten3dCoordinatesPaddedTo1D(indexX+1, indexY, indexZ,8)];
+    float Pim1JK = inTile[flatten3dCoordinatesPaddedTo1D(indexX-1, indexY, indexZ,8)];
+    float PIjp1K = inTile[flatten3dCoordinatesPaddedTo1D(indexX, indexY+1, indexZ,8)];
+    float PIjm1K = inTile[flatten3dCoordinatesPaddedTo1D(indexX, indexY-1, indexZ,8)];
+    float PIJkp1 = inTile[flatten3dCoordinatesPaddedTo1D(indexX, indexY, indexZ+1,8)];
+    float PIJkm1 = inTile[flatten3dCoordinatesPaddedTo1D(indexX, indexY, indexZ-1,8)];
+
+//    if (index == 0){
+//        currentSourceChannelObject->SampleExplicitChunkAdressDebug(worldX, worldY, worldZ, 0 );
+
+    //cout << "chunkAddress sampled explicit in algo is " << me << endl;
+//}
+
+    outTile[index] = (Pip1JK + Pim1JK + PIjp1K + PIjm1K + PIJkp1 + PIJkm1 + (divergence*scaleSquared))/6;
 
 
-           (inTile[flatten3dCoordinatesPaddedTo1D(indexX-1, indexY, indexZ,8)]+
-            inTile[flatten3dCoordinatesPaddedTo1D(indexX+1, indexY, indexZ,8)]+
-            inTile[flatten3dCoordinatesPaddedTo1D(indexX, indexY-1, indexZ,8)]+
-            inTile[flatten3dCoordinatesPaddedTo1D(indexX, indexY+1, indexZ,8)]+
-            inTile[flatten3dCoordinatesPaddedTo1D(indexX, indexY, indexZ-1,8)]+
-            inTile[flatten3dCoordinatesPaddedTo1D(indexX, indexY, indexZ+1,8)]+(
-                divergenceSource->SampleExplicit(worldX, worldY, worldZ, 0)*
-                scaleSquared))/6;
+//           (inTile[flatten3dCoordinatesPaddedTo1D(indexX-1, indexY, indexZ,8)]+
+//            inTile[flatten3dCoordinatesPaddedTo1D(indexX+1, indexY, indexZ,8)]+
+//            inTile[flatten3dCoordinatesPaddedTo1D(indexX, indexY-1, indexZ,8)]+
+//            inTile[flatten3dCoordinatesPaddedTo1D(indexX, indexY+1, indexZ,8)]+
+//            inTile[flatten3dCoordinatesPaddedTo1D(indexX, indexY, indexZ-1,8)]+
+//            inTile[flatten3dCoordinatesPaddedTo1D(indexX, indexY, indexZ+1,8)]+
+//                (divergence*scaleSquared))/6.0f;
+
+
 
 
 
@@ -134,7 +157,7 @@ return (a + b + c + d + e + f + (g)*0.166666666666);
 void GridTiledPressure::PostChunkOp(Chunk *&inChunk, Chunk *&outChunk,
                          glm::i32vec3 chunkIdSecondary){
 
-    //std::swap(inChunk, outChunk);
+    std::swap(inChunk, outChunk);
 
 
 }

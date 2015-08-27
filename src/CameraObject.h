@@ -13,8 +13,8 @@ class CameraObject : public BaseObject {
 
 public:
   CameraObject(std::string newName) : BaseObject(newName) {
-    camY = 20.0f;
-    camX = 0.0f;
+    camY = 0.0f;
+    camX = 20.0f;
     camZ = 150.0f;
     setupDefaults();
 

@@ -27,7 +27,7 @@ public:
   virtual void setupDefaults() = 0;
   void SetGridObject(GridObject *inGridObject);
 //#pragma omp declare simd
-  virtual void Algorithm(int worldX, int worldY, int worldZ, int indexX, int indexY, int indexZ) = 0; // pure virtual. out chunk might
+  virtual void Algorithm(int worldX, int worldY, int worldZ, uint32_t indexX, uint32_t indexY, uint32_t indexZ) = 0; // pure virtual. out chunk might
                                                 // not be needed but if we write
                                                 // a node that copies into a new
                                                 // grid we need to know where
@@ -47,7 +47,7 @@ public:
   void copyFiniteDifferenceInput(glm::i32vec3 chunkCoords, Chunk* main, uint32_t channel);
   void copyFiniteDifferenceInputSingleChannel(glm::i32vec3 chunkCoords, Chunk* main);
 
-  void copyTileBack(glm::i32vec3 chunkCoords);
+  void copyTileBack(glm::i32vec3 chunkCoords, Chunk* target);
 
   void SetChannelName(std::string nameToSet);
   std::string name;

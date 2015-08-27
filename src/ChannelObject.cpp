@@ -1339,6 +1339,21 @@ float ChannelObject::SampleTrilinear(float x, float y, float z,
   return tmp;
 }
 
+void ChannelObject::SampleExplicitChunkAdressDebug(float x, float y, float z,
+                                    uint32_t channel) {
+
+
+    int32_t chunkIndexDivX = glm::floor((x)*getRidOfDivCalc);
+    int32_t chunkIndexDivY = glm::floor((y)*getRidOfDivCalc);
+    int32_t chunkIndexDivZ = glm::floor((z)*getRidOfDivCalc);
+    //Chunk* testCunk =
+
+   cout << "sampling from channel object explicit"<<  GetChunk(chunkIndexDivX, chunkIndexDivY, chunkIndexDivZ) << " " << chunkIndexDivX << " "
+        << chunkIndexDivY << " " << chunkIndexDivZ << endl;
+}
+
+
+
 float ChannelObject::SampleExplicit(float x, float y, float z,
                                     uint32_t channel) {
 
