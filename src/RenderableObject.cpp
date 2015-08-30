@@ -257,7 +257,7 @@ void RenderableObject::fillTexture() {
 
                 //sampleObject->SampleTrilinear(posX-0.5, posY-0.5, posZ-0.5, 0)*20.0f;
 
-                glm::abs(sampleObject->SampleTrilinear(posX , posY, posZ, 0))*4.0f;
+                glm::abs(sampleObject->SampleTrilinear(posX , posY, posZ, 0))*2.0f;
         // cout << sample << " ";
         //}
 
@@ -341,7 +341,9 @@ void RenderableObject::Render(glm::mat4 ProjectionViewMatrix) {
 
   // CheckGLError("unbind shader");
 
-  glClearColor(0.18, 0.18, 0.2, 1.0);
+  //glClearColor(0.18, 0.18, 0.2, 1.0);
+  glClearColor(0.0, 0.0, 0.0, 1.0);
+
   glClear(GL_COLOR_BUFFER_BIT);
 
   glCullFace(GL_BACK);

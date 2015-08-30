@@ -16,9 +16,9 @@ float Absorption = 0.333;
 
 
 const float maxDist = sqrt(2.0);
-const int numSamples = 128;
+const int numSamples = 32;
 const float stepSize = maxDist/float(numSamples);
-const int numLightSamples = 64;
+const int numLightSamples = 16;
 const float lscale = maxDist / float(numLightSamples);
 const float densityFactor = 1;
 

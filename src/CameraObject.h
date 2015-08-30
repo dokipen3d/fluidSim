@@ -13,9 +13,9 @@ class CameraObject : public BaseObject {
 
 public:
   CameraObject(std::string newName) : BaseObject(newName) {
-    camY = 0.0f;
-    camX = 20.0f;
-    camZ = 150.0f;
+    camY = 75.0f;
+    camX = 90.0f;
+    camZ = 110.0f;
     setupDefaults();
 
     // std::cout << "in camera constructor" << std::endl;
