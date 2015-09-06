@@ -90,6 +90,8 @@ this->PreGridOp();
 // currentSourceChannelObject->channelInfo.channelName << endl;
 double timeE = omp_get_wtime();
 //SORTING BOUNDS------------------------------------------------------------------------------
+if (!forceInputBoundsIteration) {
+
 #pragma omp parallel for collapse(3)
   for (int i = fmx; i <= fMax; i++) {
     for (int j = fmy; j <= fMay; j++) {
@@ -123,6 +125,7 @@ double timeE = omp_get_wtime();
       }
     }
   }
+}
 //END OF SORTING BOUNDS------------------------------------------------------------------------------
 
 

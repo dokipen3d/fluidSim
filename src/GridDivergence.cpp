@@ -72,9 +72,13 @@ void GridDivergence::Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelWorldPosi
     wDivergenceP1 = velocitySourceChannelObject->SampleExplicit(X, Y, Z+1, 2 );
   //}
 
-  float Udiff = (uDivergenceP1 - uDivergenceM1);
-  float Vdiff = (vDivergenceP1 - vDivergenceM1);
-  float Wdiff = (wDivergenceP1 - wDivergenceM1);
+//  float Udiff = (uDivergenceP1 - uDivergenceM1);
+//  float Vdiff = (vDivergenceP1 - vDivergenceM1);
+//  float Wdiff = (wDivergenceP1 - wDivergenceM1);
+
+    float Udiff = (uDivergenceP1 - uDivergenceM1);
+    float Vdiff = (vDivergenceP1 - vDivergenceM1);
+    float Wdiff = (wDivergenceP1 - wDivergenceM1);
 
   float divergence = (scale * Udiff+Vdiff+Wdiff);
 

@@ -24,6 +24,9 @@ void GridEmitter::setupDefaults() {
   auto emitterSphere = make_shared<ImplicitSphere>(name);
   // callPreChunkOp = true;
   sourceVolume = emitterSphere;
+  tileImportType = ETileImportType::raw;
+
+
   // work out chunks to process based on implicit bounding box
   //    int minX = glm::floor(sourceVolume->boundingBox.min.x/chnkSize);
   //    int minY = glm::floor(sourceVolume->boundingBox.min.y/chnkSize);
@@ -99,140 +102,124 @@ void GridEmitter::setupDefaults() {
        << this->boundingBox.fluidMaxY << endl;
   cout << "grid emitter bounds set" << this->boundingBox.fluidMinZ << " to "
        << this->boundingBox.fluidMaxZ << endl;
+
+  bShouldCreateChunk = 0;
+  countCreated = 0;
+  callGridOp = true;
+
+}
+
+void GridEmitter::PreGridOp()
+{
+    countCreated = 0;
+    bShouldCreateChunk = 0;
+
+}
+
+void GridEmitter::GridOp()
+{
+    cout << "count created is " << countCreated << endl;
+}
+
+void GridEmitter::Algorithm(int worldX, int worldY, int worldZ, uint32_t indexX, uint32_t indexY, uint32_t indexZ, const std::vector<float> &inTile, std::vector<float> &outTile, const std::vector<float> &extraTile)
+{
+
+}
+
+void GridEmitter::ProcessTile(const std::vector<float> &inTile, std::vector<float> &outTile, const std::vector<float> &extraTile, glm::i32vec3 chunkId, Chunk *&pointerRefToSource, Chunk *&pointerRefToTarget)
+{
+
+    //std::vector<float> SDFValues(512);
+    bool boolShould = false;
+    //loop through and store emission values(not actually putting them in grid yet
+    for (uint32_t z = 0; z < chnkSize; z++)
+    {//for skipping voxels in thr red black gauss seidel update
+        for (uint32_t y = 0; y < chnkSize; y++)
+        {//can do 1-startvoxel to ping pong between 1 & 0
+            for (uint32_t x = 0; x < chnkSize; x++)
+            {
+
+                //set chunk as processed so we dont process it twice if it has forceInputBoundsIteration making it in the vector twice;
+                //pointerRefToTarget->alreadyProcessedThisIteration = true;
+
+
+                int X = ((chunkId.x * (int)chnkSize) + x);
+                int Y = ((chunkId.y * (int)chnkSize) + y);
+                int Z = ((chunkId.z * (int)chnkSize) + z);
+
+
+
+
+
+
+                // float sampleA = sourceVolume->sampleVolume(glm::vec3(X, Y, Z));
+                float sample = sourceVolume->sampleVolume(glm::vec3(X + 0.5f, Y + 0.5f, Z + 0.5f));//has to be offset by 0.5 because of central differnece ato make sphere sit at 0 (cell centres are at 0.5 on the 'world grid;
+
+
+                outTile[x + (y*chnkSize) + (z*chnkSize*chnkSize) ] = sample;
+                if (sample < bandwidth){
+                    boolShould = true;
+                }
+
+
+            }
+        }
+    }
+
+
+
+    //if weve deteced that there should be emission and also if the chunk doesn't exist then go and create it
+    if ( boolShould && !currentTargetChannelObject->ChunkExists(chunkId.x, chunkId.y, chunkId.z) )//(glm::sqrt(X + Y + Z)) - radius;
+    {
+        //set new target to newly created chunk. this would normally be done in prechunk op but here the creation is dependent on the emission values. since there is no swapping of chunks and we emit directly into same grid, then this isn't an issue
+        pointerRefToTarget = currentTargetChannelObject->CreateChunk(chunkId.x, chunkId.y,
+                                                           chunkId.z);
+        countCreated++;
+
+    }
+
+    //add value
+    for (uint32_t z = 0; z < chnkSize; z++)
+    {//for skipping voxels in thr red black gauss seidel update
+        for (uint32_t y = 0; y < chnkSize; y++)
+        {//can do 1-startvoxel to ping pong between 1 & 0
+            for (uint32_t x = 0; x < chnkSize; x++)
+            {
+                //float sdfValue = SDFValues[x + (y*chnkSize) + (z*chnkSize*chnkSize)];
+                outTile[x + (y*chnkSize) + (z*chnkSize*chnkSize) ] =
+
+                        inTile[x + (y*chnkSize) + (z*chnkSize*chnkSize) ] + (0.4 * when_less_than(outTile[x + (y*chnkSize) + (z*chnkSize*chnkSize) ], 0.0f));
+
+
+
+
+            }
+        }
+    }
+
+
+
+
+
+
+
+           // float newval = addPositiveDifference(outChunk->chunkData[dataIndex],3.0f* glm::abs(glm::simplex(glm::vec3(X/19,Y/19-(currentTime*3.4),Z/19)) ) );
+
 }
 
 //----------------------------------------------
-void GridEmitter::Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelWorldPosition,
-                            Chunk *inChunk, Chunk *outChunk, uint32_t dataIndex,
-                            uint32_t channel, bool internalAccessible)
 
-{
-  // myString <<  "and data is " << inChunk->chunkData[chunkDataIndex] << endl;
-  // inChunk->chunkData[chunkDataIndex] = 5;
-  // myString << " and data is " << inChunk->chunkData[chunkDataIndex] << endl;
-  // float sample =
-  // currentSourceChannelObject->SampleChannelAtPosition(500.5,0.0,0.0000);
-  // myString << "in algo" << endl;
-  //    float sample =
-  //    sourceVolume->sampleVolume(glm::vec3((chunkId.x&(chnkSize-1))+voxelPosition.x,//this
-  //    mod math can be sped up once working with bitwise. because 4 and  are
-  //    power of two we could do & instead of %
-  //                                                        (chunkId.y&(chnkSize-1))+voxelPosition.y,
-  //                                                        (chunkId.z&(chnkSize-1))+voxelPosition.z)
-  //                                                        );
-  //    float sample =
-  //    sourceVolume->sampleVolume(glm::vec3((chunkId.x%(chnkSize))+voxelPosition.x,//this
-  //    mod math can be sped up once working with bitwise. because 4 and  are
-  //    power of two we could do & instead of %
-  //                                                        (chunkId.y%(chnkSize))+voxelPosition.y,
-  //                                                        (chunkId.z%(chnkSize))+voxelPosition.z)
-  //                                                        );
-  // cout << "in chunk algo" << chunkId.x << " " << chunkId.y << " " <<
-  // chunkId.z << endl;
-
-  // cout << voxelPosition.x << ", ";
-  //    float X = ((chunkId.x*(int)chnkSize)+voxelPosition.x);
-
-  //    float Y = ((chunkId.y*(int)chnkSize)+voxelPosition.y);
-
-  //    float Z = ((chunkId.z*(int)chnkSize)+voxelPosition.z);
-
-    float X = voxelWorldPosition.x;
-
-    float Y = voxelWorldPosition.y;
-
-    float Z = voxelWorldPosition.z;
-
-
-
-  // float sampleA = sourceVolume->sampleVolume(glm::vec3(X, Y, Z));
-  float sample =
-      sourceVolume->sampleVolume(glm::vec3(voxelWorldPosition.x  + 0.5f, voxelWorldPosition.y + 0.5f, voxelWorldPosition.z + 0.5f));//has to be offset by 0.5 because of central differnece ato make sphere sit at 0 (cell centres are at 0.5 on the 'world grid;
-
-  if (sample < bandwidth) {
-    if (!currentTargetChannelObject->ChunkExists(chunkId.x, chunkId.y,
-                                                 chunkId.z)) {
-      // do checks to emit
-      // cout << "chunk id is " << chunkId.x <<  " " << chunkId.y << " " <<
-      // chunkId.z << endl;
-
-      //            if ( chunkId.x == 2 && chunkId.y == 2 && chunkId.z == 2){
-      //                            //cout << "222 is being called "  << endl;
-      //                            cout << "222 exists? " << boolalpha <<
-      //                            currentSourceChannelObject->ChunkExists(chunkId.x,
-      //                            chunkId.y, chunkId.z) << endl;
-      //            }
-
-      outChunk = currentTargetChannelObject->CreateChunk(chunkId.x, chunkId.y,
-                                                         chunkId.z);
-      // inChunk->chunkData[dataIndex] = 0;
-      // myString << "empty ptr can creat if I want" << endl;
-
-      //
-
-    }
-
-    else {
-      //                if ( chunkId.x == 2 && chunkId.y == 2 && chunkId.z ==
-      //                2){
-      //                                //cout << "222 is being called "  <<
-      //                                endl;
-      //                                cout << "222 exists? " << boolalpha <<
-      //                                currentSourceChannelObject->ChunkExists(chunkId.x,
-      //                                chunkId.y, chunkId.z) << endl;
-      //                }
-      // myString << "getting chunk" << endl;
-      outChunk =
-          currentTargetChannelObject->GetChunk(chunkId.x, chunkId.y, chunkId.z);
-    }
-
-    // can safely assume chunk exists?
-    // if (inChunk == currentSourceChannelObject->dummyChunk)
-    // cout << "erm DUMMY!" << endl;
-    // myString << "setting valuefor chunk " << chunkId.x << chunkId.y <<
-    // chunkId.z << voxelPosition.x << voxelPosition.y << voxelPosition.z
-    // <<endl;
-    if (sample < 0.0f) {
-      // map_range(sample, -16.0f, -1.0f, 1.0f, 0.1f)
-
-      // map_range(sample, -32.0f, 0.0f, value*0.08, 0.0f)
-      //float value = glm::max(glm::cos(currentTime*1.2), 0.0);
-      if (currentTime < 500) {
-        //outChunk->chunkData[dataIndex] += 0.2f;
-          float newval = addPositiveDifference(outChunk->chunkData[dataIndex],3.0f* glm::abs(glm::simplex(glm::vec3(X/19,Y/19-(currentTime*2.4),Z/19)) ) );
-          //float newval = addPositiveDifference(outChunk->chunkData[dataIndex],3.0f);
-
-        outChunk->chunkData[dataIndex] = newval ;
-      }
-//      else {
-//        outChunk->chunkData[dataIndex] += 0.0f;
-//      }
-      // inChunk->chunkData[dataIndex] =
-      // addPositiveDifference(inChunk->chunkData[dataIndex],0.2  );
-    }
-
-    // else
-    // inChunk->chunkData[dataIndex] += 0.0f;
-
-    // inChunk->chunkData[dataIndex] = chunkId.x;
-  }
-
-  // myString << "running" << endl;
-
-  // write code to emit into grid
-
-  // int threadid  = omp_get_thread_num();
-  // myString << voxelPosition.x<< " " << voxelPosition.y << " "
-  // <<voxelPosition.z << endl;
-  // myString << sample << " thread: " << omp_get_thread_num() << endl;
-  // myString << currentSourceChannelObject->channelInfo.channelName << endl;
-}
 
 float GridEmitter::addPositiveDifference(float inputReference,
                                          float amountToAdd) {
   return glm::max(0.5f,inputReference + (amountToAdd - inputReference));
   //return inputReference + amountToAdd;
 
+}
+
+void GridEmitter::PreChunkOp(Chunk *&inChunk, Chunk *&outChunk, glm::i32vec3 chunkIdSecondary)
+{
+  bShouldCreateChunk = false;
 }
 
 // void GridEmitter::PreChunkOp(Chunk *inChunk, glm::i32vec3 chunkIdSecondary)

@@ -11,5 +11,5 @@ void GridDissipator::Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelPosition,
   // inChunk->chunkData[dataIndex] = glm::max(0.0f ,
   // inChunk->chunkData[dataIndex]-0.08f) ;
   if (inChunk->chunkData[dataIndex] > 0)
-    inChunk->chunkData[dataIndex] -= 0.03f;
+    inChunk->chunkData[dataIndex] -= 0.2f;
 }

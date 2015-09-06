@@ -52,7 +52,7 @@ int main(int argc, char *argv[]) {
   cout << *argv[argc - 1] << endl;
 bool operate = false;
 
- omp_set_num_threads(8);
+ //omp_set_num_threads(4);
   int input, input2;
   SDL_Event keyevent;
   bool eventLoop = true;
@@ -105,7 +105,7 @@ bool operate = false;
 
   pressure->setNodeName(std::string("pressure oper"));
 
-  auto pressuretiled = make_unique<GridTiledPressure>(grid_obj.get(), std::vector<string> {});
+  auto pressuretiled = make_unique<GridTiledPressure>(grid_obj.get());
 pressuretiled->setNodeName(std::string("tiledpress"));
 
   auto projection = make_unique<GridProjection>(grid_obj.get());
@@ -195,6 +195,7 @@ pressuretiled->setNodeName(std::string("tiledpress"));
 
 
     //if (operate){
+
     gridEmit->IterateGrid();
     gridPad->IterateGrid();
 
@@ -204,9 +205,9 @@ pressuretiled->setNodeName(std::string("tiledpress"));
     bouyancy->IterateGrid();
     divergence->IterateGrid();
     pressuretiled->IterateGrid();
-   // pressure->IterateGrid();
+    //pressure->IterateGrid();
 
-    projection->IterateGrid();
+  projection->IterateGrid();
     basicAdvect->IterateGrid();
     basicVelAdvect->IterateGrid();
 
@@ -238,6 +239,7 @@ pressuretiled->setNodeName(std::string("tiledpress"));
     operate = false;
 //    if (grid_obj->simTime > 0.05)
 //        eventLoop = false;
+    //break;
   }
   //}
 

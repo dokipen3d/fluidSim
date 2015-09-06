@@ -64,8 +64,16 @@ void LockFreeHashTable::SetItem(uint32_t key, uintptr_t value) {
     //  break;
 
     if ((prevKey == 0) &&
-        (m_entries[idx].key.compare_exchange_weak(zero, key))) {
+        (m_entries[idx].key.compare_exchange_weak(zero, key)) || (prevKey == key)) {
       itemCount++;
+          uintptr_t oldVal = m_entries[idx].value.load(std::memory_order_relaxed);
+          if (m_entries[idx].value.compare_exchange_weak(oldVal, value)) {
+            // cout << "it worked" << "with val " << value << std::endl;
+          } else {
+            // Transition failed; oldval has changed
+            // We can act “as if” our put() worked but
+            // was immediately stomped over
+          }
 
       break;
     }
@@ -78,14 +86,7 @@ void LockFreeHashTable::SetItem(uint32_t key, uintptr_t value) {
     idx++;
   }
 
-  uintptr_t oldVal = m_entries[idx].value.load(std::memory_order_relaxed);
-  if (m_entries[idx].value.compare_exchange_weak(oldVal, value)) {
-    // cout << "it worked" << "with val " << value << std::endl;
-  } else {
-    // Transition failed; oldval has changed
-    // We can act “as if” our put() worked but
-    // was immediately stomped over
-  }
+
 }
 
 //----------------------------------------------
@@ -181,6 +182,12 @@ bool LockFreeHashTable::KeyExists(uint32_t key) {
 
     //        }
 
+    if (probedKey == 0) {
+      // searching = false;
+      // cout << "nope not here" << endl;
+      return false;
+    }
+
     if (probedKey == key) {
       if ((m_entries[idx].value != 0) &&
           m_entries[idx].value != reinterpret_cast<uintptr_t>(dummy))
@@ -189,11 +196,7 @@ bool LockFreeHashTable::KeyExists(uint32_t key) {
         return false;
     }
 
-    if (probedKey == 0) {
-      // searching = false;
-      // cout << "nope not here" << endl;
-      return false;
-    }
+
 
     // cout << "searching" << endl;
 

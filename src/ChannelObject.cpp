@@ -4,6 +4,7 @@
 #include <atomic>
 #include "glm/vec3.hpp"
 #include "GlobalTypes.hpp"
+#include <algorithm>
 
 #include <iostream>
 
@@ -113,6 +114,7 @@ ChannelObject::ChannelObject(EChannelInfo inInfo, GridObject *parentGrid) {
   // value
   dummyChunk = new Chunk((parentChunkSize * parentChunkSize * parentChunkSize) *
                          channelAmount);
+
   // set a pointer in the hash table to where our dummy data is
   chunks->setDummyItem((void *)dummyChunk);
   getRidOfDivCalc = 1.0f / parentChunkSize;

@@ -10,16 +10,24 @@ using namespace std;
 class GridTiledPressure : public GridTiledOperator
 {
 public:
-    GridTiledPressure(GridObject *inGridObject, std::vector<std::string> inChannelNames) : GridTiledOperator(inGridObject,inChannelNames) {
+    GridTiledPressure(GridObject *inGridObject) : GridTiledOperator(inGridObject) {
       cout << "in GridDivergence Constructor" << endl;
       setupDefaults();
     };
-    #pragma omp declare simd
+
     virtual void Algorithm(int worldX, int worldY, int worldZ,
                            uint32_t indexX, uint32_t indexY, uint32_t indexZ,
                            const std::vector<float>& inTile,
                            std::vector<float>& outTile,
                            const std::vector<float>& extraTile);
+
+    virtual void ProcessTile(const std::vector<float>& inTile,
+                             std::vector<float>& outTile,
+                             const std::vector<float>& extraTile,
+                             glm::i32vec3 chunkId,
+                             Chunk *&pointerRefToSource,
+                             Chunk *&pointerRefToTarget);
+
     virtual void setupDefaults();
     float calcPressure(float a, float b, float c, float d, float e, float f, float g, float h);
 

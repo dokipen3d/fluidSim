@@ -16,7 +16,7 @@ float Absorption = 0.333;
 
 
 const float maxDist = sqrt(2.0);
-const int numSamples = 32;
+const int numSamples = 72;
 const float stepSize = maxDist/float(numSamples);
 const int numLightSamples = 16;
 const float lscale = maxDist / float(numLightSamples);
@@ -98,7 +98,9 @@ void main()
     }
 
     FragColor.rgb = Lo;
-    //FragColor.a = 1-(T)+0.05;
+    //FragColor.rgb = vec3(1);
+
     FragColor.a = 1-(T);
+    //FragColor.a = 1-(T);
 
 }

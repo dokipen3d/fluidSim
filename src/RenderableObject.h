@@ -26,7 +26,7 @@ public:
     // << std::endl;
     gridObjectPtr = inGridObject;
     setupObjects();
-    res = 64;
+    res = 128;
     threeD = new float[res * res * res];
     // fillTexture();
   };

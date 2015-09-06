@@ -257,7 +257,13 @@ void RenderableObject::fillTexture() {
 
                 //sampleObject->SampleTrilinear(posX-0.5, posY-0.5, posZ-0.5, 0)*20.0f;
 
-                glm::abs(sampleObject->SampleTrilinear(posX , posY, posZ, 0))*2.0f;
+                (glm::abs(sampleObject->SampleTrilinear(posX , posY, posZ, 0))*2.0f);
+
+        if (!sampleObject->SampleIsOutsideBounds(posX , posY, posZ, 0)){
+
+             threeD[i + (j * res) + (k * res * res)] += 0.5;
+        }
+
         // cout << sample << " ";
         //}
 

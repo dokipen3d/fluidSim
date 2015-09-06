@@ -17,7 +17,9 @@ glm::float32 ImplicitSphere::sampleVolume(glm::vec3 pos) {
   float Y = pos.y * pos.y;
   float Z = pos.z * pos.z;
 
+  float ret = (glm::sqrt(X + Y + Z)) - radius;
+
   // cout << "sampling" << pos.x << " " << pos.y << " " <<pos.z << endl;
-  return (glm::sqrt(X + Y + Z)) - radius;
+  return ret;
   // return (pos.x*pos.x + pos.y*pos.y + pos.z*pos.z) - radius;
 }

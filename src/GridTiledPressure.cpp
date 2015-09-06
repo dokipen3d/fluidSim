@@ -2,7 +2,6 @@
 #include "ChannelObject.h"
 #include "GridObject.h"
 
-#pragma omp declare simd
 inline static uint32_t flatten3dCoordinatesPaddedTo1D(uint32_t x, uint32_t y,
                                                 uint32_t z,
                                                 uint32_t chunkSize) {
@@ -15,7 +14,6 @@ inline static uint32_t flatten3dCoordinatesPaddedTo1D(uint32_t x, uint32_t y,
                );
 }
 
-#pragma omp declare simd
 inline static uint32_t flattenCoordinatesTo1D(uint32_t x, uint32_t y,
                                                 uint32_t z,
                                                 uint32_t chunkSize) {
@@ -42,10 +40,11 @@ void GridTiledPressure::setupDefaults()
     callGridOp = true;
     callPreChunkOp = true;
     callPostChunkOp = true;
+    copyExtraTile = true;
     scale = 1.0f;
     scaleSquared = -(scale*scale);
     numberOfIterations = 20;
-
+    forceInputBoundsIteration = false;
 
 
 }
@@ -109,14 +108,94 @@ void GridTiledPressure::Algorithm(int worldX, int worldY, int worldZ, uint32_t i
     //const uint32_t index =
 
     outTile[flattenCoordinatesTo1D(indexX, indexY, indexZ,chnkSize)] =
-               (inTile[flatten3dCoordinatesPaddedTo1D(indexX++, indexY, indexZ,chnkSize)]+
-                inTile[flatten3dCoordinatesPaddedTo1D(indexX--, indexY, indexZ,chnkSize)]+
-                inTile[flatten3dCoordinatesPaddedTo1D(indexX, indexY++, indexZ,chnkSize)]+
-                inTile[flatten3dCoordinatesPaddedTo1D(indexX, indexY--, indexZ,chnkSize)]+
-                inTile[flatten3dCoordinatesPaddedTo1D(indexX, indexY, indexZ++,chnkSize)]+
-                inTile[flatten3dCoordinatesPaddedTo1D(indexX, indexY, indexZ--,chnkSize)]+
+               (inTile[flatten3dCoordinatesPaddedTo1D(indexX+1, indexY, indexZ,chnkSize)]+
+                inTile[flatten3dCoordinatesPaddedTo1D(indexX-1, indexY, indexZ,chnkSize)]+
+                inTile[flatten3dCoordinatesPaddedTo1D(indexX, indexY+1, indexZ,chnkSize)]+
+                inTile[flatten3dCoordinatesPaddedTo1D(indexX, indexY-1, indexZ,chnkSize)]+
+                inTile[flatten3dCoordinatesPaddedTo1D(indexX, indexY, indexZ+1,chnkSize)]+
+                inTile[flatten3dCoordinatesPaddedTo1D(indexX, indexY, indexZ-1,chnkSize)]+
                     (extraTile.at(flattenCoordinatesTo1D(indexX, indexY, indexZ,chnkSize))*scaleSquared))/6.0f;
 
+
+
+
+
+}
+
+void GridTiledPressure::ProcessTile(const std::vector<float> &inTile, std::vector<float> &outTile, const std::vector<float> &extraTile, glm::i32vec3 chunkId, Chunk *&pointerRefToSource, Chunk *&pointerRefToTarget)
+{
+
+//  #pragma omp simd collapse(3)
+    for (uint32_t z = 0; z < chnkSize; z++)
+    {//for skipping voxels in thr red black gauss seidel update
+        for (uint32_t y = 0; y < chnkSize; y++)
+        {//can do 1-startvoxel to ping pong between 1 & 0
+            #pragma ivdep
+            for (uint32_t x = 0; x < chnkSize; x++)
+            {//and then do skipAmount = startVoxel+1 in each postgridop
+
+
+                outTile[flattenCoordinatesTo1D(x, y, z,chnkSize)] =
+                           (inTile[flatten3dCoordinatesPaddedTo1D(x+1, y, z,chnkSize)]+
+                            inTile[flatten3dCoordinatesPaddedTo1D(x-1, y, z,chnkSize)]+
+                            inTile[flatten3dCoordinatesPaddedTo1D(x, y+1, z,chnkSize)]+
+                            inTile[flatten3dCoordinatesPaddedTo1D(x, y-1, z,chnkSize)]+
+                            inTile[flatten3dCoordinatesPaddedTo1D(x, y, z+1,chnkSize)]+
+                            inTile[flatten3dCoordinatesPaddedTo1D(x, y, z-1,chnkSize)]+
+                (extraTile.at(flattenCoordinatesTo1D(x, y, z,chnkSize))*scaleSquared))/6.0f;
+
+//                outTile[  x +  (y * 8) + (z*64) ] =
+//                           (inTile[ (x+2) + ((y+1)*10) + ((z+1)*100) ]+
+//                            inTile[ (x) + ((y+1)*10) + ((z+1)*100) ]+
+//                            inTile[ (x+1) + ((y+2)*10) + ((z+1)*100) ]+
+//                            inTile[ (x+1) + ( y*10 ) +  ((z+1)*100) ]+
+//                            inTile[ (x+1) +  ( (y+1)*10 ) + ((z+2)*100) ]+
+//                            inTile[ (x+1) + ( (y+1)*10 ) + ((z)*100) ]+
+//                                (extraTile[  x +  (y * 8) + (z*64) ]*scaleSquared))/6.0f;
+
+//                outTile[x+  (y*8) + (z*8*8)] =
+//                           (inTile[(y)*(8+2) + ((z+1)*(8+2)*(8+2))]+
+//                            inTile[(y+2)*(8+2) + ((z+1)*(8+2)*(8+2))]);
+
+
+          }
+      }
+    }
+
+//    for (int z = 0; z < 8; z++)
+//    {
+//        for (int y = 0; y < 8; y++)
+//        {
+//            const float* inRow = &inTile[( (y+1)*(chnkSize+2) + ((z+1)*(chnkSize+2)*(chnkSize+2)) )];
+//            float* outRow = &outTile[ (y*chnkSize) + (z*chnkSize*chnkSize) ];
+//            const float* extraRow = &extraTile[ (y*chnkSize) + (z*chnkSize*chnkSize) ];
+
+
+
+//            for (int x = 0; x < 8; x++)
+//            {
+//                 outRow[x] = inRow[x] + inRow[x+2];
+//            }
+//        }
+//    }
+
+//        for (int z = 0; z < 8; z++)
+//        {
+//            for (int y = 0; y < 8; y++)
+//            {
+//                for (int x = 0; x < 8; x++)
+//                {
+//                                    outTile[flattenCoordinatesTo1D(x, y, z,chnkSize)] =
+//                                               (inTile[flatten3dCoordinatesPaddedTo1D(x+1, y, z,chnkSize)]+
+//                                                inTile[flatten3dCoordinatesPaddedTo1D(x-1, y, z,chnkSize)]+
+//                                                inTile[flatten3dCoordinatesPaddedTo1D(x, y+1, z,chnkSize)]+
+//                                                inTile[flatten3dCoordinatesPaddedTo1D(x, y-1, z,chnkSize)]+
+//                                                inTile[flatten3dCoordinatesPaddedTo1D(x, y, z+1,chnkSize)]+
+//                                                inTile[flatten3dCoordinatesPaddedTo1D(x, y, z-1,chnkSize)]+
+//                                                    (extraTile.at(flattenCoordinatesTo1D(x, y, z,chnkSize))*scaleSquared))/6.0f;
+//                }
+//            }
+//        }
 
 
 

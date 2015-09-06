@@ -6,6 +6,8 @@
 #include <string>
 #include "glm/fwd.hpp"
 #include "GlobalTypes.hpp"
+#include "GridObject.h"
+
 
 
 class GridObject;
@@ -21,12 +23,11 @@ struct chunkAddresses2 {
 class GridTiledOperator {
 
 public:
-  GridTiledOperator(GridObject *inGridObject, std::vector<std::string> inChannelNames);
+  GridTiledOperator(GridObject *inGridObject);
   virtual ~GridTiledOperator();
 
   virtual void setupDefaults() = 0;
   void SetGridObject(GridObject *inGridObject);
-  #pragma omp declare simd
   virtual void Algorithm(int worldX, int worldY, int worldZ,
                          uint32_t indexX, uint32_t indexY, uint32_t indexZ,
                          const std::vector<float>& inTile,
@@ -35,6 +36,15 @@ public:
                                                 // not be needed but if we write
                                                 // a node that copies into a new
                                                 // grid we need to know where
+
+
+  virtual void ProcessTile(const std::vector<float>& inTile,
+                           std::vector<float>& outTile,
+                           const std::vector<float>& extraTile,
+                           glm::i32vec3 chunkId,
+                           Chunk *&pointerRefToSource,
+                           Chunk *&pointerRefToTarget ) = 0;//handle loop in derived class. take away function from loop to try simd
+
   virtual void IterateGrid();
   virtual void PostChunkOp(Chunk *&inChunk, Chunk *&outChunk,
                            glm::i32vec3 chunkIdSecondary);
@@ -61,6 +71,7 @@ public:
   bool callPreChunkOp = true;
   bool callGridOp = false;
   bool callPostChunkOp = false;
+  bool copyExtraTile = false;
   void refreshSourceAndTargetChannelDetails();
   u_int32_t numberOfIterations = 1;
   int startVoxel = 0;

@@ -19,6 +19,7 @@ public:
   bool justCreatedOneFrameAgo;
   atomic<uint32_t> voxelCount;
   double timeCreated;
+  bool alreadyProcessedThisIteration = false;
 
 private:
 };
