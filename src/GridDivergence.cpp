@@ -41,36 +41,36 @@ void GridDivergence::Algorithm(glm::i32vec3 chunkId, glm::i32vec3 voxelWorldPosi
   float wDivergenceP1;
 
   float uDivergenceM1 = velocitySourceChannelObject->SampleExplicit(X, Y, Z, 0 );
-//  if (velocitySourceChannelObject->SampleIsOutsideBounds(X+1, Y, Z, 0 ))
-//  {
-//    uDivergenceP1 = uDivergenceM1;
-//  }
-//  else
-//  {
+  if (velocitySourceChannelObject->SampleIsOutsideBounds(X+1, Y, Z, 0 ))
+  {
+    uDivergenceP1 = uDivergenceM1;
+  }
+  else
+  {
     uDivergenceP1 = velocitySourceChannelObject->SampleExplicit(X+1, Y, Z, 0 );
-  //}
+  }
 
   float vDivergenceM1 = velocitySourceChannelObject->SampleExplicit(X, Y, Z, 1 );
 
-//  if (velocitySourceChannelObject->SampleIsOutsideBounds(X, Y+1, Z, 1 ))
-//  {
-//    vDivergenceP1 = vDivergenceM1;
-//  }
-//  else
-//  {
+  if (velocitySourceChannelObject->SampleIsOutsideBounds(X, Y+1, Z, 1 ))
+  {
+    vDivergenceP1 = vDivergenceM1;
+  }
+  else
+  {
     vDivergenceP1 = velocitySourceChannelObject->SampleExplicit(X, Y+1, Z, 1);
-  //}
+  }
 
   float wDivergenceM1 = velocitySourceChannelObject->SampleExplicit(X, Y, Z, 2 );
 
-//  if(velocitySourceChannelObject->SampleIsOutsideBounds(X, Y, Z+1, 2 ))
-//  {
-//      wDivergenceP1 = wDivergenceM1;
-//  }
-//  else
-//  {
+  if(velocitySourceChannelObject->SampleIsOutsideBounds(X, Y, Z+1, 2 ))
+  {
+      wDivergenceP1 = wDivergenceM1;
+  }
+  else
+  {
     wDivergenceP1 = velocitySourceChannelObject->SampleExplicit(X, Y, Z+1, 2 );
-  //}
+  }
 
 //  float Udiff = (uDivergenceP1 - uDivergenceM1);
 //  float Vdiff = (vDivergenceP1 - vDivergenceM1);

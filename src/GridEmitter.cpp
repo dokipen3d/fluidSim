@@ -170,6 +170,8 @@ void GridEmitter::ProcessTile(const std::vector<float> &inTile, std::vector<floa
 
     //if weve deteced that there should be emission and also if the chunk doesn't exist then go and create it
     if ( boolShould && !currentTargetChannelObject->ChunkExists(chunkId.x, chunkId.y, chunkId.z) )//(glm::sqrt(X + Y + Z)) - radius;
+   // if ( !currentTargetChannelObject->ChunkExists(chunkId.x, chunkId.y, chunkId.z) )//(glm::sqrt(X + Y + Z)) - radius;
+
     {
         //set new target to newly created chunk. this would normally be done in prechunk op but here the creation is dependent on the emission values. since there is no swapping of chunks and we emit directly into same grid, then this isn't an issue
         pointerRefToTarget = currentTargetChannelObject->CreateChunk(chunkId.x, chunkId.y,
@@ -188,7 +190,7 @@ void GridEmitter::ProcessTile(const std::vector<float> &inTile, std::vector<floa
                 //float sdfValue = SDFValues[x + (y*chnkSize) + (z*chnkSize*chnkSize)];
                 outTile[x + (y*chnkSize) + (z*chnkSize*chnkSize) ] =
 
-                        inTile[x + (y*chnkSize) + (z*chnkSize*chnkSize) ] + (0.4 * when_less_than(outTile[x + (y*chnkSize) + (z*chnkSize*chnkSize) ], 0.0f));
+                        inTile[x + (y*chnkSize) + (z*chnkSize*chnkSize) ] + (0.64 * when_less_than(outTile[x + (y*chnkSize) + (z*chnkSize*chnkSize) ], 0.0f));
 
 
 

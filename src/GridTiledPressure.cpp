@@ -43,7 +43,7 @@ void GridTiledPressure::setupDefaults()
     copyExtraTile = true;
     scale = 1.0f;
     scaleSquared = -(scale*scale);
-    numberOfIterations = 20;
+    numberOfIterations = 50;
     forceInputBoundsIteration = false;
 
 

@@ -80,15 +80,15 @@ bool operate = false;
 
   //auto basicAdvect = make_unique<GridMacCormackAdvect>(grid_obj.get());
 
-  //auto basicAdvect = make_unique<GridRK2Advect>(grid_obj.get());
-  auto basicAdvect = make_unique<GridBasicAdvect>(grid_obj.get());
+  auto basicAdvect = make_unique<GridRK2Advect>(grid_obj.get());
+  //auto basicAdvect = make_unique<GridBasicAdvect>(grid_obj.get());
 
   basicAdvect->setNodeName(std::string("basicAdvect"));
 
   //auto basicVelAdvect = make_unique<GridMacCormackVelAdvect>(grid_obj.get());
 
-  //auto basicVelAdvect = make_unique<GridRK2VelAdvect>(grid_obj.get());
-  auto basicVelAdvect = make_unique<GridBasicVelAdvect>(grid_obj.get());
+  auto basicVelAdvect = make_unique<GridRK2VelAdvect>(grid_obj.get());
+  //auto basicVelAdvect = make_unique<GridBasicVelAdvect>(grid_obj.get());
 
   basicVelAdvect->setNodeName(std::string("basicVelAdvect"));
 
@@ -201,7 +201,7 @@ pressuretiled->setNodeName(std::string("tiledpress"));
 
     //vecEmit->IterateGrid();
 
-    gridDiss->IterateGrid();
+    //gridDiss->IterateGrid();
     bouyancy->IterateGrid();
     divergence->IterateGrid();
     pressuretiled->IterateGrid();

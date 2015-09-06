@@ -147,7 +147,7 @@ void GridTiledOperator::IterateGrid()
     // currentSourceChannelObject->channelInfo.channelName << endl;
     double timeE = omp_get_wtime();
     //SORTING BOUNDS------------------------------------------------------------------------------
-  //  if (!forceInputBoundsIteration){
+    if (!forceInputBoundsIteration){
 
     #pragma omp parallel for collapse(3)
     for (int i = fmx; i <= fMax; i++)
@@ -176,7 +176,7 @@ void GridTiledOperator::IterateGrid()
             }
         }
     }
-  //  }
+    }
     //END OF SORTING BOUNDS------------------------------------------------------------------------------
 
 
@@ -378,10 +378,10 @@ void GridTiledOperator::IterateGrid()
         //END FOR ALL CHUNKS---------------------------------------------------------------------------------
         #pragma omp barrier
 
-        if (callGridOp)
-        {
-           this->GridOp();
-        }
+//        if (callGridOp)
+//        {
+//           this->GridOp();
+//        }
 
 
     }
