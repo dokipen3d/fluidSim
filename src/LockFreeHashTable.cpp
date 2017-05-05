@@ -48,6 +48,7 @@ LockFreeHashTable::~LockFreeHashTable() {
 
 //----------------------------------------------
 
+//have this return a bool if the item allready exists. can then set a pointer from channel object and alocate after
 void LockFreeHashTable::SetItem(uint32_t key, uintptr_t value) {
   //assert(key != 0);
   //assert(value != 0);
@@ -69,6 +70,8 @@ void LockFreeHashTable::SetItem(uint32_t key, uintptr_t value) {
           uintptr_t oldVal = m_entries[idx].value.load(std::memory_order_relaxed);
           if (m_entries[idx].value.compare_exchange_weak(oldVal, value)) {
             // cout << "it worked" << "with val " << value << std::endl;
+            //here is where we would return true to channel object and say its okay for init?
+            //delete old?
           } else {
             // Transition failed; oldval has changed
             // We can act “as if” our put() worked but
